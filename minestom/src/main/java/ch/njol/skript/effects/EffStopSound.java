@@ -40,6 +40,7 @@ public class EffStopSound extends Effect {
 	@Nullable
 	private Expression<Sound.Source> category;
 	private Expression<? extends Audience> targets;
+
 	private boolean allSounds;
 
 	@SuppressWarnings("unchecked")
