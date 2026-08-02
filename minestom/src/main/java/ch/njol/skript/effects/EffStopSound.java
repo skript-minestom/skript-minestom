@@ -22,12 +22,11 @@ import java.util.Locale;
 	"Stops specific sounds, or all sounds, from playing to players or to everybody in an instance.",
 	"If no sound category is provided, the sound is stopped in every category."
 })
-@Examples({
-	"stop sound \"block.chest.open\" for player",
-	"stop sounds \"ambient.cave\" and \"ambient.underwater.loop\" for all players",
-	"stop all sounds in music for player",
-	"stop all sounds in player's instance"
-})
+@Examples("""
+	stop sound "block.chest.open" for player
+	stop sounds "ambient.cave" and "ambient.underwater.loop" for all players
+	stop all sounds in music for player
+	stop all sounds in player's instance""")
 public class EffStopSound extends Effect {
 
 	static {
