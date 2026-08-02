@@ -18,10 +18,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.util.Locale;
 
 @Name("Stop Sound")
-@Description({
-	"Stops specific sounds, or all sounds, from playing to players or to everybody in an instance.",
-	"If no sound category is provided, the sound is stopped in every category."
-})
+@Description("""
+	Stops specific sounds, or all sounds, from playing to players or to everybody in an instance.
+	If no sound category is provided, the sound is stopped in every category""")
 @Examples("""
 	stop sound "block.chest.open" for player
 	stop sounds "ambient.cave" and "ambient.underwater.loop" for all players
