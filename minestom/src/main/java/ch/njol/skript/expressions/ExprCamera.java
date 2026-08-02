@@ -19,7 +19,7 @@ import org.bukkit.event.Event;
 import org.jspecify.annotations.Nullable;
 
 @Name("Camera Target")
-@Description("The camera target of a player. Only available within an instance change effect.")
+@Description("The camera target of a player")
 @Examples("set camera target of player to {_entity}")
 public class ExprCamera extends SimplePropertyExpression<Player, Entity> {
 
