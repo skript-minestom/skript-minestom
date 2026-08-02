@@ -33,7 +33,7 @@ public class EffStopSound extends Effect {
 	static {
 		Skript.registerEffect(EffStopSound.class,
 			"stop (all:all sound[s]|sound[s] %-strings%) [(in|from) %-soundcategory%] (to|for|from playing to) %players%",
-			"stop (all:all sound[s]|sound[s] %-strings%) [(in|from) %-soundcategory%] [in [(world|instance)] %instances%]");
+			"stop (all:all sound[s]|sound[s] %-strings%) [(in|from) %-soundcategory%] [in [(world|instance)[s]] %instances%]");
 	}
 
 	@Nullable
