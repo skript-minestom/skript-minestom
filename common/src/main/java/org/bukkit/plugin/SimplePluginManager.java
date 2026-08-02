@@ -8,7 +8,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,16 +62,8 @@ public class SimplePluginManager implements PluginManager {
 
 	public void callEvent(Event event) {
 		HandlerList handlerList = event.getHandlers();
-		List<RegisteredListener> handlers = new ArrayList<>(handlerList.getRegisteredListeners());
 
-		handlers.sort((a, b) -> {
-			int priorityA = a.getPriority().ordinal();
-			int priorityB = b.getPriority().ordinal();
-
-			return Integer.compare(priorityB, priorityA);
-		});
-
-		for (RegisteredListener handler : handlers) {
+		for (RegisteredListener handler : handlerList.getBakedListeners()) {
 			if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && handler.isIgnoreCancelled())
 				continue;
 			handler.getExecutor().execute(handler.getListener(), event);
