@@ -32,6 +32,7 @@ import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
 import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.PeekingIterator;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -92,7 +93,10 @@ public class SecLoop extends LoopSection {
 	private final transient Map<Event, Object> current = new ConcurrentHashMap<>();
 	private final transient Map<Event, Iterator<?>> iteratorMap = new ConcurrentHashMap<>();
 	private final transient Map<Event, Object> previous = new ConcurrentHashMap<>();
-	private final transient Map<Event, Object> next = Collections.synchronizedMap(new WeakHashMap<>());
+	private final transient Map<Event, Object> next = new MapMaker()
+		.concurrencyLevel(8)
+		.weakKeys()
+		.makeMap();
 
 	protected @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
