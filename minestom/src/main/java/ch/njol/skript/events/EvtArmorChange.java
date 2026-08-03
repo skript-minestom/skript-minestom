@@ -3,6 +3,7 @@ package ch.njol.skript.events;
 import ch.njol.skript.Skript;
 import ch.njol.skript.events.wrapper.EntityEquipWrapper;
 import ch.njol.skript.lang.Literal;
+import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser;
 import net.minestom.server.entity.EquipmentSlot;
