@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Name("Player Chat Completions")
-@Description({
-	"The custom chat completion suggestions. You can add, set, remove, and clear them. Removing the names of online players with this expression is ineffective.",
-	"This expression will not return anything due to server limitations."
-})
+@Description("""
+	The custom chat completion suggestions. You can add, set, remove, and clear them. Removing the names of online players with this expression is ineffective.
+	This expression will not return anything due to server limitations.""")
 @Example("add \"Skript\" and \"Njol\" to chat completions of all players")
 @Example("remove \"text\" from {_p}'s chat completions")
 @Example("clear player's chat completions")

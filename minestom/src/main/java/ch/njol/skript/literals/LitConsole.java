@@ -14,7 +14,8 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Console")
-@Examples("send \"hi console\" to console")
+@Examples("""
+	send "hi console" to console""")
 public class LitConsole extends SimpleLiteral<ConsoleSender> {
 
 	static {

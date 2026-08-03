@@ -13,9 +13,9 @@ import net.minestom.server.coordinate.Point;
 
 @Name("XYZ Component")
 @Description("Gets or changes the x, y or z component of a point.")
-@Examples({
-	"set {_v} to vector(1, 2, 3)",
-	"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\""})
+@Examples("""
+	set {_v} to vector(1, 2, 3)
+	send "%x of {_v}%, %y of {_v}%, %z of {_v}%\"""")
 @Since("2.2-dev28")
 public class ExprPointXYZ extends SimplePropertyExpression<Point, Number> {
 

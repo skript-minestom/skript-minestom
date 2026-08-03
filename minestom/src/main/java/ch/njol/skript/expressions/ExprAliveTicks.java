@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Alive Ticks")
 @Description("The number of ticks an entity has been alive.")
-@Examples("broadcast \"%alive ticks of player%\"")
+@Examples("""
+	broadcast "%alive ticks of player%\"""")
 public class ExprAliveTicks extends SimplePropertyExpression<Entity, Long> {
 
 	static {

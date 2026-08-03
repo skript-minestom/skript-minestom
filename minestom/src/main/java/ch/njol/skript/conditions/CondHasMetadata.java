@@ -16,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Has Metadata")
 @Description("Checks whether taggable objects have the given metadata tags.")
-@Examples("player has the metadata tag \"frozen\"")
+@Examples("""
+	player has the metadata tag "frozen\"""")
 public class CondHasMetadata extends Condition {
 
 	static {

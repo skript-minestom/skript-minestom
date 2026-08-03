@@ -17,11 +17,12 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Peter Güttinger
  */
 @Name("Position")
-@Description({"The position of a block or entity. This not only represents the x, y and z coordinates of the position but also includes the world and the direction an entity is looking " +
-	"(e.g. teleporting to a saved position will make the teleported entity face the same saved direction every time).",
-	"Please note that the position of an entity is at it's feet, use <a href='#ExprEyePoint'>head position</a> to get the position of the head."})
-@Examples({"set {home::%uuid of player%} to player's position",
-	"message \"Your home was set to %player's position% in %instance of player%.\""})
+@Description("""
+	The position of a block or entity. This not only represents the x, y and z coordinates of the position but also includes the world and the direction an entity is looking (e.g. teleporting to a saved position will make the teleported entity face the same saved direction every time).
+	Please note that the position of an entity is at it's feet, use <a href='#ExprEyePoint'>head position</a> to get the position of the head.""")
+@Examples("""
+	set {home::%uuid of player%} to player's position
+	message "Your home was set to %player's position% in %instance of player%.\"""")
 @Since("")
 public class ExprPositionOf extends PropertyExpression<Point, Point> {
 

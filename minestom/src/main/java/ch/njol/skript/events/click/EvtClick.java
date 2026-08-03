@@ -36,16 +36,18 @@ public class EvtClick extends SkriptEvent {
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				  "[(" + RIGHT + ":right|" + LEFT + ":left)(| |-)][mouse(| |-)]click[ing] [on %-entitytypes/blocks%] [(with|using|holding) %-items%]",
 				  "[(" + RIGHT + ":right|" + LEFT + ":left)(| |-)][mouse(| |-)]click[ing] (with|using|holding) %items% on %entitytypes/blocks%")
-			  .description("Called when a user clicks on a block, an entity or air with or without an item in their hand.",
-				  "Please note that rightclick events with an empty hand while not looking at a block are not sent to the server, so there's no way to detect them.",
-				  "Also note that a leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event.")
-			  .examples("on click:",
-				  "on rightclick holding fishing rod:",
-				  "on leftclick on stone or obsidian:",
-				  "on rightclick on creeper:",
-				  "on click with a sword:",
-				  "on click on chest[facing=north]:",
-				  "on click on campfire[lit=true]:")
+			  .description("""
+			  	Called when a user clicks on a block, an entity or air with or without an item in their hand.
+			  	Please note that rightclick events with an empty hand while not looking at a block are not sent to the server, so there's no way to detect them.
+			  	Also note that a leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event.""")
+			  .examples("""
+			  	on click:
+			  	on rightclick holding fishing rod:
+			  	on leftclick on stone or obsidian:
+			  	on rightclick on creeper:
+			  	on click with a sword:
+			  	on click on chest[facing=north]:
+			  	on click on campfire[lit=true]:""")
 			  .since("1.0, 2.10 (blockdata)");
 	}
 

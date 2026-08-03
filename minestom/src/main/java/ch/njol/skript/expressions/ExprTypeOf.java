@@ -28,14 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Name("Type of")
-@Description({
-	"Type of a block, item, entity, inventory, potion effect or enchantment type.",
-	"Types of items, blocks and block datas are item types similar to them but have amounts",
-	"of one, no display names and, on Minecraft 1.13 and newer versions, are undamaged.",
-	"Types of entities and inventories are entity types and inventory types known to Skript.",
-	"Types of potion effects are potion effect types.",
-	"Types of enchantment types are enchantments."
-})
+@Description("""
+	Type of a block, item, entity, inventory, potion effect or enchantment type.
+	Types of items, blocks and block datas are item types similar to them but have amounts
+	of one, no display names and, on Minecraft 1.13 and newer versions, are undamaged.
+	Types of entities and inventories are entity types and inventory types known to Skript.
+	Types of potion effects are potion effect types.
+	Types of enchantment types are enchantments.""")
 @Example("""
 	on rightclick on an entity:
 		message "This is a %type of clicked entity%!"

@@ -18,7 +18,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Kick")
 @Description("Kicks the given players from the server with an optional message. During a connect event, kicks the connecting player through that event instead.")
-@Examples("kick player due to \"You have been banned\"")
+@Examples("""
+	kick player due to "You have been banned\"""")
 public class EffKick extends Effect {
 
 	static {

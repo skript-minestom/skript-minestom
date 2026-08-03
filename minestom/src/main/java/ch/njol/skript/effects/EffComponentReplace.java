@@ -20,7 +20,8 @@ import java.util.regex.Pattern;
 
 @Name("Component Replace")
 @Description("Replaces text in adventure components in place. Optionally replaces only the first occurrence or uses regex matching.")
-@Examples("component replace \"foo\" in {_component} with \"bar\"")
+@Examples("""
+	component replace "foo" in {_component} with "bar\"""")
 public class EffComponentReplace extends Effect {
 
 	private static final TextReplacementConfig.Condition ONLY_ONE_REPLACEMENT = (_, _, replaced) -> {

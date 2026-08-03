@@ -13,7 +13,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Ping")
 @Description("A player's network latency in milliseconds. Is able to be spoofed as well, but will be overridden when the server is pinged.")
-@Examples("broadcast \"Ping: %ping of player%\"")
+@Examples("""
+	broadcast "Ping: %ping of player%\"""")
 public class ExprPing extends SimplePropertyExpression<Player, Integer> {
 
 	static {

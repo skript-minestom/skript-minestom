@@ -22,7 +22,8 @@ import static ch.njol.skript.effects.EffOpenInventory.getDefaultTitle;
 
 @Name("New Inventory")
 @Description("An expression to create a new inventory.")
-@Examples("set {_inv} to new chest 3 row inventory named mm(\"<red>bob\")")
+@Examples("""
+	set {_inv} to new chest 3 row inventory named mm("<red>bob")""")
 public class ExprNewInventory extends SimpleExpression<AbstractInventory>{
 
 	static {

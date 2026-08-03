@@ -14,7 +14,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Chunk Coordinate")
 @Description("The x or z coordinate of a chunk.")
-@Examples("broadcast \"Chunk X: %chunk x of chunk at player%\"")
+@Examples("""
+	broadcast "Chunk X: %chunk x of chunk at player%\"""")
 public class ExprChunkCoordinate extends PropertyExpression<Chunk, Integer> {
 
 	static {

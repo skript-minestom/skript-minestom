@@ -14,11 +14,13 @@ public class EvtBlockBreak extends SkriptEvent {
 	static {
 		Skript.registerEvent("Player Block Break", EvtBlockBreak.class, PlayerBlockBreakWrapper.class,
 			"[block] (break[ing]|min(e|ing)) [[of] %-blocks%]")
-			.description("Called when a player breaks a block.",
-				"Optionally specify one or more block types to only listen for those blocks.")
-			.examples("on block break:",
-				"on block break of stone:",
-				"on mining of diamond ore or deepslate diamond ore:");
+			.description("""
+				Called when a player breaks a block.
+				Optionally specify one or more block types to only listen for those blocks.""")
+			.examples("""
+				on block break:
+				on block break of stone:
+				on mining of diamond ore or deepslate diamond ore:""");
 	}
 
 	@Nullable

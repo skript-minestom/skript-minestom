@@ -19,7 +19,8 @@ import java.util.Arrays;
 
 @Name("Item with Lore")
 @Description("An item with a specific lore.")
-@Examples("give player stone with lore \"First line\" and \"Second line\"")
+@Examples("""
+	give player stone with lore "First line" and "Second line\"""")
 public class ExprItemWithLore extends SimpleExpression<Item> {
 
 	static {

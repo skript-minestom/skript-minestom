@@ -21,8 +21,9 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @Name("Point")
 @Description("The position where an event happened (e.g. at an entity or block), or a location <a href='#ExprDirection'>relative</a> to another (e.g. 1 meter above another location).")
-@Examples({"drop 5 apples at the event-position # exactly the same as writing 'drop 5 apples'",
-	"set {_loc} to the position 1 meter above the player"})
+@Examples("""
+	drop 5 apples at the event-position # exactly the same as writing 'drop 5 apples'
+	set {_loc} to the position 1 meter above the player""")
 @Since("2.0")
 public class ExprPosition extends WrapperExpression<Point> {
 	static {

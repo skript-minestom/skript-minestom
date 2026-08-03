@@ -10,7 +10,8 @@ import net.minestom.server.coordinate.Vec;
 
 @Name("Vectors - Length")
 @Description("Gets or sets the length of a vector.")
-@Examples("send \"%standard length of vector 1, 2, 3%\"")
+@Examples("""
+	send "%standard length of vector 1, 2, 3%\"""")
 @Since("2.2-dev28")
 public class ExprVectorLength extends SimplePropertyExpression<Vec, Number> {
 

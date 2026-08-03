@@ -18,11 +18,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Vectors - Spherical Shape")
 @Description("Forms a 'spherical shaped' vector using yaw and pitch to manipulate the current point.")
-@Examples({
-	"loop 360 times:",
-	"\tset {_v} to spherical vector radius 1, yaw loop-value, pitch loop-value",
-	"set {_v} to spherical vector radius 1, yaw 45, pitch 90"
-})
+@Examples("""
+	loop 360 times:
+		set {_v} to spherical vector radius 1, yaw loop-value, pitch loop-value
+	set {_v} to spherical vector radius 1, yaw 45, pitch 90""")
 @Since("2.2-dev28")
 public class ExprVectorSpherical extends SimpleExpression<Vec> {
 

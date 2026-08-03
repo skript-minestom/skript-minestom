@@ -13,7 +13,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Player Skin")
 @Description("The skin of a player.")
-@Examples("set skin of player to skin from \"jeb_\"")
+@Examples("""
+	set skin of player to skin from "jeb_\"""")
 public class ExprPlayerSkin extends SimplePropertyExpression<Player, PlayerSkin> {
 
 	static {

@@ -19,11 +19,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Play Sound")
 @Description("Plays a sound at a certain location, for certain players, or from an entity.")
-@Examples({
-	"play sound \"entity.player.levelup\" at player to all players",
-	"play sound \"ambient.cave\" at vector(10, 64, 10) in player's instance",
-	"play sound \"entity.villager.ambient\" from {_entity} to player # makes the sound follow the provided entity"
-})
+@Examples("""
+	play sound "entity.player.levelup" at player to all players
+	play sound "ambient.cave" at vector(10, 64, 10) in player's instance
+	play sound "entity.villager.ambient" from {_entity} to player # makes the sound follow the provided entity""")
 public class EffPlaySound extends Effect {
 
 	static {

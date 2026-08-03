@@ -27,11 +27,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Use Item")
 @Description("Makes living entities begin, stop, or complete using an item in their hand. Dispatches the corresponding Minestom item use events for players.")
-@Examples({
-	"make player begin using item",
-	"make player stop using active item",
-	"make player complete using active item"
-})
+@Examples("""
+	make player begin using item
+	make player stop using active item
+	make player complete using active item""")
 public class EffUseItem extends Effect {
 
 	static {

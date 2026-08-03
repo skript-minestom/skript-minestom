@@ -21,7 +21,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Send Notification")
 @Description("Sends an advancement-style notification to the given players with a frame type, title, and icon item.")
-@Examples("send task notification with title \"Quest Complete!\" and diamond as the icon to player")
+@Examples("""
+	send task notification with title "Quest Complete!" and diamond as the icon to player""")
 public class EffSendNotification extends Effect {
 
 	static {

@@ -16,10 +16,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Event Cancelled")
 @Description("Checks whether or not the event is cancelled.")
-@Examples({"on click:",
-	"\tif event is cancelled:",
-	"\t\tbroadcast \"no clicks allowed!\""
-})
+@Examples("""
+	on click:
+		if event is cancelled:
+			broadcast "no clicks allowed!\"""")
 @Since("2.2-dev36")
 public class CondCancelled extends Condition {
 

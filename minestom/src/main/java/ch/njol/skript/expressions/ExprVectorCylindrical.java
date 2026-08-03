@@ -18,11 +18,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Vectors - Cylindrical Shape")
 @Description("Forms a 'cylindrical shaped' vector using yaw to manipulate the current point.")
-@Examples({
-	"loop 360 times:",
-	"\tset {_v} to cylindrical vector radius 1, yaw loop-value, height 2",
-	"set {_v} to cylindrical vector radius 1, yaw 90, height 2"
-})
+@Examples("""
+	loop 360 times:
+		set {_v} to cylindrical vector radius 1, yaw loop-value, height 2
+	set {_v} to cylindrical vector radius 1, yaw 90, height 2""")
 @Since("2.2-dev28")
 public class ExprVectorCylindrical extends SimpleExpression<Vec> {
 

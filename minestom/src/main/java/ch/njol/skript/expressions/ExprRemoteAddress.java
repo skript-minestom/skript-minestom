@@ -21,7 +21,8 @@ import static ch.njol.skript.expressions.ExprProtocolVersion.verifyMOTDEvent;
 
 @Name("Remote Address")
 @Description("A player's IP address or remote address.")
-@Examples("broadcast \"%ip of player%\"")
+@Examples("""
+	broadcast "%ip of player%\"""")
 public class ExprRemoteAddress extends SimpleExpression<String> {
 
 	static {

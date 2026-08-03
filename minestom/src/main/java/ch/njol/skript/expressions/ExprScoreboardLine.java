@@ -25,7 +25,8 @@ import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 
 @Name("Scoreboard Line")
 @Description("A specific line of a sidebar/scoreboard.")
-@Examples("set line 1 of player's sidebar to \"Welcome!\"")
+@Examples("""
+	set line 1 of player's sidebar to "Welcome!\"""")
 public class ExprScoreboardLine extends SimpleExpression<ComponentWrapper> {
 
 	static {

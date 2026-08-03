@@ -21,18 +21,16 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Name("Teleport")
-@Description({
-	"Teleports one or more entities to a location.",
-	"Optionally specify an instance to move entities into a different world.",
-	"Use 'sync' to wait for each teleport to finish before continuing.",
-	"An optional subsection runs once the teleport completes."
-})
-@Examples({
-	"teleport player to vector(0, 64, 0):",
-	"    broadcast \"Player arrived!\"",
-	"teleport {_entity} to {_loc} in instance {_instance} sync:",
-	"    set health of entity to 20"
-})
+@Description("""
+	Teleports one or more entities to a location.
+	Optionally specify an instance to move entities into a different world.
+	Use 'sync' to wait for each teleport to finish before continuing.
+	An optional subsection runs once the teleport completes.""")
+@Examples("""
+	teleport player to vector(0, 64, 0):
+	    broadcast "Player arrived!"
+	teleport {_entity} to {_loc} in instance {_instance} sync:
+	    set health of entity to 20""")
 public class EffSecTeleport extends EffectSection {
 
 	static {

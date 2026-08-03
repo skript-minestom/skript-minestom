@@ -15,12 +15,9 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Is Within")
-@Description({
-	"Whether a point is within something else. The \"something\" can be a block, an entity, a chunk, a world, " +
-		"or a cuboid formed by two other points.",
-	"Note that using the <a href='#CondCompare'>is between</a> condition will refer to a straight line " +
-		"between points, while this condition will refer to the cuboid between points."
-})
+@Description("""
+	Whether a point is within something else. The "something" can be a block, an entity, a chunk, a world, or a cuboid formed by two other points.
+	Note that using the <a href='#CondCompare'>is between</a> condition will refer to a straight line between points, while this condition will refer to the cuboid between points.""")
 @Examples("""
 	if player's position is within {_loc1} and {_loc2}:
 		send "You are in a PvP zone!" to player

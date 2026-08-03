@@ -22,7 +22,9 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Fill Chunk")
 @Description("Fills a chunk or a portion of it with a specific block within a chunk generator.")
-@Examples({"fill chunk with stone", "fill chunk between y levels 0 and 64 with water"})
+@Examples("""
+	fill chunk with stone
+	fill chunk between y levels 0 and 64 with water""")
 public class EffFillChunk extends Effect implements EventRestrictedSyntax {
 
 	static {

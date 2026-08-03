@@ -24,13 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 
 @Name("Title - Send")
-@Description({
-	"Sends a title and/or subtitle to an audience with an optional fade in, stay, and/or fade out time.",
-	"If sending only the subtitle, it will only be shown if the audience currently has a title displayed. "
-		+ "Otherwise, it will be shown when the audience is next shown a title.",
-	"Additionally, if no input is given for the times, the previous times of the last sent title will be used (or default values). "
-		+ "Use the <a href='#EffResetTitle'>reset title</a> effect to restore the default values for the times."
-})
+@Description("""
+	Sends a title and/or subtitle to an audience with an optional fade in, stay, and/or fade out time.
+	If sending only the subtitle, it will only be shown if the audience currently has a title displayed. Otherwise, it will be shown when the audience is next shown a title.
+	Additionally, if no input is given for the times, the previous times of the last sent title will be used (or default values). Use the <a href='#EffResetTitle'>reset title</a> effect to restore the default values for the times.""")
 @Example("send title \"Competition Started\" with subtitle \"Have fun, Stay safe!\" to player for 5 seconds")
 @Example("send title \"Hi %player%\" to player")
 @Example("send title \"Loot Drop\" with subtitle \"starts in 3 minutes\" to all players")

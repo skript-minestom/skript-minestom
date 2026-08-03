@@ -15,13 +15,15 @@ public class EvtAttack extends SkriptEvent {
 	static {
 		Skript.registerEvent("Entity Attack", EvtAttack.class, EntityAttackWrapper.class,
 			"(%-entitytypes%|entity) attack [on %-entitytypes%]")
-			.description("Called when one entity attacks another.",
-				"The attacking entity can be referred to as 'attacker' and the entity being attacked as 'victim'.",
-				"Optionally filter by the attacker's entity type and/or the victim's entity type.")
-			.examples("on entity attack:",
-				"on player attack:",
-				"on zombie attack on villager:",
-				"on entity attack on player:");
+			.description("""
+				Called when one entity attacks another.
+				The attacking entity can be referred to as 'attacker' and the entity being attacked as 'victim'.
+				Optionally filter by the attacker's entity type and/or the victim's entity type.""")
+			.examples("""
+				on entity attack:
+				on player attack:
+				on zombie attack on villager:
+				on entity attack on player:""");
 	}
 
 	@Nullable

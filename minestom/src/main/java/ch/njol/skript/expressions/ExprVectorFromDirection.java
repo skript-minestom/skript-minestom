@@ -17,17 +17,15 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Vectors - Create from Direction")
-@Description({
-	"Creates vectors from given directions.",
-	"Relative directions are relative to the origin, (0, 0, 0). Therefore, the vector from the direction 'forwards' is (0, 0, 1)."
-})
-@Examples({
-	"set {_v} to vector from direction upwards",
-	"set {_v} to vector in direction of player",
-	"set {_v} to vector in horizontal direction of player",
-	"set {_v} to vector from facing of player",
-	"set {_v::*} to vectors from north, south, east, and west"
-})
+@Description("""
+	Creates vectors from given directions.
+	Relative directions are relative to the origin, (0, 0, 0). Therefore, the vector from the direction 'forwards' is (0, 0, 1).""")
+@Examples("""
+	set {_v} to vector from direction upwards
+	set {_v} to vector in direction of player
+	set {_v} to vector in horizontal direction of player
+	set {_v} to vector from facing of player
+	set {_v::*} to vectors from north, south, east, and west""")
 @Since("2.8.0")
 public class ExprVectorFromDirection extends SimpleExpression<Vec> {
 

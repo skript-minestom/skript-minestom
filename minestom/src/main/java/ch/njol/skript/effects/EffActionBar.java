@@ -16,7 +16,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Action Bar")
 @Description("Sends an action bar to the given players.")
-@Examples("send action bar \"Hello World!\" to all players")
+@Examples("""
+	send action bar "Hello World!" to all players""")
 public class EffActionBar extends Effect {
 
 	static {

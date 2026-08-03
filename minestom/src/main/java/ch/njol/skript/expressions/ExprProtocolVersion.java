@@ -24,7 +24,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Protocol Version")
 @Description("A player's protocol version, or the protocol version in a server list ping event.")
-@Examples("broadcast \"Version: %protocol version of player%\"")
+@Examples("""
+	broadcast "Version: %protocol version of player%\"""")
 public class ExprProtocolVersion extends SimpleExpression<Object> {
 
 	static {

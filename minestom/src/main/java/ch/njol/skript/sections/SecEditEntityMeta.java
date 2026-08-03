@@ -20,11 +20,10 @@ import java.util.List;
 
 @Name("Edit Entity Meta")
 @Description("Edits the metadata of one or more entities. Unnecessary unless you want entity meta to apply in one packet.")
-@Examples({
-	"edit meta of {_zombie}:",
-	"    set name of entity to \"New Name\"",
-	"    set custom name visibility of entity to true"
-})
+@Examples("""
+	edit meta of {_zombie}:
+	    set name of entity to "New Name"
+	    set custom name visibility of entity to true""")
 public class SecEditEntityMeta extends Section {
 
 	static {

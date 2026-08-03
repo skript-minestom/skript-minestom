@@ -15,16 +15,14 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.util.List;
 
 @Name("Run at End of Tick")
-@Description({
-	"Schedules the code inside this section to run at the end of the current server tick.",
-	"Local variables from the current scope are preserved."
-})
-@Examples({
-	"schedule to run at the end of the tick:",
-	"    broadcast \"End of tick!\"",
-	"run by end of tick:",
-	"    delete {temp::*}"
-})
+@Description("""
+	Schedules the code inside this section to run at the end of the current server tick.
+	Local variables from the current scope are preserved.""")
+@Examples("""
+	schedule to run at the end of the tick:
+	    broadcast "End of tick!"
+	run by end of tick:
+	    delete {temp::*}""")
 public class SecRunEndOfTick extends Section {
 
 	static {

@@ -13,7 +13,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Instance/World")
 @Description("The instance an entity is in.")
-@Examples("broadcast \"%instance of player%\"")
+@Examples("""
+	broadcast "%instance of player%\"""")
 public class ExprInstance extends SimplePropertyExpression<Entity, Instance> {
 
 	static {

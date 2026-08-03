@@ -28,10 +28,9 @@ import java.util.Set;
 @Description("""
 	Draws particles at the given locations for specific players or everyone in specified instances. Either players or an instance must be provided.
 	See ExprParticle for more particle customization""")
-@Examples({
-	"draw 10 of flame at player for player",
-	"draw 5 of smoke at player's position in player's instance with speed 0.5"
-})
+@Examples("""
+	draw 10 of flame at player for player
+	draw 5 of smoke at player's position in player's instance with speed 0.5""")
 public class EffParticle extends Effect {
 
 	static {

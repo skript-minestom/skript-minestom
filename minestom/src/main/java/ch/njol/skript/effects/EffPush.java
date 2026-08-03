@@ -21,8 +21,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 @Name("Push")
-@Description({"Push entities in a given direction or towards a specific point.",
-	"Velocity values on Minestom are 1/20th (20 ticks per second is why) the value of Paper's."})
+@Description("""
+	Push entities in a given direction or towards a specific point.
+	Velocity values on Minestom are 1/20th (20 ticks per second is why) the value of Paper's.""")
 @Example("push the player upwards")
 @Example("push the victim downwards at speed 0.5")
 @Example("push player towards player's target at speed 2")

@@ -13,11 +13,13 @@ public class EvtSpawn extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Entity Spawn", EvtSpawn.class, EntitySpawnWrapper.class, "[%-entitytypes%] spawn[ing]")
-			.description("Called when an entity spawns in an instance.",
-				"Optionally specify one or more entity types to only listen for those entities.")
-			.examples("on spawn:",
-				"on zombie spawn:",
-				"on creeper or skeleton spawning:");
+			.description("""
+				Called when an entity spawns in an instance.
+				Optionally specify one or more entity types to only listen for those entities.""")
+			.examples("""
+				on spawn:
+				on zombie spawn:
+				on creeper or skeleton spawning:""");
 	}
 
 	@Nullable

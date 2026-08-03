@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Entity ID")
 @Description("The network entity ID of an entity.")
-@Examples("broadcast \"ID: %entity id of player%\"")
+@Examples("""
+	broadcast "ID: %entity id of player%\"""")
 public class ExprEntityId extends SimplePropertyExpression<Entity, Integer> {
 
 	static {

@@ -12,10 +12,9 @@ import java.util.Locale;
 import java.util.function.Function;
 
 @Name("Alpha/Red/Green/Blue RGBLike Value")
-@Description({
-	"The alpha, red, green, or blue value of colors. Ranges from 0 to 255.",
-	"Alpha represents opacity."
-})
+@Description("""
+	The alpha, red, green, or blue value of colors. Ranges from 0 to 255.
+	Alpha represents opacity.""")
 @Example("broadcast red value of rgb(100, 0, 50) # sends '100'")
 @Example("set {_red} to red's red value + 10")
 @Keywords({"ARGB", "RGB", "color", "colour"})

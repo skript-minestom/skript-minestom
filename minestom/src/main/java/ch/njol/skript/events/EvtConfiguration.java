@@ -15,12 +15,14 @@ public class EvtConfiguration extends SkriptEvent {
 	static {
 		Skript.registerEvent("Configuration / First Configuration", EvtConfiguration.class, AsyncPlayerConfigurationWrapper.class,
 			"[:first] [player] config[ur(e|ation)]")
-			.description("Called while a player is being configured asynchronously before they spawn into an instance.",
-				"This is the point at which the spawning instance can be changed.",
-				"Use 'first' to only listen for a player's initial configuration in a session.")
-			.examples("on player configuration:",
-				"on first player configuration:",
-				"on configuration:");
+			.description("""
+				Called while a player is being configured asynchronously before they spawn into an instance.
+				This is the point at which the spawning instance can be changed.
+				Use 'first' to only listen for a player's initial configuration in a session.""")
+			.examples("""
+				on player configuration:
+				on first player configuration:
+				on configuration:""");
 	}
 
 	private boolean first;

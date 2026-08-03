@@ -19,7 +19,8 @@ import static ch.njol.skript.util.VectorMath.RAD_TO_DEG;
 
 @Name("Vectors - Angle Between")
 @Description("Gets the angle between two vectors.")
-@Examples("send \"%the angle between vector 1, 0, 0 and vector 0, 1, 1%\"")
+@Examples("""
+	send "%the angle between vector 1, 0, 0 and vector 0, 1, 1%\"""")
 @Since("2.2-dev28")
 public class ExprVectorAngleBetween extends SimpleExpression<Number> {
 

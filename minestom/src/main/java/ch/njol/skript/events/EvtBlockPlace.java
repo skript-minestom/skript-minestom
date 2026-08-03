@@ -14,11 +14,13 @@ public class EvtBlockPlace extends SkriptEvent {
 	static {
 		Skript.registerEvent("Player Block Place", EvtBlockPlace.class, PlayerBlockPlaceWrapper.class,
 			"[block] plac(e|ing) [[of] %-blocks%]")
-			.description("Called when a player places a block.",
-				"Optionally specify one or more block types to only listen for those blocks.")
-			.examples("on block place:",
-				"on block placing of oak planks:",
-				"on placing of chest or trapped chest:");
+			.description("""
+				Called when a player places a block.
+				Optionally specify one or more block types to only listen for those blocks.""")
+			.examples("""
+				on block place:
+				on block placing of oak planks:
+				on placing of chest or trapped chest:""");
 	}
 
 	@Nullable

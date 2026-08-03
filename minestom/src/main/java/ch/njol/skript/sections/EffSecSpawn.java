@@ -28,13 +28,12 @@ import java.util.concurrent.CompletableFuture;
 
 @Name("Spawn Entity")
 @Description("Spawns one or more entities at a location.")
-@Examples({
-	"spawn living zombie at player's position:",
-	"    before spawn:",
-	"        set name of entity to \"Custom Zombie\"",
-	"    after spawn:",
-	"        broadcast \"Zombie spawned!\""
-})
+@Examples("""
+	spawn living zombie at player's position:
+	    before spawn:
+	        set name of entity to "Custom Zombie"
+	    after spawn:
+	        broadcast "Zombie spawned!\"""")
 public class EffSecSpawn extends EffectSection {
 
 	private static final EntryValidator ENTRY_VALIDATOR;

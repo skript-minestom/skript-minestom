@@ -28,7 +28,8 @@ import java.io.IOException;
 
 @Name("MOTD Icon")
 @Description("The favicon image in the server list ping event.")
-@Examples("set motd favicon to image from file \"server-icon.png\"")
+@Examples("""
+	set motd favicon to image from file "server-icon.png\"""")
 public class ExprMOTDIcon extends SimpleExpression<BufferedImage> implements EventRestrictedSyntax {
 
 	static {

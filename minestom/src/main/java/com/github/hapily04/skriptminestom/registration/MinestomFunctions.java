@@ -113,7 +113,8 @@ public class MinestomFunctions {
 				TagResolver[] resolvers = (TagResolver[]) params[1];
 				return new ComponentWrapper[]{toWrapper(BASIC_MINI_MESSAGE.deserialize(input, resolvers))};
 			}
-		}).description("Deserializes a MiniMessage string into a Component, with optional tag resolvers.").examples("send mm(\"<red>Hello <name>!\", resolver(\"name\", player's name))");
+		}).description("Deserializes a MiniMessage string into a Component, with optional tag resolvers.").examples("""
+			send mm("<red>Hello <name>!", resolver("name", player's name))""");
 		Functions.registerFunction(new JavaFunction<>("suggestionEntry", new Parameter[]{
 			new Parameter<>("entry", DefaultClasses.STRING, true, null),
 			new Parameter<>("tooltip", Classes.getExactClassInfo(ComponentWrapper.class), true, null) // todo provide default value of null
@@ -161,10 +162,9 @@ public class MinestomFunctions {
 					 }
 				 }).description("Returns a RGB color from the given red, green and blue parameters. Alpha values can be added optionally, " +
 					 "but these only take affect in certain situations, like text display backgrounds.")
-				 .examples(
-					 "dye player's leggings rgb(120, 30, 45)",
-					 "set the colour of a text display to rgb(10, 50, 100, 50)"
-				 )
+				 .examples("""
+				 	dye player's leggings rgb(120, 30, 45)
+				 	set the colour of a text display to rgb(10, 50, 100, 50)""")
 				 .since("2.5, 2.10 (alpha)");
 
 		// Particle Data
@@ -262,7 +262,8 @@ public class MinestomFunctions {
 				if (value instanceof ComponentLike c) return CollectionUtils.array(Placeholder.component(name, c));
 				return new TagResolver[0];
 			}
-		}).description("Creates a MiniMessage tag resolver.").examples("set {_resolver} to resolver(\"name\", player's name)");
+		}).description("Creates a MiniMessage tag resolver.").examples("""
+			set {_resolver} to resolver("name", player's name)""");
 		Functions.registerFunction(new SimpleJavaFunction<>("player", new Parameter[]{
 			new Parameter<>("from", DefaultClasses.STRING, true, null),
 			new Parameter<>("strict", DefaultClasses.BOOLEAN, true, new SimpleLiteral<>(false, true))
@@ -274,10 +275,12 @@ public class MinestomFunctions {
 				boolean strict = (boolean) params[1][0];
 				return new Player[]{findPlayer(input, strict)};
 			}
-		}).description("Find an online player from their username or UUID.").examples("send \"test\" to player(\"bob\")");
+		}).description("Find an online player from their username or UUID.").examples("""
+			send "test" to player("bob")""");
 		Functions.register(DefaultFunction.builder(Skript.getAddonInstance(), "mood", AmbientSounds.Mood.class)
 			.description("Creates ambient mood sound data for biome effects.")
-			.examples("set {_mood} to mood(\"ambient.cave\", 1 second, 8, 2)")
+			.examples("""
+				set {_mood} to mood("ambient.cave", 1 second, 8, 2)""")
 			.parameter("sound-id", String.class)
 			.parameter("delay", Timespan.class)
 			.parameter("block-search-extent", Integer.class)
@@ -297,7 +300,8 @@ public class MinestomFunctions {
 			}));
 		Functions.register(DefaultFunction.builder(Skript.getAddonInstance(), "additions", AmbientSounds.Additions.class)
 			.description("Creates ambient addition sound data for biome effects.")
-			.examples("set {_additions} to additions(\"ambient.cave\", 0.01)")
+			.examples("""
+				set {_additions} to additions("ambient.cave", 0.01)""")
 			.parameter("sound-id", String.class)
 			.parameter("tick-chance", Number.class)
 			.build(args -> {
@@ -310,7 +314,8 @@ public class MinestomFunctions {
 			}));
 		Functions.register(DefaultFunction.builder(Skript.getAddonInstance(), "music", Music.class)
 			.description("Creates background music data with min/max delay and whether it replaces current music.")
-			.examples("set {_music} to music(\"music.overworld\", 1 minute, 2 minutes, true)")
+			.examples("""
+				set {_music} to music("music.overworld", 1 minute, 2 minutes, true)""")
 			.parameter("sound-id", String.class)
 			.parameter("min-delay", Timespan.class)
 			.parameter("max-delay", Timespan.class)

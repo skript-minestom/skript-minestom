@@ -30,14 +30,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 
 @Name("Blocks")
-@Description({"Blocks relative to other blocks or between other blocks.",
-	"Can be used to get blocks relative to other blocks or for looping.",
-	"Blocks from/to and between will return a straight line whereas blocks within will return a cuboid."})
-@Examples({"loop blocks above the player:",
-	"loop blocks between the block below the player and {_block}:",
-	"set the blocks below the player, the victim and the {_block} to air",
-	"set all blocks within {loc1} and {loc2} to stone",
-	"set all blocks within chunk at player to air"})
+@Description("""
+	Blocks relative to other blocks or between other blocks.
+	Can be used to get blocks relative to other blocks or for looping.
+	Blocks from/to and between will return a straight line whereas blocks within will return a cuboid.""")
+@Examples("""
+	loop blocks above the player:
+	loop blocks between the block below the player and {_block}:
+	set the blocks below the player, the victim and the {_block} to air
+	set all blocks within {loc1} and {loc2} to stone
+	set all blocks within chunk at player to air""")
 @Since("1.0, 2.5.1 (within/cuboid/chunk)")
 public class ExprBlocks extends SimpleExpression<BlockVec> {
 

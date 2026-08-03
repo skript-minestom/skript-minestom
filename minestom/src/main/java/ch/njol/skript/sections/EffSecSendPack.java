@@ -26,11 +26,10 @@ import java.util.UUID;
 
 @Name("Send Resource Pack")
 @Description("Sends a resource pack to one or more players.")
-@Examples({
-	"send resource pack from \"https://example.com/pack.zip\" with uuid \"...\" with hash \"...\" to player:",
-	"    if resource pack status is successfully loaded:",
-	"        broadcast \"Pack loaded!\""
-})
+@Examples("""
+	send resource pack from "https://example.com/pack.zip" with uuid "..." with hash "..." to player:
+	    if resource pack status is successfully loaded:
+	        broadcast "Pack loaded!\"""")
 public class EffSecSendPack extends EffectSection {
 
 	static {

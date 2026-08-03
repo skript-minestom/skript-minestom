@@ -23,7 +23,8 @@ import java.io.IOException;
 
 @Name("Save NBT")
 @Description("Saves an NBT compound to a gzip-compressed file in the server directory.")
-@Examples("save {_nbt} to file \"data/player.dat\"")
+@Examples("""
+	save {_nbt} to file "data/player.dat\"""")
 public class EffSaveNBT extends Effect {
 
 	static {

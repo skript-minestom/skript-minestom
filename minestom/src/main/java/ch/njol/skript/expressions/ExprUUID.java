@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
 
 @Name("UUID")
 @Description("The UUID of an entity.")
-@Examples("broadcast \"UUID: %uuid of player%\"")
+@Examples("""
+	broadcast "UUID: %uuid of player%\"""")
 public class ExprUUID extends SimplePropertyExpression<Object, String> {
 
 	static {
