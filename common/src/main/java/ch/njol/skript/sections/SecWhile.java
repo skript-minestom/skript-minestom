@@ -30,13 +30,13 @@ import ch.njol.skript.lang.LoopSection;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
+import com.google.common.collect.MapMaker;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 @Name("While Loop")
 @Description("While Loop sections are loops that will just keep repeating as long as a condition is met.")
@@ -63,14 +63,16 @@ public class SecWhile extends LoopSection {
 		Skript.registerSection(SecWhile.class, "[(:do)] while <.+>");
 	}
 
-	@SuppressWarnings("NotNullFieldNotInitialized")
 	private Condition condition;
 
 	@Nullable
 	private TriggerItem actualNext;
 
 	private boolean doWhile;
-	private final Set<Event> ranDoWhile = Collections.newSetFromMap(Collections.synchronizedMap(new WeakHashMap<>()));
+	private final Set<Event> ranDoWhile = Collections.newSetFromMap(new MapMaker()
+			.concurrencyLevel(8)
+			.weakKeys()
+			.makeMap());
 
 	@Override
 	public boolean init(Expression<?>[] exprs,
