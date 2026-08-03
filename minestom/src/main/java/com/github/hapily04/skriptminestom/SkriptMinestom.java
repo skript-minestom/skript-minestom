@@ -53,7 +53,9 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
 import static com.github.hapily04.skriptminestom.util.MessageUtils.SKRIPT_MINI_MESSAGE;
@@ -152,9 +154,11 @@ public class SkriptMinestom {
 		GlobalEventHandler geh = MinecraftServer.getGlobalEventHandler();
 		EventNode<net.minestom.server.event.Event> skriptEventNode = EventNode.all("skript-user-events").setPriority(50);
 		geh.addChild(skriptEventNode);
+		Set<Class<? extends Event>> listeningFor = new HashSet<>();
 		for (SkriptEventInfo<?> eventInfo : Skript.getEvents()) {
 			for (Class<? extends Event> bukkitEventClazz : eventInfo.events) {
 				if (!EventWrapper.class.isAssignableFrom(bukkitEventClazz)) continue;
+				if (!listeningFor.add(bukkitEventClazz)) continue;
 				Constructor<? extends Event> constructor = null;
 				Class<? extends Event> eventType = null;
 				for (Constructor<?> c :  bukkitEventClazz.getDeclaredConstructors()) {
