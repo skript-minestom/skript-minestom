@@ -95,11 +95,6 @@ public class SimpleEvents {
 		Skript.registerEvent("Bundle Item Select", SimpleEvent.class, InventoryBundleItemSelectWrapper.class, "bundle item select")
 			.description("Called when a player scrolls on an item to select a bundle item. Also called when the player stops hovering over the item.")
 			.examples("on bundle item select:");
-		Skript.registerEvent("Arm Swing", SimpleEvent.class, PlayerHandAnimationWrapper.class, "[player] arm swing")
-			.description("Called when a player swings their arm.")
-			.examples("""
-				on arm swing:
-					broadcast "%event-player% swung their %event-player hand%\"""");
 		Skript.registerEvent("Effect Command", SimpleEvent.class, EffectCommandEvent.class, "effect command")
 			.description("Called when a player runs an effect command.")
 			.examples("on effect command:");
