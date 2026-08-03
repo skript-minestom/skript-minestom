@@ -14,6 +14,8 @@ import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.network.player.PlayerConnection;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,10 +25,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 
-public class LuckPermsPlayer extends Player {
+public class LuckPermsPlayer extends Player implements Permissible {
 
     private final @NotNull LuckPerms luckPerms;
     private final @NonNull PlayerAdapter<Player> playerAdapter;
+    private boolean op;
 
     public LuckPermsPlayer(@NotNull LuckPerms luckPerms, @NotNull PlayerConnection connection, @NotNull GameProfile profile) {
         super(connection, profile);
@@ -114,8 +117,29 @@ public class LuckPermsPlayer extends Player {
      * @param permissionName the name of the permission to check
      * @return true if the player has the permission
      */
+    @Override
     public boolean hasPermission(@NotNull String permissionName) {
 		return this.getPermission(permissionName).asBoolean();
+    }
+
+    @Override
+    public boolean isPermissionSet(@NotNull String name) {
+        return getPermission(name) != Tristate.UNDEFINED;
+    }
+
+    @Override
+    public boolean isPermissionSet(@NotNull Permission perm) {
+        return false;
+    }
+
+    @Override
+    public boolean isOp() {
+        return op;
+    }
+
+    @Override
+    public void setOp(boolean value) {
+        this.op = value;
     }
 
     /**
@@ -152,7 +176,7 @@ public class LuckPermsPlayer extends Player {
     }
 
     public static boolean hasPermission(CommandSender sender, String permissionNode) {
-        return sender instanceof ConsoleSender || (sender instanceof LuckPermsPlayer lp && lp.hasPermission(permissionNode));
+        return sender instanceof ConsoleSender || (sender instanceof Permissible p && p.hasPermission(permissionNode));
     }
 
 }

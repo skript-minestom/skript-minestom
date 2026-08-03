@@ -11,10 +11,10 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.ConsoleSender;
 import org.bukkit.event.Event;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -54,7 +54,7 @@ public class CondHasPermission extends Condition {
 			s -> permissions.check(e,
 				perm -> {
 					if (s instanceof ConsoleSender) return true;
-					return ((LuckPermsPlayer) s).hasPermission(perm);
+					return ((Permissible) s).hasPermission(perm);
 				}), isNegated());
 	}
 
