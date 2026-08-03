@@ -161,9 +161,7 @@ public class MinestomFunctions {
 					 }
 				 }).description("Returns a RGB color from the given red, green and blue parameters. Alpha values can be added optionally, " +
 					 "but these only take affect in certain situations, like text display backgrounds.")
-				 .examples("""
-				 	dye player's leggings rgb(120, 30, 45)
-				 	set the colour of a text display to rgb(10, 50, 100, 50)""")
+				 .examples("set background color of {_text-display} to rgb(10, 50, 100, 50)")
 				 .since("2.5, 2.10 (alpha)");
 
 		// Particle Data
