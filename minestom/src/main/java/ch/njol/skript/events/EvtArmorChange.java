@@ -55,7 +55,7 @@ public class EvtArmorChange extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (slot == null ? "armor" : slot.name().toLowerCase(Locale.ENGLISH)) + " change";
+		return (slot == null ? "armor" : Classes.toString(slot)) + " change";
 	}
 
 }
