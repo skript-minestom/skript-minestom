@@ -82,10 +82,8 @@ publishing {
 		maven {
 			url = uri("https://maven.hapily.me/snapshots")
 			credentials {
-				username = (project.findProperty("repoHapilyUsername") as? String)
-					?: throw GradleException("Missing global property 'repoHapilyUsername'")
-				password = (project.findProperty("repoHapilyPassword") as? String)
-					?: throw GradleException("Missing global property 'repoHapilyPassword'")
+				username = providers.gradleProperty("repoHapilyUsername").orNull
+				password = providers.gradleProperty("repoHapilyPassword").orNull
 			}
 		}
 	}
