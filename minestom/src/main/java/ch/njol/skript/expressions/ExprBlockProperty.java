@@ -18,8 +18,7 @@ import java.util.List;
 
 @Name("Block Property")
 @Description("A block state property value of a block.")
-@Examples("""
-	set {_facing} to block "facing" property of block at player""")
+@Examples("set {_facing} to block \"facing\" property of block at player")
 public class ExprBlockProperty extends PropertyExpression<Block, String> {
 
 	static {

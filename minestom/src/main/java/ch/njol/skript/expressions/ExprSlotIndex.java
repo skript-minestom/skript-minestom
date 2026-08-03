@@ -10,8 +10,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Slot Index")
 @Description("The index/number of a slot.")
-@Examples("""
-	broadcast "%slot index of player's tool%\"""")
+@Examples("broadcast \"%slot index of player's tool%\"")
 public class ExprSlotIndex extends SimplePropertyExpression<Slot, Integer> {
 
 	static {

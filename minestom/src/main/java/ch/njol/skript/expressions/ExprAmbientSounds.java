@@ -24,8 +24,7 @@ import java.util.Locale;
 
 @Name("Ambient Sounds")
 @Description("Creates ambient sounds with optional loop, mood, and additions.")
-@Examples("""
-	set {_sounds} to new ambient sounds with loop "minecraft:ambient.cave\"""")
+@Examples("set {_sounds} to new ambient sounds with loop \"minecraft:ambient.cave\"")
 public class ExprAmbientSounds extends SimpleExpression<AmbientSounds> {
 
 	static {

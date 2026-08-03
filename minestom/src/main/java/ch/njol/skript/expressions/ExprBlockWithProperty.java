@@ -17,8 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Block With Property")
 @Description("A block with a specific block state property set.")
-@Examples("""
-	set {_b} to oak stairs with block "facing" property of "north\"""")
+@Examples("set {_b} to oak stairs with block \"facing\" property of \"north\"")
 public class ExprBlockWithProperty extends SimpleExpression<Block> {
 
 	static {

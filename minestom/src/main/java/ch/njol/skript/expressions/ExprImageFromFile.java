@@ -24,8 +24,7 @@ import java.util.List;
 
 @Name("Image From File")
 @Description("Loads a buffered image from a file path.")
-@Examples("""
-	set {_img} to image from file "server-icon.png\"""")
+@Examples("set {_img} to image from file \"server-icon.png\"")
 public class ExprImageFromFile extends SimpleExpression<BufferedImage> {
 
 	static {

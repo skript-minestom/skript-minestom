@@ -16,8 +16,7 @@ import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 
 @Name("Display Text")
 @Description("The text displayed by a text display entity.")
-@Examples("""
-	set display text of {_entity} to "Hello World!\"""")
+@Examples("set display text of {_entity} to \"Hello World!\"")
 public class ExprText extends SimplePropertyExpression<Entity, ComponentWrapper> {
 
 	static {

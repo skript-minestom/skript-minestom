@@ -16,8 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Has NBT Tag")
 @Description("Checks whether NBT compounds contain the given tag paths. Supports nested tags using dot notation.")
-@Examples("""
-	{_nbt} has the nbt tag "Health\"""")
+@Examples("{_nbt} has the nbt tag \"Health\"")
 public class CondHasTag extends Condition {
 
 	static {

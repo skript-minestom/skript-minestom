@@ -19,8 +19,7 @@ import org.bukkit.event.Event;
 
 @Name("Biome/Dimension From Key")
 @Description("A biome or dimension type from a namespace key.")
-@Examples("""
-	set {_biome} to biome from namespace key "minecraft:plains\"""")
+@Examples("set {_biome} to biome from namespace key \"minecraft:plains\"")
 public class ExprEnvironmentFromKey extends SimpleExpression<Object> {
 
 	static {

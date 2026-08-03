@@ -17,8 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Item with NBT")
 @Description("An item with a specific NBT.")
-@Examples("""
-	give player stone with nbt from "{enchantment_glint_override:1b}\"""")
+@Examples("give player stone with nbt from \"{enchantment_glint_override:1b}\"")
 public class ExprItemWithNBT extends SimpleExpression<Item> {
 
 	static {

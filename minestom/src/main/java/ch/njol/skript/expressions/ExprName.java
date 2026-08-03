@@ -23,8 +23,7 @@ import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 
 @Name("Name")
 @Description("The name of a player, entity, or item.")
-@Examples("""
-	set name of {_entity} to "Custom Name\"""")
+@Examples("set name of {_entity} to \"Custom Name\"")
 public class ExprName extends SimplePropertyExpression<Object, ComponentWrapper> {
 
 	private static final Component PLAYER_INVENTORY_TITLE = Component.text("player inventory");

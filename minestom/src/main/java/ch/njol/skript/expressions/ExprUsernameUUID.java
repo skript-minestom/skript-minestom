@@ -21,8 +21,7 @@ import java.util.UUID;
 
 @Name("Username/UUID From Mojang")
 @Description("Looks up a Mojang username from a UUID or vice versa.")
-@Examples("""
-	set {_name} to username from "%uuid of player%\"""")
+@Examples("set {_name} to username from \"%uuid of player%\"")
 public class ExprUsernameUUID extends SimpleExpression<String> {
 
 	static {

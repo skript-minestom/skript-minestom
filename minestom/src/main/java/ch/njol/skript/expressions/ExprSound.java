@@ -22,8 +22,7 @@ import java.util.OptionalLong;
 
 @Name("Sound")
 @Description("Creates a sound from an ID with optional seed, category, volume, and pitch.")
-@Examples("""
-	set {_sound} to sound "minecraft:entity.experience_orb.pickup" at volume 1 and pitch 1""")
+@Examples("set {_sound} to sound \"minecraft:entity.experience_orb.pickup\" at volume 1 and pitch 1")
 public class ExprSound extends SimpleExpression<Sound> {
 
 	static {

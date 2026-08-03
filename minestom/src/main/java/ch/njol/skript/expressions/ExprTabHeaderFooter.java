@@ -21,8 +21,7 @@ import static com.github.hapily04.skriptminestom.util.NBTUtils.getTagOrElse;
 
 @Name("Tablist Header/Footer")
 @Description("The header or footer of a player's tablist, or their display name in the tablist.")
-@Examples("""
-	set tablist header of player to "Welcome to our server!\"""")
+@Examples("set tablist header of player to \"Welcome to our server!\"")
 public class ExprTabHeaderFooter extends PropertyExpression<Player, Object> {
 
 	private static final Tag<Component> HEADER_TAG = Tag.Transient("skript-minestom:tablist-header");

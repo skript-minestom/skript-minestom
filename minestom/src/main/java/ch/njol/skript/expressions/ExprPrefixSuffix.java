@@ -15,8 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Prefix/Suffix")
 @Description("A player's LuckPerms prefix or suffix.")
-@Examples("""
-	broadcast "%prefix of player%\"""")
+@Examples("broadcast \"%prefix of player%\"")
 public class ExprPrefixSuffix extends SimplePropertyExpression<Player, String> {
 
 	static {

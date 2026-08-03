@@ -145,8 +145,7 @@ public class MinestomClasses {
 			.user("console ?senders?")
 			.name("Console Sender")
 			.description("The console.")
-			.examples("""
-				send "Server started" to console""")
+			.examples("send \"Server started\" to console")
 			.defaultExpression(new EventValueExpression<>(ConsoleSender.class))
 			.parser(new Parser<>() {
 				@Override
@@ -168,8 +167,7 @@ public class MinestomClasses {
 			.user("players?")
 			.name("Player")
 			.description("A entity of type Player with a connection to the server.")
-			.examples("""
-				send "hi" to player("Steve")""")
+			.examples("send \"hi\" to player(\"Steve\")")
 			.defaultExpression(new EventValueExpression<>(Player.class))
 			.parser(new Parser<>() {
 				@Nullable
@@ -215,8 +213,7 @@ public class MinestomClasses {
 			.user("taggables?")
 			.name("Taggable")
 			.description("An object that can hold tags (entities, instances, etc.)")
-			.examples("""
-				set metadata "key" of player to "value\"""")
+			.examples("set metadata \"key\" of player to \"value\"")
 			.defaultExpression(new EventValueExpression<>(Taggable.class)));
 		Classes.registerClass(new ClassInfo<>(Entity.class, "entity")
 			.user("entit(y|ies)")
@@ -519,8 +516,7 @@ public class MinestomClasses {
 			.user("dimension ?types?")
 			.name("Dimension Type")
 			.description("A dimension type with several values.")
-			.examples("""
-				set {_dim} to dimension type from namespace key "minecraft:overworld\"""")
+			.examples("set {_dim} to dimension type from namespace key \"minecraft:overworld\"")
 			.defaultExpression(new EventValueExpression<>(DimensionType.class))
 			.parser(new Parser<>() {
 				@Override
@@ -716,15 +712,13 @@ public class MinestomClasses {
 			.user("frame ?types?")
 			.name("Frame Type")
 			.description("The type of the frame for an advancement/notification.")
-			.examples("""
-				send task notification with title "Quest Complete!" and diamond as the icon to player""")
+			.examples("send task notification with title \"Quest Complete!\" and diamond as the icon to player")
 			.defaultExpression(new EventValueExpression<>(FrameType.class)));
 		Classes.registerClass(new ClassInfo<>(ComponentWrapper.class, "component")
 			.user("components?")
 			.name("Component")
 			.description("A piece of text with formatting (adventure component).")
-			.examples("""
-				set player's tab list header to mm("<rainbow>Hello!")""")
+			.examples("set player's tab list header to mm(\"<rainbow>Hello!\")")
 			.defaultExpression(new EventValueExpression<>(ComponentWrapper.class))
 			.parser(new Parser<>() {
 				@Override
@@ -781,8 +775,7 @@ public class MinestomClasses {
 			.user("tag ?resolvers?")
 			.name("Tag Resolver")
 			.description("Replace tags within a MiniMessage string.")
-			.examples("""
-				set {_r} to resolver("name", player's name)""")
+			.examples("set {_r} to resolver(\"name\", player's name)")
 			.defaultExpression(new EventValueExpression<>(TagResolver.class))
 			.parser(new Parser<>() {
 				@Override
@@ -804,8 +797,7 @@ public class MinestomClasses {
 			.user("component ?likes?")
 			.name("Component Like")
 			.description("Represents something that can be viewed as a component, like a regular component or a hover event.")
-			.examples("""
-				set {_c} to mm("Hello")""")
+			.examples("set {_c} to mm(\"Hello\")")
 			.defaultExpression(new EventValueExpression<>(ComponentLike.class))
 			.parser(new Parser<>() {
 				@Override
@@ -827,8 +819,7 @@ public class MinestomClasses {
 			.user("suggestion ?entr(y|ies)?")
 			.name("Suggestion Entry")
 			.description("An entry for the suggestions section of a command containing the suggestion and a component tooltip.")
-			.examples("""
-				add suggestionEntry("hello", mm("<red>tooltip!")) to suggestions""")
+			.examples("add suggestionEntry(\"hello\", mm(\"<red>tooltip!\")) to suggestions")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1081,8 +1072,7 @@ public class MinestomClasses {
 			.user("score ?boards?")
 			.name("Scoreboard")
 			.description("The scoreboard on the side of a player's screen")
-			.examples("""
-				set {_s} to new sidebar named "Stats\"""")
+			.examples("set {_s} to new sidebar named \"Stats\"")
 			.defaultExpression(new EventValueExpression<>(Sidebar.class))
 			.parser(new Parser<>() {
 				@Override
@@ -1225,8 +1215,7 @@ public class MinestomClasses {
 			.user("sounds?")
 			.name("Sound")
 			.description("A sound with an id, seed, category, volume, and pitch.")
-			.examples("""
-				play sound "entity.player.levelup" at player to all players""")
+			.examples("play sound \"entity.player.levelup\" at player to all players")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1292,8 +1281,7 @@ public class MinestomClasses {
 			.user("ambient ?sounds?")
 			.name("Ambient Sounds")
 			.description("An ambient sound with an id, mood, and additions.")
-			.examples("""
-				set {_sounds} to new ambient sounds with loop "minecraft:ambient.cave\"""")
+			.examples("set {_sounds} to new ambient sounds with loop \"minecraft:ambient.cave\"")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1377,8 +1365,7 @@ public class MinestomClasses {
 			.user("moods?")
 			.name("Mood")
 			.description("The mood for ambient sounds.")
-			.examples("""
-				set {_mood} to mood("ambient.cave", 1 second, 8, 2)""")
+			.examples("set {_mood} to mood(\"ambient.cave\", 1 second, 8, 2)")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1436,8 +1423,7 @@ public class MinestomClasses {
 			.user("additions?")
 			.name("Additions")
 			.description("The additions for ambient sounds.")
-			.examples("""
-				set {_additions} to additions("ambient.cave", 0.01)""")
+			.examples("set {_additions} to additions(\"ambient.cave\", 0.01)")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1548,8 +1534,7 @@ public class MinestomClasses {
 			.user("musics?")
 			.name("Music")
 			.description("The regular/creative/underwater background music.")
-			.examples("""
-				set {_music} to music("music.overworld", 1 minute, 2 minutes, true)""")
+			.examples("set {_music} to music(\"music.overworld\", 1 minute, 2 minutes, true)")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1682,8 +1667,7 @@ public class MinestomClasses {
 			.user("sound ?categor(y|ies)")
 			.name("Sound Category")
 			.description("A sound category e.g. master")
-			.examples("""
-				play sound "entity.player.levelup" at player to all players""")
+			.examples("play sound \"entity.player.levelup\" at player to all players")
 			.defaultExpression(new EventValueExpression<>(Sound.Source.class)));
 		Classes.registerClass(new EnumClassInfo<>(AbstractDisplayMeta.BillboardConstraints.class, "billboardconstraint")
 			.user("bill ?board ?constraints?")
@@ -1879,8 +1863,7 @@ public class MinestomClasses {
 			.user("tag ?types?")
 			.name("NBT Tag Type")
 			.description("The tag type of an nbt tag (e.g. int array)")
-			.examples("""
-				set {_tag} to string nbt tag "CustomName" of {_nbt}""")
+			.examples("set {_tag} to string nbt tag \"CustomName\" of {_nbt}")
 			.defaultExpression(new EventValueExpression<>(NBTUtils.TagType.class)));
 		Classes.registerClass(new EnumClassInfo<>(ServerListPingType.class, "pingtype")
 			.user("ping ?types?")
@@ -1892,8 +1875,7 @@ public class MinestomClasses {
 			.user("input ?keys?")
 			.name("Input Key")
 			.description("Represents a movement input key that is pressed by a player.")
-			.examples("""
-				broadcast "%current input keys of player%\"""")
+			.examples("broadcast \"%current input keys of player%\"")
 			.defaultExpression(new EventValueExpression<>(InputKey.class)));
 		Classes.registerClass(new EnumClassInfo<>(ClientSettings.ParticleSetting.class, "particlesetting")
 			.user("particle ?settings?")
@@ -2149,8 +2131,7 @@ public class MinestomClasses {
 			.user("skins?")
 			.name("Skin")
 			.description("A skin with textures and a signature")
-			.examples("""
-				set skin of player to skin from "jeb_\"""")
+			.examples("set skin of player to skin from \"jeb_\"")
 			.defaultExpression(new EventValueExpression<>(PlayerSkin.class))
 			.parser(new Parser<>() {
 				@Override
@@ -2203,8 +2184,7 @@ public class MinestomClasses {
 		Classes.registerClass(new ClassInfo<>(NBTCompound.class, "nbtcompound")
 			.user("nbt ?compounds?")
 			.name("NBT Compound")
-			.description("""
-				A compound (e.g. {test:1b,hello:"hi"}""")
+			.description("A compound (e.g. {test:1b,hello:\"hi\"}")
 			.examples("set {_nbt} to nbt compound of player's tool")
 			.parser(new Parser<>() {
 				@Override

@@ -13,8 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Translation Key")
 @Description("The translation key of an entity type, item, attribute, block, or sound.")
-@Examples("""
-	broadcast "%translation key of zombie%\"""")
+@Examples("broadcast \"%translation key of zombie%\"")
 public class ExprTranslationKey extends SimplePropertyExpression<Object, String> {
 
 	static {

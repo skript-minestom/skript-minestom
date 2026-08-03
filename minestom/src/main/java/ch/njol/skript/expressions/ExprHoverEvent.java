@@ -15,8 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Hover Event")
 @Description("The hover event of a component.")
-@Examples("""
-	set hover event of {_component} to hover event showing "Hello\"""")
+@Examples("set hover event of {_component} to hover event showing \"Hello\"")
 public class ExprHoverEvent extends SimplePropertyExpression<ComponentWrapper, HoverEvent> {
 
 	static {

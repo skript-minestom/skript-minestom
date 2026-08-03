@@ -22,8 +22,7 @@ import java.util.List;
 
 @Name("Metadata")
 @Description("The metadata of an entity or an object.")
-@Examples("""
-	set metadata "key" of player to "value\"""")
+@Examples("set metadata \"key\" of player to \"value\"")
 public class ExprMetadata extends PropertyExpression<Taggable, Object> {
 
 	static {

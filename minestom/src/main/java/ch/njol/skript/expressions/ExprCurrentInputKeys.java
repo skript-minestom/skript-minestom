@@ -17,8 +17,7 @@ import java.util.List;
 
 @Name("Player Input Keys")
 @Description("Get the current input keys of a player.")
-@Examples("""
-	broadcast "%player% is pressing %current input keys of player%\"""")
+@Examples("broadcast \"%player% is pressing %current input keys of player%\"")
 public class ExprCurrentInputKeys extends PropertyExpression<Player, InputKey> {
 
 	static {

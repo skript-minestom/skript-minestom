@@ -26,8 +26,7 @@ import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_ME
 
 @Name("MOTD Description")
 @Description("The description shown in the server list ping event.")
-@Examples("""
-	set motd description to "<green>Welcome!\"""")
+@Examples("set motd description to \"<green>Welcome!\"")
 public class ExprMOTDDescription extends SimpleExpression<ComponentWrapper> implements EventRestrictedSyntax {
 
 	static {

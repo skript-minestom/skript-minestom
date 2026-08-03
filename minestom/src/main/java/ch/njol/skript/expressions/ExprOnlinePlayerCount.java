@@ -15,8 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Online Player Count")
 @Description("The number of online players.")
-@Examples("""
-	broadcast "Online: %number of online players%\"""")
+@Examples("broadcast \"Online: %number of online players%\"")
 public class ExprOnlinePlayerCount extends SimpleExpression<Integer> {
 
 	static {

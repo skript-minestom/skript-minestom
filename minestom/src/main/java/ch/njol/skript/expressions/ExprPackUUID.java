@@ -16,8 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Resource Pack UUID")
 @Description("The UUID of a resource pack in a resource pack callback event.")
-@Examples("""
-	broadcast "Pack %resource pack uuid% updated!\"""")
+@Examples("broadcast \"Pack %resource pack uuid% updated!\"")
 public class ExprPackUUID extends SimpleExpression<String> implements EventRestrictedSyntax {
 
 	static {

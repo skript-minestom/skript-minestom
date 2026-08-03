@@ -11,8 +11,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Host Name")
 @Description("The hostname a player connected with.")
-@Examples("""
-	broadcast "%host name of player%\"""")
+@Examples("broadcast \"%host name of player%\"")
 public class ExprHostName extends SimplePropertyExpression<Player, String> {
 
 	static {

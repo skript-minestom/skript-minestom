@@ -17,8 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("New Sidebar/Scoreboard")
 @Description("Creates a new sidebar/scoreboard.")
-@Examples("""
-	set {_s} to new sidebar named "Stats\"""")
+@Examples("set {_s} to new sidebar named \"Stats\"")
 public class ExprScoreboard extends SimpleExpression<Sidebar> {
 
 	static {

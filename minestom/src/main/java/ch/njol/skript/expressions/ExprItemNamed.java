@@ -17,8 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Item Named")
 @Description("An item with a specific custom name.")
-@Examples("""
-	give player stone named "Lucky Stone\"""")
+@Examples("give player stone named \"Lucky Stone\"")
 public class ExprItemNamed extends SimpleExpression<Item> {
 
 	static {

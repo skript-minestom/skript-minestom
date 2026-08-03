@@ -28,8 +28,7 @@ import static ch.njol.skript.expressions.ExprMOTDPlayerCount.getPlayerInfo;
 
 @Name("MOTD Hover Sample")
 @Description("The hover/player sample text in the server list ping event.")
-@Examples("""
-	set motd hover sample to mm("<red>Notch") and mm("<rainbow>jeb_")""")
+@Examples("set motd hover sample to mm(\"<red>Notch\") and mm(\"<rainbow>jeb_\")")
 public class ExprMOTDHoverSample extends SimpleExpression<ComponentWrapper> implements EventRestrictedSyntax {
 
 	static {

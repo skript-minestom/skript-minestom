@@ -19,8 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Server Brand")
 @Description("The server brand name sent to clients (shown in F3 menu).")
-@Examples("""
-	set server brand to "My custom server brand\"""")
+@Examples("set server brand to \"My custom server brand\"")
 public class ExprServerBrand extends SimpleExpression<String> {
 
 	static {

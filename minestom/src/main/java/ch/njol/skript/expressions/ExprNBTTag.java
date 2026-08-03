@@ -32,8 +32,7 @@ import java.util.List;
 
 @Name("NBT Tag")
 @Description("A typed NBT tag from an NBT compound.")
-@Examples("""
-	set {_tag} to string nbt tag "CustomName" of {_nbt}""")
+@Examples("set {_tag} to string nbt tag \"CustomName\" of {_nbt}")
 public class ExprNBTTag extends SimpleExpression<Object> {
 
 	static {

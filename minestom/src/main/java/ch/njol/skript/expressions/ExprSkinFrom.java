@@ -19,8 +19,7 @@ import java.util.List;
 
 @Name("Skin From")
 @Description("Returns a skin from a player name, UUID, or signature.")
-@Examples("""
-	set skin of player to skin from "jeb_\"""")
+@Examples("set skin of player to skin from \"jeb_\"")
 public class ExprSkinFrom extends SimpleExpression<PlayerSkin> {
 
 	static {
