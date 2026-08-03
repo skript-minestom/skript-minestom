@@ -37,9 +37,11 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Name("Loop")
@@ -90,10 +92,10 @@ public class SecLoop extends LoopSection {
 	private final transient Map<Event, Object> current = new ConcurrentHashMap<>();
 	private final transient Map<Event, Iterator<?>> iteratorMap = new ConcurrentHashMap<>();
 	private final transient Map<Event, Object> previous = new ConcurrentHashMap<>();
+	private final transient Map<Event, Object> next = Collections.synchronizedMap(new WeakHashMap<>());
 
 	protected @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
-	private Object nextValue = null;
 	private boolean loopPeeking;
 
 	@Override
@@ -141,6 +143,7 @@ public class SecLoop extends LoopSection {
 				iter = null;
 			}
 		}
+		Object nextValue = next.get(event);
 		if (iter == null || (!iter.hasNext() && nextValue == null)) {
 			exit(event);
 			debug(event, false);
@@ -149,7 +152,7 @@ public class SecLoop extends LoopSection {
 			if (current.containsKey(event)) previous.put(event, current.get(event));
 			if (nextValue != null) {
 				this.store(event, nextValue);
-				nextValue = null;
+				next.remove(event);
 			} else if (iter.hasNext()) {
 				this.store(event, iter.next());
 			}
@@ -179,12 +182,16 @@ public class SecLoop extends LoopSection {
 	public @Nullable Object getNext(Event event) {
 		if (!loopPeeking)
 			return null;
+		Object nextValue = next.get(event);
+		if (nextValue != null)
+			return nextValue;
 		Iterator<?> iter = iteratorMap.get(event);
 		if (iter == null || !iter.hasNext())
 			return null;
 		if (iter instanceof PeekingIterator<?> peekingIterator)
 			return peekingIterator.peek();
 		nextValue = iter.next();
+		next.put(event, nextValue);
 		return nextValue;
 	}
 
@@ -213,6 +220,7 @@ public class SecLoop extends LoopSection {
 		current.remove(event);
 		iteratorMap.remove(event);
 		previous.remove(event);
+		next.remove(event);
 		super.exit(event);
 	}
 
