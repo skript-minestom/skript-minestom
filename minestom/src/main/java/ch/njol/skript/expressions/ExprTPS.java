@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 	The server's ticks per second, as measured by spark.
 	Without a window, this returns all five of spark's averages, in order: the last 5 seconds, 10 seconds, minute, 5 minutes and 15 minutes.""")
 @Examples("""
-	broadcast "%tps from the last 1 minute%"
+	broadcast "%tps from the last minute%"
 	
 	every 30 seconds:
 		if tps from the last 5 seconds < 15:
