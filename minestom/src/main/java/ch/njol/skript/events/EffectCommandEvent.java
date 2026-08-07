@@ -3,6 +3,7 @@ package ch.njol.skript.events;
 import ch.njol.skript.registrations.EventValues;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
+import net.minestom.server.instance.Instance;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.skriptlang.skript.bukkit.lang.eventvalue.EventValue;
@@ -13,6 +14,7 @@ public class EffectCommandEvent extends Event implements CancellableEvent {
 
 	static {
 		EventValues.registerEventValue(EventValue.simple(EffectCommandEvent.class, Player.class, EffectCommandEvent::getExecutor));
+		EventValues.registerEventValue(EventValue.simple(EffectCommandEvent.class, Instance.class, from -> from.executor.getInstance()));
 		EventValues.registerEventValue(EventValue.builder(EffectCommandEvent.class, String.class)
 			.patterns("command")
 			.getter(EffectCommandEvent::getCommand)
