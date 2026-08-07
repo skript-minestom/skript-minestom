@@ -216,9 +216,9 @@ task nightlyResources(type: ProcessResources) {
 	from 'src/main/resources', {
 		include '**'
 		def hash = 'git rev-parse --short HEAD'.execute().text.trim()
-		version = project.property('version') + '-nightly-' + hash
+		def nightlyVersion = project.property('version') + '-nightly-' + hash
 		filter ReplaceTokens, tokens: [
-			'version'         : version,
+			'version'         : nightlyVersion,
 			'today'           : '' + LocalTime.now(),
 			'release-flavor'  : 'skriptlang-nightly', // SkriptLang build, automatically done by CI
 			'release-channel' : 'prerelease', // No update checking, but these are VERY unstable

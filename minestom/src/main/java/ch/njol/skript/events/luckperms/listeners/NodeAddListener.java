@@ -6,6 +6,7 @@ import ch.njol.skript.events.luckperms.PermissionAddEvent;
 import ch.njol.skript.events.luckperms.PrefixAddEvent;
 import ch.njol.skript.events.luckperms.SuffixAddEvent;
 import com.github.hapily04.skriptminestom.SkriptMinestom;
+import net.luckperms.api.LuckPerms;
 import net.luckperms.api.event.node.NodeAddEvent;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
@@ -21,7 +22,8 @@ import org.bukkit.event.Event;
 public class NodeAddListener {
 
 	static {
-		SkriptMinestom.getLuckPerms().getEventBus().subscribe(Skript.getInstance(), NodeAddEvent.class, e -> {
+		LuckPerms luckPerms = SkriptMinestom.getLuckPerms();
+		if (luckPerms != null) luckPerms.getEventBus().subscribe(Skript.getInstance(), NodeAddEvent.class, e -> {
 			if (!e.isUser()) {
 				return;
 			}

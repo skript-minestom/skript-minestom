@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.minestom.server.entity.Player;
 import org.bukkit.event.Event;
 
@@ -47,9 +47,8 @@ public class ExprGroup extends SimpleExpression<String> {
 		Player[] players = this.players.getArray(event);
 		List<String> groups = new ArrayList<>();
 		for (Player player : players) {
-			LuckPermsPlayer lp = (LuckPermsPlayer) player;
-			if (primary) groups.add(lp.getPrimaryGroup());
-			else groups.addAll(lp.getAllGroups());
+			if (primary) groups.add(LuckPermsLookup.getPrimaryGroup(player));
+			else groups.addAll(LuckPermsLookup.getAllGroups(player));
 		}
 		return groups.toArray(new String[0]);
 	}

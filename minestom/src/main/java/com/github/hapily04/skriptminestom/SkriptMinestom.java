@@ -20,6 +20,7 @@ import com.github.hapily04.skriptminestom.command.SkriptCommand;
 import com.github.hapily04.skriptminestom.command.StopCommand;
 import com.github.hapily04.skriptminestom.luckperms.DummyContextProvider;
 import com.github.hapily04.skriptminestom.luckperms.HoconConfigurationAdapter;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
 import com.github.hapily04.skriptminestom.registration.MinestomClasses;
 import com.github.hapily04.skriptminestom.registration.MinestomFunctions;
@@ -37,12 +38,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChatEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -82,18 +83,15 @@ public class SkriptMinestom {
 		MinecraftServer.getConnectionManager().setPlayerProvider(
 			(playerConnection, gameProfile) -> {
 				Player player = new LuckPermsPlayer(luckPerms, playerConnection, gameProfile);
-				CustomConnectEvent customConnectEvent = new CustomConnectEvent(player);
-				EventDispatcher.call(customConnectEvent);
-				if (customConnectEvent.isKicked()) return null;
+				if (!fireConnectEvent(player)) return null;
 				return player;
 			});
 
-		CommandManager commandManager = MinecraftServer.getCommandManager();
-		commandManager.register(new SkriptCommand(), new StopCommand());
-		commandManager.setUnknownCommandCallback((sender, command) -> Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command)));
+		initCommands();
+		initStopCommand();
 		try {
-			initSkript();
-			initEffectCommands();
+			initSkript(MinecraftServer.getGlobalEventHandler());
+			initEffectCommands(MinecraftServer.getGlobalEventHandler());
 			scheduleShutdownTasks();
 			server.start(properties.getProperty(ADDRESS_KEY), Integer.parseInt(properties.getProperty(PropertyUtils.PORT_KEY)));
 			MinestomTerminal.start();
@@ -133,15 +131,25 @@ public class SkriptMinestom {
 			.enable();
 	}
 
+	/**
+	 * Boots Skript, registering its event listeners on {@code node} instead of the global
+	 * event handler — lets an embedding server scope Skript to its own {@link EventNode}.
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private static void initSkript() throws URISyntaxException {
+	public static void initSkript(EventNode<net.minestom.server.event.Event> node) throws URISyntaxException {
 		//Bukkit.setTicker(tick -> MinecraftServer.getSchedulerManager().scheduleTask(tick, TaskSchedule.tick(1), TaskSchedule.tick(1))); // tick on minestom's thread
 		Bukkit.setServer(new BukkitServer());
 		Bukkit.getScheduler(); // initialize scheduler
 
 		PluginManager pluginManager = Bukkit.getPluginManager();
-		Skript skript = (Skript) pluginManager.loadPlugin(new File(Skript.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+		File skriptFile = new File(Skript.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		File minestomFile = new File(SkriptMinestom.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		Skript skript = (Skript) pluginManager.loadPlugin(skriptFile);
 		Skript.onRegistration(() -> {
+			if (!minestomFile.equals(skriptFile)) {
+				org.skriptlang.skript.util.ClassLoader.loadClasses(SkriptMinestom.class, minestomFile, "ch.njol.skript",
+					"conditions", "effects", "events", "expressions", "literals", "sections", "structures");
+			}
 			MinestomClasses.register();
 			MinestomFunctions.register();
 			MarkerRegistration.register();
@@ -152,9 +160,8 @@ public class SkriptMinestom {
 		Skript.closeUnsafeSkript();
 
 		// init events
-		GlobalEventHandler geh = MinecraftServer.getGlobalEventHandler();
 		EventNode<net.minestom.server.event.Event> skriptEventNode = EventNode.all("skript-user-events").setPriority(50);
-		geh.addChild(skriptEventNode);
+		node.addChild(skriptEventNode);
 		Set<Class<? extends Event>> listeningFor = new HashSet<>();
 		for (SkriptEventInfo<?> eventInfo : Skript.getEvents()) {
 			for (Class<? extends Event> bukkitEventClazz : eventInfo.events) {
@@ -178,11 +185,12 @@ public class SkriptMinestom {
 		}
 	}
 
-	private static void initEffectCommands() {
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerChatEvent.class, event -> {
+	/** Registers the {@code !}-prefixed effect-command chat listener on {@code node}. */
+	public static void initEffectCommands(EventNode<net.minestom.server.event.Event> node) {
+		node.addListener(PlayerChatEvent.class, event -> {
 			if (!SkriptConfig.enableEffectCommands.value()) return;
-			LuckPermsPlayer player = (LuckPermsPlayer) event.getPlayer();
-			if (!player.hasPermission("skript.effectcommands")) return;
+			Player player = event.getPlayer();
+			if (!LuckPermsLookup.hasPermission(player, "skript.effectcommands")) return;
 			String message = event.getRawMessage();
 			if (!message.startsWith(SkriptConfig.effectCommandToken.value())) return;
 			event.setCancelled(true);
@@ -217,23 +225,62 @@ public class SkriptMinestom {
 				p.kick(kickComponent);
 			}
 			spark.shutdown();
-			PluginManager pluginManager = Bukkit.getPluginManager();
-
-			Collection<SkriptAddon> addons = Skript.getAddons();
-			Plugin skript = pluginManager.getPlugin("Skript");
-			if (skript != null) pluginManager.disablePlugin(skript);
-			for (SkriptAddon addon : addons) {
-				pluginManager.disablePlugin(addon.plugin);
-			}
-
+			shutdown();
 			LuckPermsMinestom.disable();
 			MinestomTerminal.stop();
 			System.exit(0); // sometimes server hangs so manually stop
 		});
 	}
 
+	/**
+	 * Registers {@code /skript} and routes unknown commands to {@link UnknownCommandEvent}.
+	 * The callback is a single-slot setter, so this replaces any already set.
+	 */
+	public static void initCommands() {
+		CommandManager commandManager = MinecraftServer.getCommandManager();
+		commandManager.register(new SkriptCommand());
+		commandManager.setUnknownCommandCallback((sender, command) -> Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command)));
+	}
+
+	/** Registers {@code /stop}. Kept out of {@link #initCommands()} as an embedding server usually has its own. */
+	public static void initStopCommand() {
+		MinecraftServer.getCommandManager().register(new StopCommand());
+	}
+
+	/**
+	 * Fires {@link CustomConnectEvent} for a connecting player, returning {@code false} if
+	 * the event kicked them (in which case the caller should reject the connection).
+	 */
+	public static boolean fireConnectEvent(Player player) {
+		CustomConnectEvent connectEvent = new CustomConnectEvent(player);
+		EventDispatcher.call(connectEvent);
+		return !connectEvent.isKicked();
+	}
+
+	/**
+	 * Disables the shim Skript plugin (and any registered addons), which is what runs
+	 * {@code Skript.onDisable()} and flushes variables to disk. Does not touch Spark,
+	 * LuckPerms, the terminal, or kick players — see {@link #scheduleShutdownTasks()} for the
+	 * full standalone-server shutdown sequence.
+	 */
+	public static void shutdown() {
+		PluginManager pluginManager = Bukkit.getPluginManager();
+
+		Collection<SkriptAddon> addons = Skript.getAddons();
+		Plugin skript = pluginManager.getPlugin("Skript");
+		if (skript != null) pluginManager.disablePlugin(skript);
+		for (SkriptAddon addon : addons) {
+			pluginManager.disablePlugin(addon.plugin);
+		}
+	}
+
 	public static LuckPerms getLuckPerms() {
-		return luckPerms;
+		if (luckPerms != null) return luckPerms;
+		try {
+			return LuckPermsProvider.get();
+		} catch (IllegalStateException e) {
+			return null;
+		}
 	}
 
 	public static SparkMinestom getSpark() {

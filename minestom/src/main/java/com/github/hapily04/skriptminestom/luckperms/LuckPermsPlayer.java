@@ -14,40 +14,49 @@ import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.network.player.PlayerConnection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-
 public class LuckPermsPlayer extends Player {
 
-    private final @NotNull LuckPerms luckPerms;
-    private final @NonNull PlayerAdapter<Player> playerAdapter;
+    private final @Nullable LuckPerms luckPerms;
+    private @Nullable PlayerAdapter<Player> playerAdapter;
 
-    public LuckPermsPlayer(@NotNull LuckPerms luckPerms, @NotNull PlayerConnection connection, @NotNull GameProfile profile) {
+    public LuckPermsPlayer(@Nullable LuckPerms luckPerms, @NotNull PlayerConnection connection, @NotNull GameProfile profile) {
         super(connection, profile);
         this.luckPerms = luckPerms;
-        this.playerAdapter = this.luckPerms.getPlayerAdapter(Player.class);
     }
 
-    private @NotNull User getLuckPermsUser() {
-        return this.playerAdapter.getUser(this);
+    private @Nullable PlayerAdapter<Player> getPlayerAdapter() {
+        if (playerAdapter == null && luckPerms != null) {
+            playerAdapter = luckPerms.getPlayerAdapter(Player.class);
+        }
+        return playerAdapter;
     }
 
-    private @NotNull CachedMetaData getLuckPermsMetaData() {
-        return this.getLuckPermsUser().getCachedData().getMetaData();
+    protected @Nullable User getLuckPermsUser() {
+        PlayerAdapter<Player> adapter = getPlayerAdapter();
+        return adapter == null ? null : adapter.getUser(this);
+    }
+
+    private @Nullable CachedMetaData getLuckPermsMetaData() {
+        User user = getLuckPermsUser();
+        return user == null ? null : user.getCachedData().getMetaData();
     }
 
     public @NotNull String getPrimaryGroup() {
-        return getLuckPermsUser().getPrimaryGroup();
+        User user = getLuckPermsUser();
+        return user == null ? "" : user.getPrimaryGroup();
     }
 
     public @NotNull List<String> getAllGroups() {
         User user = getLuckPermsUser();
+        if (user == null || luckPerms == null) return List.of();
         Collection<InheritanceNode> nodes = user.getNodes(NodeType.INHERITANCE);
         List<String> groups = new ArrayList<>(nodes.size());
         for (InheritanceNode node : nodes) {
@@ -72,6 +81,7 @@ public class LuckPermsPlayer extends Player {
      */
     public @NotNull CompletableFuture<DataMutateResult> addPermission(@NotNull String permission) {
         User user = getLuckPermsUser();
+        if (user == null || luckPerms == null) return CompletableFuture.completedFuture(DataMutateResult.FAIL);
         DataMutateResult result = user.data().add(Node.builder(permission).build());
         return this.luckPerms.getUserManager().saveUser(user).thenApply(ignored -> result);
     }
@@ -89,6 +99,7 @@ public class LuckPermsPlayer extends Player {
      */
     public @NotNull CompletableFuture<DataMutateResult> setPermission(@NotNull Node permission, boolean value) {
         User user = getLuckPermsUser();
+        if (user == null || luckPerms == null) return CompletableFuture.completedFuture(DataMutateResult.FAIL);
         DataMutateResult result = value
                 ? user.data().add(permission)
                 : user.data().remove(permission);
@@ -104,12 +115,14 @@ public class LuckPermsPlayer extends Player {
      */
     public @NotNull CompletableFuture<DataMutateResult> removePermission(@NotNull String permissionName) {
         User user = getLuckPermsUser();
+        if (user == null || luckPerms == null) return CompletableFuture.completedFuture(DataMutateResult.FAIL);
         DataMutateResult result = user.data().remove(Node.builder(permissionName).build());
         return this.luckPerms.getUserManager().saveUser(user).thenApply(ignored -> result);
     }
 
     /**
-     * Checks if the player has a permission.
+     * Checks if the player has a permission. {@code false} when no LuckPerms user is
+     * available.
      *
      * @param permissionName the name of the permission to check
      * @return true if the player has the permission
@@ -121,38 +134,42 @@ public class LuckPermsPlayer extends Player {
     /**
      * Gets the value of a permission. This passes a {@link Tristate} value
      * straight from LuckPerms, which may be a better option than using
-     * boolean values in some cases.
+     * boolean values in some cases. {@link Tristate#UNDEFINED} when no LuckPerms user is
+     * available.
      *
      * @param permissionName the name of the permission to check
      * @return the value of the permission
      */
     public @NotNull Tristate getPermission(@NotNull String permissionName) {
         User user = getLuckPermsUser();
+        if (user == null) return Tristate.UNDEFINED;
         return user.getCachedData().getPermissionData().checkPermission(permissionName);
     }
 
     /**
-     * Gets the prefix of the player.
+     * Gets the prefix of the player. {@code ""} when no LuckPerms user is available.
      *
      * @return the prefix of the player
      */
     public @NotNull String getPrefix() {
-        String prefix = getLuckPermsMetaData().getPrefix();
+        CachedMetaData metaData = getLuckPermsMetaData();
+        String prefix = metaData == null ? null : metaData.getPrefix();
         return prefix == null ? "" : prefix;
     }
 
     /**
-     * Gets the suffix of the player.
+     * Gets the suffix of the player. {@code ""} when no LuckPerms user is available.
      *
      * @return the suffix of the player
      */
     public @NotNull String getSuffix() {
-        String suffix = getLuckPermsMetaData().getSuffix();
+        CachedMetaData metaData = getLuckPermsMetaData();
+        String suffix = metaData == null ? null : metaData.getSuffix();
         return suffix == null ? "" : suffix;
     }
 
     public static boolean hasPermission(CommandSender sender, String permissionNode) {
-        return sender instanceof ConsoleSender || (sender instanceof LuckPermsPlayer lp && lp.hasPermission(permissionNode));
+        return LuckPermsLookup.hasPermission(sender, permissionNode);
     }
 
 }
