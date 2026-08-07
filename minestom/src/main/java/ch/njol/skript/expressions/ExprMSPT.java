@@ -26,7 +26,7 @@ import java.util.function.ToDoubleFunction;
 
 	every 30 seconds:
 		if 95th percentile mspt from the last 10 seconds > 45:
-			broadcast "<red>The server is lagging!\"""")
+			broadcast mm("<red>The server is lagging!")""")
 @Keywords({"mspt", "tick", "lag", "spark", "performance"})
 public class ExprMSPT extends SimpleExpression<Number> {
 
