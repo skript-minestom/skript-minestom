@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 	Matching is done by namespaced key, so an oak log is tagged with both the item and the block version of "logs".""")
 @Examples("""
 	if player's tool is tagged with item tag "planks":
-		send "that's a plank!"
+		send "that's a plank!" to player
 
 	on block break:
 		if event-block is tagged with tag "mineable/pickaxe":
