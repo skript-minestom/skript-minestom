@@ -28,7 +28,7 @@ import java.util.List;
 	broadcast tags of dirt
 	set {_tags::*} to block tags of event-block
 	if player's tool's item tags contains item tag "planks":
-		send "holding a plank\"""")
+		send "holding a plank" to player""")
 @Keywords({"tag", "tags of", "minecraft tag"})
 public class ExprTagsOf extends SimpleExpression<MinecraftTag> {
 
