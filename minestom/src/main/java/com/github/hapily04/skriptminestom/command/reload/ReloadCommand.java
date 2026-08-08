@@ -153,7 +153,7 @@ public class ReloadCommand extends Command {
 
 	private static boolean cantExecute(CommandSender sender, String permission) {
 		boolean hasPermission = LuckPermsPlayer.hasPermission(sender, permission);
-		if (hasPermission) sender.sendMessage(NO_PERMISSION);
+		if (!hasPermission) sender.sendMessage(NO_PERMISSION);
 		return !hasPermission;
 	}
 
