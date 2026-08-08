@@ -57,6 +57,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 	dimension -> dimensiontype
 	preload biome -> biome (fills the entire world with the provided biome)
 	[async] preload option -> normal/strict (strict will not allow default generation of new chunks, even blank ones, as the player travels the world)
+	preload chunk amount -> number (the radius in chunks to preload when there is no world file to read chunks from, defaults to the server's chunk view distance)
 	generator -> section allowing custom generation of each chunk as the world loads (complex generation not recommended as it can get laggy with Skript)""")
 @Examples("""
 	create biome under "test:lobby" stored in {_b}:
@@ -88,6 +89,7 @@ public class EffSecCreateInstance extends EffectSection {
 			.addEntryData(new ExpressionEntryData<>("preload biome", null, true, Biome.class))
 			.addEntry("preload option", null, true)
 			.addEntry("async preload option", null, true)
+			.addEntryData(new ExpressionEntryData<>("preload chunk amount", null, true, Integer.class))
 			.addSection("generator", true)
 			.build();
 		Skript.registerSection(EffSecCreateInstance.class,
@@ -118,6 +120,8 @@ public class EffSecCreateInstance extends EffectSection {
 	private Expression<Biome> biome;
 	@Nullable
 	private String preloadOption;
+	@Nullable
+	private Expression<Integer> preloadChunkAmount;
 	boolean asyncPreload = false;
 	@Nullable
 	private Trigger generator;
@@ -183,6 +187,12 @@ public class EffSecCreateInstance extends EffectSection {
 					return false;
 				}
 				this.preloadOption = preloadOption;
+			}
+
+			preloadChunkAmount = container.getOptional("preload chunk amount", Expression.class, false);
+			if (preloadChunkAmount != null && this.preloadOption == null) {
+				Skript.error("Entry 'preload chunk amount' only applies when a preload option is also provided.");
+				return false;
 			}
 
 			SectionNode generator = container.getOptional("generator", SectionNode.class, false);
@@ -263,7 +273,7 @@ public class EffSecCreateInstance extends EffectSection {
 					Variables.removeLocals(generateEvent);
 				});
 			}
-			if (preloadOption != null) preLoadChunks(container, trueWorldFile, preloadOption.equals("strict"), biome);
+			if (preloadOption != null) preLoadChunks(container, trueWorldFile, preloadOption.equals("strict"), biome, preloadChunkAmount(event));
 		} else {
 			assert originalInstance != null; // it won't be null because it's in the pattern
 			InstanceContainer instanceContainer = originalInstance.getSingle(event);
@@ -311,7 +321,18 @@ public class EffSecCreateInstance extends EffectSection {
 		}
 	}
 
-	private void preLoadChunks(InstanceContainer container, @Nullable File file, boolean strict, RegistryKey<Biome> biome) {
+	private int preloadChunkAmount(Event event) {
+		if (preloadChunkAmount == null) return ServerFlag.CHUNK_VIEW_DISTANCE;
+		Integer amount = preloadChunkAmount.getSingle(event);
+		if (amount == null || amount < 0) {
+			SkriptLogger.LOGGER.warn("Entry 'preload chunk amount' was provided, but its value is not a valid chunk amount. " +
+				"Falling back to the server's chunk view distance.");
+			return ServerFlag.CHUNK_VIEW_DISTANCE;
+		}
+		return amount;
+	}
+
+	private void preLoadChunks(InstanceContainer container, @Nullable File file, boolean strict, RegistryKey<Biome> biome, int chunkViewDistance) {
 		ChunkLoader loader = container.getChunkLoader();
 		boolean loadServerRenderDistance = true;
 		IntSet queuedChunks = new IntArraySet();
@@ -358,7 +379,6 @@ public class EffSecCreateInstance extends EffectSection {
 
 		// this will only be called if a provided world file that we're loading from doesn't exist or has no chunks in it
 		if (loadServerRenderDistance) {
-			int chunkViewDistance = ServerFlag.CHUNK_VIEW_DISTANCE;
 			int chunkViewDistancePlus = chunkViewDistance+1;
 			for (int x = -chunkViewDistancePlus; x < chunkViewDistancePlus; x++) {
 				for (int z = -chunkViewDistancePlus; z < chunkViewDistancePlus; z++) {
