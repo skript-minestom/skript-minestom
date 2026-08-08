@@ -6,7 +6,7 @@ import java.time.LocalTime
 plugins {
 	id "com.gradleup.shadow" version "9.3.0"
 	id 'maven-publish'
-	id 'java'
+	id 'java-library'
 	id 'application'
 }
 
@@ -32,19 +32,20 @@ allprojects {
 dependencies {
 	shadow "org.bstats:bstats-base:3.2.1"
 	shadow "org.bstats:bstats-bukkit:3.2.1"
-	shadow "net.kyori:adventure-text-serializer-bungeecord:4.3.2"
-	shadow "org.eclipse.jdt:org.eclipse.jdt.annotation:2.2.700"
-	shadow "com.google.code.findbugs:findbugs:3.0.1"
-	shadow "com.google.code.gson:gson:2.8.9"
-	shadow "com.google.guava:guava:33.5.0-jre"
-	shadow "com.googlecode.json-simple:json-simple:1.1.1"
-	shadow "org.apache.commons:commons-lang3:3.20.0"
-	shadow "commons-lang:commons-lang:2.6"
-	shadow "org.yaml:snakeyaml:1.32"
-	shadow "ch.qos.logback:logback-classic:1.5.32"
-	shadow "net.kyori:adventure-text-minimessage:4.26.1"
-	shadow "net.kyori:adventure-text-serializer-ansi:4.26.1"
-	shadow "net.java.dev.jna:jna:5.17.0" // oopsk support
+	api "net.kyori:adventure-text-serializer-bungeecord:4.3.2"
+	api "org.eclipse.jdt:org.eclipse.jdt.annotation:2.2.700"
+	api("com.google.code.findbugs:findbugs:3.0.1") { transitive = false }
+	api "com.google.code.findbugs:jsr305:3.0.2"
+	api "com.google.code.gson:gson:2.8.9"
+	api "com.google.guava:guava:33.5.0-jre"
+	api("com.googlecode.json-simple:json-simple:1.1.1") { transitive = false }
+	api "org.apache.commons:commons-lang3:3.20.0"
+	api "commons-lang:commons-lang:2.6"
+	api "org.yaml:snakeyaml:1.32"
+	api "ch.qos.logback:logback-classic:1.5.32"
+	api "net.kyori:adventure-text-minimessage:4.26.1"
+	api "net.kyori:adventure-text-serializer-ansi:4.26.1"
+	api "net.java.dev.jna:jna:5.17.0" // oopsk support
 }
 
 task jar(overwrite: true, type: ShadowJar) {
