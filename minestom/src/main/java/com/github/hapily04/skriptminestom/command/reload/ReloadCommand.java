@@ -27,6 +27,7 @@ import static com.github.hapily04.skriptminestom.util.MessageUtils.SKRIPT_MINI_M
 public class ReloadCommand extends Command {
 
 	private static final Component RELOAD_USAGE = SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <error_color>Usage: /skript reload <all/folder/file/config>");
+	private static final Component NO_PERMISSION = SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <error_color>You don't have permission to do that.");
 
 	public ReloadCommand() {
 		super("reload");
@@ -34,9 +35,12 @@ public class ReloadCommand extends Command {
 		setDefaultExecutor((sender, _) -> sender.sendMessage(RELOAD_USAGE));
 		Argument<String[]> folderFileArg = new ArgumentStringArray("to_reload")
 			.setSuggestionCallback((sender, ctx, suggestion) -> {
-				suggestion.addEntry(new SuggestionEntry("all"));
-				suggestion.addEntry(new SuggestionEntry("config"));
-				initSuggestions(suggestion, ctx.getInput(), false);
+				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.all"))
+					suggestion.addEntry(new SuggestionEntry("all"));
+				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.config"))
+					suggestion.addEntry(new SuggestionEntry("config"));
+				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.scripts"))
+					initSuggestions(suggestion, ctx.getInput(), false);
 			});
 		addSyntax((sender, context) -> {
 			String locationProvided = context.get(folderFileArg)[0];
@@ -44,7 +48,7 @@ public class ReloadCommand extends Command {
 			locationProvided = locationProvided.replace('/', File.separatorChar);
 			locationProvided = locationProvided.replace('\\', File.separatorChar);
 			if (locationProvided.equalsIgnoreCase("all")) {
-				if (!LuckPermsPlayer.hasPermission(sender, "skript.reload.all")) return;
+				if (cantExecute(sender, "skript.reload.all")) return;
 				reloadingMessage(sender, "all scripts and config");
 				try (TimingLogHandler timingLogHandler = new TimingLogHandler().start()) {
 					try (RedirectingLogHandler redirectingLogHandler = new RedirectingLogHandler(sender, null).start()) {
@@ -55,14 +59,14 @@ public class ReloadCommand extends Command {
 					}
 				}
 			} else if (locationProvided.equalsIgnoreCase("config")) {
-				if (!LuckPermsPlayer.hasPermission(sender, "skript.reload.config")) return;
+				if (cantExecute(sender, "skript.reload.config")) return;
 				reloadingMessage(sender, "config");
 				try (TimingLogHandler timingLogHandler = new TimingLogHandler().start()) {
 					SkriptConfig.load();
 					reloadedMessage(sender, timingLogHandler, "config");
 				}
 			} else {
-				if (!LuckPermsPlayer.hasPermission(sender, "skript.reload.scripts")) return;
+				if (cantExecute(sender, "skript.reload.scripts")) return;
 				File scriptFile = ScriptLoader.getScriptFromName(locationProvided);
 				if (scriptFile == null) {
 					fileNotFoundMessage(sender, originalProvidedLocation);
@@ -145,6 +149,12 @@ public class ReloadCommand extends Command {
 	static void reloadedMessage(CommandSender sender, TimingLogHandler timingLogHandler, String whatToReload) {
 		long time = timingLogHandler.getTimeTaken();
 		sender.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <success_color>Successfully reloaded <yellow>" + whatToReload + " <success_color>in " + time + "ms."));
+	}
+
+	private static boolean cantExecute(CommandSender sender, String permission) {
+		boolean hasPermission = LuckPermsPlayer.hasPermission(sender, permission);
+		if (hasPermission) sender.sendMessage(NO_PERMISSION);
+		return !hasPermission;
 	}
 
 }
