@@ -2241,6 +2241,32 @@ public class MinestomClasses {
 				}
 			}));
 
+		Classes.registerClass(new ClassInfo<>(MinecraftTag.class, "minecrafttag")
+			.user("minecraft ?tags?")
+			.name("Minecraft Tag")
+			.description("""
+				A tag used to group items, blocks or entity types, such as 'minecraft:logs'.
+				Tags have a namespace and a value, written as "namespace:value". Obtain them with the 'tag' expression.""")
+			.usage("<namespace>:<value>")
+			.examples("minecraft tag \"logs\"")
+			.defaultExpression(new EventValueExpression<>(MinecraftTag.class))
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull MinecraftTag o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull MinecraftTag o) {
+					return o.type().getName() + " tag " + o.key().asString();
+				}
+			}));
+
 		/*
 		 * Converters
 		 */
@@ -2349,6 +2375,7 @@ public class MinestomClasses {
 		//Comparators.registerComparator(Item.class, Slot.class, (o1, o2) -> Relation.get(o1.getItem().isSimilar(o2.getItem())));
 		Comparators.registerComparator(Item.class, Item.class, (o1, o2) -> Relation.get(o1.getItem().equals(o2.getItem())));
 		Comparators.registerComparator(Block.class, Block.class, (o1, o2) -> Relation.get(o1.compare(o2)));
+		Comparators.registerComparator(MinecraftTag.class, MinecraftTag.class, (o1, o2) -> Relation.get(o1.equals(o2)));
 		Comparators.registerComparator(Item.class, Block.class, (o1, o2) -> {
 			ItemStack item = o1.getItem();
 			Material material = item.material();
