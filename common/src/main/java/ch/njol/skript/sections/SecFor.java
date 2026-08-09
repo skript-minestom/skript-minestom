@@ -5,25 +5,24 @@ import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.TriggerItem;
-import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.ContainerExpression;
+import ch.njol.skript.registrations.Feature;
 import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
 import ch.njol.skript.util.LiteralUtils;
+import ch.njol.skript.variables.HintManager;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
-@Name("For Each Loop (Experimental)")
+@Name("For Each Loop")
 @Description("""
 	A specialised loop section run for each element in a list.
 	Unlike the basic loop, this is designed for extracting the key & value from pairs.
@@ -31,23 +30,27 @@ import java.util.Map;
 	
 	When looping a simple (non-indexed) set of values, e.g. all players, the index will be the loop counter number."""
 )
-@Examples({
-	"for each {_player} in players:",
-	"\tsend \"Hello %{_player}%!\" to {_player}",
-	"",
-	"loop {_item} in {list of items::*}:",
-	"\tbroadcast {_item}'s name",
-	"",
-	"for each key {_index} in {list of items::*}:",
-	"\tbroadcast {_index}",
-	"",
-	"loop key {_index} and value {_value} in {list of items::*}:",
-	"\tbroadcast \"%{_index}% = %{_value}%\"",
-	"",
-	"for each {_index} = {_value} in {my list::*}:",
-	"\tbroadcast \"%{_index}% = %{_value}%\"",
-})
-@Since("INSERT VERSION")
+@Example("""
+	for each {_player} in players:
+		send "Hello %{_player}%!" to {_player}
+	""")
+@Example("""
+	loop {_item} in {list of items::*}:
+		broadcast {_item}'s name
+	""")
+@Example("""
+	for each key {_index} in {list of items::*}:
+		broadcast {_index}
+	""")
+@Example("""
+	loop key {_index} and value {_value} in {list of items::*}:
+		broadcast "%{_index}% = %{_value}%"
+	""")
+@Example("""
+	for each {_index}, {_value} in {my list::*}:
+		broadcast "%{_index}% = %{_value}%"
+	""")
+@Since("2.10, 2.14 (stable release)")
 public class SecFor extends SecLoop {
 
 	static {
@@ -63,11 +66,11 @@ public class SecFor extends SecLoop {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs,
-						int matchedPattern,
-						Kleenean isDelayed,
-						ParseResult parseResult,
-						SectionNode sectionNode,
-						List<TriggerItem> triggerItems) {
+	                    int matchedPattern,
+	                    Kleenean isDelayed,
+	                    ParseResult parseResult,
+	                    SectionNode sectionNode,
+	                    List<TriggerItem> triggerItems) {
 		//<editor-fold desc="Set the key/value expressions based on the pattern" defaultstate="collapsed">
 		switch (matchedPattern) {
 			case 0:
@@ -97,20 +100,39 @@ public class SecFor extends SecLoop {
 			Skript.error("Can't understand this loop: '" + parseResult.expr + "'");
 			return false;
 		}
-		if (Container.class.isAssignableFrom(expression.getReturnType())) {
+		if (!(expression instanceof Variable) && Container.class.isAssignableFrom(expression.getReturnType())) {
 			ContainerType type = expression.getReturnType().getAnnotation(ContainerType.class);
 			if (type == null)
 				throw new SkriptAPIException(expression.getReturnType()
-													   .getName() + " implements Container but is missing the required @ContainerType annotation");
+					.getName() + " implements Container but is missing the required @ContainerType annotation");
 			this.expression = new ContainerExpression((Expression<? extends Container<?>>) expression, type.value());
 		}
 		if (expression.isSingle()) {
 			Skript.error("Can't loop '" + expression + "' because it's only a single value");
 			return false;
 		}
+		keyed = KeyProviderExpression.canReturnKeys(expression);
 		//</editor-fold>
+
+		//<editor-fold desc="Handle type hints for variables" defaultstate="collapsed">
+		// we add because there is no guarantee the loop will run
+		HintManager hintManager = getParser().getHintManager();
+		if (keyStore != null && HintManager.canUseHints((Variable<?>) keyStore)) {
+			Class<?>[] hints;
+			if (expression instanceof Variable) { // variable indices (keys) are strings
+				hints = new Class[]{String.class};
+			} else { // keyStore may hold strings or longs
+				hints = new Class[]{String.class, Long.class};
+			}
+			hintManager.add((Variable<?>) keyStore, hints);
+		}
+		if (valueStore != null && HintManager.canUseHints((Variable<?>) valueStore)) {
+			hintManager.add((Variable<?>) valueStore, expression.possibleReturnTypes());
+		}
+		//</editor-fold>
+
 		this.loadOptionalCode(sectionNode);
-		super.setNext(this);
+		this.setInternalNext(this);
 		return true;
 	}
 
@@ -118,13 +140,11 @@ public class SecFor extends SecLoop {
 	protected void store(Event event, Object next) {
 		super.store(event, next);
 		//<editor-fold desc="Store the loop index/value in the variables" defaultstate="collapsed">
-		if (next instanceof Map.Entry) {
-			//noinspection unchecked
-			Map.Entry<String, Object> entry = (Map.Entry<String, Object>) next;
+		if (next instanceof KeyedValue<?> keyedValue) {
 			if (keyStore != null)
-				this.keyStore.change(event, new Object[] {entry.getKey()}, Changer.ChangeMode.SET);
+				this.keyStore.change(event, new Object[] {keyedValue.key()}, Changer.ChangeMode.SET);
 			if (valueStore != null)
-				this.valueStore.change(event, new Object[] {entry.getValue()}, Changer.ChangeMode.SET);
+				this.valueStore.change(event, new Object[] {keyedValue.value()}, Changer.ChangeMode.SET);
 		} else {
 			if (keyStore != null)
 				this.keyStore.change(event, new Object[] {this.getLoopCounter(event)}, Changer.ChangeMode.SET);
