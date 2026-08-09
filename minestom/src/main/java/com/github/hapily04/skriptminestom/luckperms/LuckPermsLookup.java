@@ -59,8 +59,7 @@ public final class LuckPermsLookup {
     }
 
     public static boolean hasPermission(@NotNull CommandSender sender, @NotNull String permissionName) {
-        if (sender instanceof ConsoleSender) return true;
-        return sender instanceof Player player && hasPermission(player, permissionName);
+        return sender instanceof ConsoleSender || (sender instanceof Player player && hasPermission(player, permissionName));
     }
 
     public static @NotNull String getPrimaryGroup(@NotNull Player player) {
