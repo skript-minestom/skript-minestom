@@ -51,6 +51,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -234,7 +235,7 @@ public class SkriptMinestom {
 			for (Player p : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
 				p.kick(kickComponent);
 			}
-			spark.shutdown();
+			if (spark != null) spark.shutdown();
 			shutdown();
 			LuckPermsMinestom.disable();
 			MinestomTerminal.stop();
@@ -284,7 +285,7 @@ public class SkriptMinestom {
 		}
 	}
 
-	public static LuckPerms getLuckPerms() {
+	public static @Nullable LuckPerms getLuckPerms() {
 		if (luckPerms != null) return luckPerms;
 		try {
 			return LuckPermsProvider.get();
@@ -293,7 +294,7 @@ public class SkriptMinestom {
 		}
 	}
 
-	public static SparkMinestom getSpark() {
+	public static @Nullable SparkMinestom getSpark() {
 		return spark;
 	}
 
