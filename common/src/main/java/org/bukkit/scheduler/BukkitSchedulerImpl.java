@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class BukkitSchedulerImpl implements BukkitScheduler {
+
 	// concurrenthashmap fixes concurrentmodificationexception from having a lot of events run at once
 	private final Map<Integer, Task> tasks = new ConcurrentHashMap<>();
 	private final Queue<Task> pendingTasks = new ConcurrentLinkedQueue<>();
