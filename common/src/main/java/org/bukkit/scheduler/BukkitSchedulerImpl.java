@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class BukkitSchedulerImpl implements BukkitScheduler {
+
 	// concurrenthashmap fixes concurrentmodificationexception from having a lot of events run at once
 	private final Map<Integer, Task> tasks = new ConcurrentHashMap<>();
 	private final Queue<Task> pendingTasks = new ConcurrentLinkedQueue<>();
@@ -32,12 +33,21 @@ public class BukkitSchedulerImpl implements BukkitScheduler {
 		for (int taskID : tasks.keySet()) {
 			Task task = tasks.get(taskID);
 			if (task == null) continue; // Task was removed mid-tick
+			if (task.isCancelled()) {
+				tasks.remove(taskID);
+				continue;
+			}
 			task.ticksLeft--;
 
 			if (task.ticksLeft > 0) continue;
 			currentTask = task;
-			if (task.async) threadPool.submit(task.runnable);
-			else task.runnable.run();
+			try {
+				if (task.async) threadPool.submit(task.runnable);
+				else task.runnable.run();
+			} catch (Throwable t) {
+				Bukkit.getLogger().log(java.util.logging.Level.SEVERE,
+					"Task " + taskID + " from " + task.getOwner().getName() + " threw an exception", t);
+			}
 
 			currentTask = null;
 			task.ticksLeft = task.isRepeating() ? task.duration : task.delay;
@@ -163,15 +173,24 @@ public class BukkitSchedulerImpl implements BukkitScheduler {
 	}
 
 	public boolean isCurrentlyRunning(int taskID) {
-		if (!tasks.containsKey(taskID))
+		Task task = tasks.get(taskID);
+		if (task == null)
 			return false;
 
-		Task task = tasks.get(taskID);
 		return task.isRepeating() || (!task.async && currentTask == task);
 	}
 
 	public void cancelTask(int taskID) {
-		tasks.remove(taskID).setCancelled(true);
+		Task task = tasks.remove(taskID);
+		if (task == null) {
+			for (Task pending : pendingTasks) {
+				if (pending.id != taskID) continue;
+				pendingTasks.remove(pending);
+				task = pending;
+				break;
+			}
+		}
+		if (task != null) task.setCancelled(true);
 	}
 
 	public <T> Future<T> callSyncMethod(Plugin plugin, Callable<T> task) {

@@ -36,7 +36,9 @@ public class ExprMe extends SimpleExpression<Player> {
 	@Override
 	@Nullable
 	protected Player[] get(Event e) {
-		return new Player[]{((EffectCommandEvent) e).getExecutor()};
+		EffectCommandEvent event = (EffectCommandEvent) e;
+		if (event.getExecutor() instanceof Player player) return new Player[]{player};
+		return new Player[0];
 	}
 
 	@Override

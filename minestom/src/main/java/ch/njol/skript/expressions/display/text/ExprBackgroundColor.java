@@ -36,7 +36,7 @@ public class ExprBackgroundColor extends SimplePropertyExpression<Entity, RGBLik
 
 	@Override
 	public void change(Event event, @org.jspecify.annotations.Nullable @org.eclipse.jdt.annotation.Nullable Object[] delta, Changer.ChangeMode mode) {
-		RGBLike color = delta == null ? null : (Color) delta[0];
+		RGBLike color = delta == null ? null : (RGBLike) delta[0];
 		for (Entity entity : getExpr().getArray(event)) {
 			if (!(entity.getEntityMeta() instanceof TextDisplayMeta meta)) continue;
 			switch (mode) {

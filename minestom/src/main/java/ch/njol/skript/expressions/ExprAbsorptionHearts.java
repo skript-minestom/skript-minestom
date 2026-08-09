@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Absorption Hearts")
 @Description("The absorption hearts of a player.")
-@Examples("set health of player to 20")
+@Examples("set absorption hearts of player to 20")
 public class ExprAbsorptionHearts extends SimplePropertyExpression<Player, Number> {
 
 	static {
