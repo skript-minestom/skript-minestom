@@ -9,7 +9,6 @@ import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.util.Tristate;
-import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.player.GameProfile;
@@ -166,10 +165,6 @@ public class LuckPermsPlayer extends Player {
         CachedMetaData metaData = getLuckPermsMetaData();
         String suffix = metaData == null ? null : metaData.getSuffix();
         return suffix == null ? "" : suffix;
-    }
-
-    public static boolean hasPermission(CommandSender sender, String permissionNode) {
-        return LuckPermsLookup.hasPermission(sender, permissionNode);
     }
 
 }

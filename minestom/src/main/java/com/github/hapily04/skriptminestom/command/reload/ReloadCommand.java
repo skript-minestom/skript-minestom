@@ -6,7 +6,7 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.TimingLogHandler;
 import ch.njol.util.OpenCloseable;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
@@ -31,15 +31,15 @@ public class ReloadCommand extends Command {
 
 	public ReloadCommand() {
 		super("reload");
-		setCondition((sender, _) -> LuckPermsPlayer.hasPermission(sender, "skript.reload"));
+		setCondition((sender, _) -> LuckPermsLookup.hasPermission(sender, "skript.reload"));
 		setDefaultExecutor((sender, _) -> sender.sendMessage(RELOAD_USAGE));
 		Argument<String[]> folderFileArg = new ArgumentStringArray("to_reload")
 			.setSuggestionCallback((sender, ctx, suggestion) -> {
-				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.all"))
+				if (LuckPermsLookup.hasPermission(sender, "skript.reload.all"))
 					suggestion.addEntry(new SuggestionEntry("all"));
-				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.config"))
+				if (LuckPermsLookup.hasPermission(sender, "skript.reload.config"))
 					suggestion.addEntry(new SuggestionEntry("config"));
-				if (LuckPermsPlayer.hasPermission(sender, "skript.reload.scripts"))
+				if (LuckPermsLookup.hasPermission(sender, "skript.reload.scripts"))
 					initSuggestions(suggestion, ctx.getInput(), false);
 			});
 		addSyntax((sender, context) -> {
@@ -152,7 +152,7 @@ public class ReloadCommand extends Command {
 	}
 
 	private static boolean cantExecute(CommandSender sender, String permission) {
-		boolean hasPermission = LuckPermsPlayer.hasPermission(sender, permission);
+		boolean hasPermission = LuckPermsLookup.hasPermission(sender, permission);
 		if (!hasPermission) sender.sendMessage(NO_PERMISSION);
 		return !hasPermission;
 	}

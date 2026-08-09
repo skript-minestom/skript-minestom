@@ -3,7 +3,7 @@ package com.github.hapily04.skriptminestom.command;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.github.hapily04.skriptminestom.Version;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -27,7 +27,7 @@ public class InfoCommand extends Command {
 
 	public InfoCommand() {
 		super("info");
-		setCondition((sender, _) -> LuckPermsPlayer.hasPermission(sender, "skript.info"));
+		setCondition((sender, _) -> LuckPermsLookup.hasPermission(sender, "skript.info"));
 		setDefaultExecutor((sender, _) -> {
 			TagResolver minestomVersion = Placeholder.unparsed("minestom_version", Git.version() + " (MC " + MinecraftServer.VERSION_NAME + ")");
 			TagResolver skriptMinestomVersion = Placeholder.unparsed("skript_minestom_version", Version.VERSION);

@@ -1,7 +1,7 @@
 package com.github.hapily04.skriptminestom.command;
 
 import com.github.hapily04.skriptminestom.command.reload.ReloadCommand;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.builder.Command;
 
@@ -21,7 +21,7 @@ public class SkriptCommand extends Command {
 
     public SkriptCommand() {
         super("skript", "sk");
-        setCondition((sender, _) ->  LuckPermsPlayer.hasPermission(sender, "skript.skript"));
+        setCondition((sender, _) ->  LuckPermsLookup.hasPermission(sender, "skript.skript"));
         setDefaultExecutor((sender, _) -> sender.sendMessage(HELP_MESSAGE));
         addSubcommand(new ReloadCommand());
 		//addSubcommand(new DisableCommand());

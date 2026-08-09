@@ -2,7 +2,7 @@ package com.github.hapily04.skriptminestom.command;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.util.FileUtils;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.Argument;
@@ -24,7 +24,7 @@ public class DisableCommand extends Command {
 
 	public DisableCommand() {
 		super("disable");
-		setCondition((sender, _) -> LuckPermsPlayer.hasPermission(sender, "skript.disable"));
+		setCondition((sender, _) -> LuckPermsLookup.hasPermission(sender, "skript.disable"));
 		setDefaultExecutor((sender, _) -> sender.sendMessage(DISABLE_USAGE));
 		Argument<String[]> fileArg = new ArgumentStringArray("to_disable")
 			.setSuggestionCallback((_, ctx, suggestion) -> initSuggestions(suggestion, ctx.getInput(), false));

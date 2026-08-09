@@ -130,7 +130,7 @@ public class SkriptMinestom {
 		Path directory = new File(FileUtils.getServerDirectory(), "spark").toPath();
 		return SparkMinestom.builder(directory)
 			.commands(true) // enables registration of Spark commands
-			.permissionHandler((sender, a) -> LuckPermsPlayer.hasPermission(sender, "spark"))
+			.permissionHandler((sender, a) -> LuckPermsLookup.hasPermission(sender, "spark"))
 			.enable();
 	}
 
