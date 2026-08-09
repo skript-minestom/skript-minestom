@@ -1,9 +1,13 @@
 package org.skriptlang.skript.registration;
 
-import ch.njol.skript.lang.*;
-import org.jetbrains.annotations.ApiStatus;
+import ch.njol.skript.lang.Condition;
+import ch.njol.skript.lang.Effect;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Section;
+import ch.njol.skript.lang.Statement;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
+import org.skriptlang.skript.docs.Origin;
 import org.skriptlang.skript.lang.structure.Structure;
 import org.skriptlang.skript.util.Registry;
 import org.skriptlang.skript.util.ViewProvider;
@@ -11,9 +15,8 @@ import org.skriptlang.skript.util.ViewProvider;
 import java.util.Collection;
 
 /**
- * A syntax registry manages all {@link SyntaxRegister}s for syntax registration.
+ * A syntax registry is a central container for all {@link SyntaxInfo}s.
  */
-@ApiStatus.Experimental
 public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<SyntaxInfo<?>> {
 
 	/**
@@ -58,6 +61,17 @@ public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<S
 	}
 
 	/**
+	 * Constructs a syntax registry that applies an origin to all syntax infos registered through it
+	 *  with the {@link Origin#UNKNOWN} origin.
+	 * @param syntaxRegistry The syntax registry providing the implementation.
+	 * @param origin The origin to apply.
+	 * @return A syntax registry that applies an origin.
+	 */
+	static SyntaxRegistry withOrigin(SyntaxRegistry syntaxRegistry, Origin origin) {
+		return new SyntaxRegistryImpl.OriginApplyingRegistry(syntaxRegistry, origin);
+	}
+
+	/**
 	 * A method to obtain all syntaxes registered under a certain key.
 	 * @param key The key to obtain syntaxes from.
 	 * @return An unmodifiable snapshot of all syntaxes registered under <code>key</code>.
@@ -74,10 +88,18 @@ public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<S
 	<I extends SyntaxInfo<?>> void register(Key<I> key, I info);
 
 	/**
+	 * Unregisters all registrations of a syntax, regardless of the {@link Key}.
+	 * @param info The syntax info to unregister.
+	 * @see #unregister(Key, SyntaxInfo)
+	 */
+	void unregister(SyntaxInfo<?> info);
+
+	/**
 	 * Unregisters a syntax registered under a provided key.
 	 * @param key The key the <code>info</code> is registered under.
 	 * @param info The syntax info to unregister.
 	 * @param <I> The syntax type.
+	 * @see #unregister(SyntaxInfo)
 	 */
 	<I extends SyntaxInfo<?>> void unregister(Key<I> key, I info);
 
@@ -104,7 +126,6 @@ public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<S
 	 * Represents a syntax element type.
 	 * @param <I> The syntax type.
 	 */
-	@ApiStatus.Experimental
 	interface Key<I extends SyntaxInfo<?>> {
 
 		/**
@@ -129,7 +150,6 @@ public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<S
 	 * @param <I> The child key's syntax type.
 	 * @param <P> The parent key's syntax type.
 	 */
-	@ApiStatus.Experimental
 	interface ChildKey<I extends P, P extends SyntaxInfo<?>> extends Key<I> {
 
 		/**
@@ -140,7 +160,7 @@ public interface SyntaxRegistry extends ViewProvider<SyntaxRegistry>, Registry<S
 		 * @param <P> The parent key's syntax type.
 		 */
 		@Contract("_, _ -> new")
-		static <I extends P, P extends SyntaxInfo<?>> Key<I> of(Key<P> parent, String name) {
+		static <I extends P, P extends SyntaxInfo<?>> ChildKey<I, P> of(Key<P> parent, String name) {
 			return new SyntaxRegistryImpl.ChildKeyImpl<>(parent, name);
 		}
 
