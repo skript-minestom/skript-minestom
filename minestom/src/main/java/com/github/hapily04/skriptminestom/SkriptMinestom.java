@@ -44,6 +44,8 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChatEvent;
+import net.minestom.server.thread.TickThread;
+import net.minestom.server.timer.TaskSchedule;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
@@ -69,6 +71,7 @@ public class SkriptMinestom {
 	private static Properties properties;
 	private static LuckPerms luckPerms;
 	private static SparkMinestom spark;
+	private static volatile Thread schedulerThread;
 
 	static void main() {
 		properties = PropertyUtils.loadServerProperties();
@@ -135,7 +138,14 @@ public class SkriptMinestom {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static void initSkript() throws URISyntaxException {
-		//Bukkit.setTicker(tick -> MinecraftServer.getSchedulerManager().scheduleTask(tick, TaskSchedule.tick(1), TaskSchedule.tick(1))); // tick on minestom's thread
+		Bukkit.setPrimaryThreadCheck(() -> {
+			Thread current = Thread.currentThread();
+			return current instanceof TickThread || current == schedulerThread;
+		});
+		Bukkit.setTicker(tick -> MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+			schedulerThread = Thread.currentThread();
+			tick.run();
+		}, TaskSchedule.tick(1), TaskSchedule.tick(1))); // tick on minestom's thread
 		Bukkit.setServer(new BukkitServer());
 		Bukkit.getScheduler(); // initialize scheduler
 

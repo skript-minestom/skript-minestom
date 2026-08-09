@@ -17,11 +17,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 public class Bukkit {
 	private static final Thread primaryThread = Thread.currentThread();
+	private static BooleanSupplier primaryThreadCheck = () -> Thread.currentThread().equals(primaryThread);
 	private static final PluginManager pluginManager = new SimplePluginManager();
 	private static final Logger trueLogger = LoggerFactory.getLogger(Bukkit.class);
 	private static final java.util.logging.Logger logger = generateBadLogger("Bukkit", trueLogger);
@@ -89,7 +91,11 @@ public class Bukkit {
 	}
 
 	public static boolean isPrimaryThread() {
-		return Thread.currentThread().equals(primaryThread);
+		return primaryThreadCheck.getAsBoolean();
+	}
+
+	public static void setPrimaryThreadCheck(BooleanSupplier check) {
+		Bukkit.primaryThreadCheck = check;
 	}
 
 	public static Thread getPrimaryThread() {
