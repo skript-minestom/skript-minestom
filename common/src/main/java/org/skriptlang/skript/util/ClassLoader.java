@@ -87,6 +87,10 @@ public class ClassLoader {
 	 * @see #loadClasses(Class, JarFile)
 	 */
 	public void loadClasses(Class<?> source, File jarFile) {
+		if (jarFile == null || !jarFile.isFile()) {
+			loadClasses(source);
+			return;
+		}
 		try (JarFile jar = new JarFile(jarFile)) {
 			loadClasses(source, jar);
 		} catch (IOException e) {

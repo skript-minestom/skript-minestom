@@ -78,6 +78,8 @@ public class PluginClassLoader extends URLClassLoader {
 			return description;
 
 		URL resource = findResource("plugin.yml"); // Only searches this loader’s URLs
+		if (resource == null && file.isDirectory())
+			resource = getResource("plugin.yml");
 		if (resource == null) {
 			Bukkit.getBetterLogger().warn("Found JAR '{}' in the plugins folder without a plugin.yml file.", file.getName());
 			return null;

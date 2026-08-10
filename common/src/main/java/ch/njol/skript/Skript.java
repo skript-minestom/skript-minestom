@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -64,6 +65,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -250,6 +252,23 @@ public final class Skript extends JavaPlugin implements Listener {
 		return addonsFolder;
 	}
 
+	private Collection<String> getResourceEntries() throws IOException {
+		URL url = getClass().getResource("/config.sk");
+		if (url == null)
+			return Collections.emptyList();
+		Path root;
+		try {
+			root = Paths.get(url.toURI()).getParent();
+		} catch (URISyntaxException | IllegalArgumentException e) {
+			return Collections.emptyList();
+		}
+		try (Stream<Path> paths = Files.walk(root)) {
+			return paths.filter(Files::isRegularFile)
+				.map(path -> root.relativize(path).toString().replace(File.separatorChar, '/'))
+				.collect(Collectors.toList());
+		}
+	}
+
 	@Override
 	public void onEnable() {
 		updateMinecraftVersion();
@@ -297,35 +316,44 @@ public final class Skript extends JavaPlugin implements Listener {
 					populateLanguageFiles = true;
 				}
 
-				f = new ZipFile(getFile());
-				for (ZipEntry e : new EnumerationIterable<ZipEntry>(f.entries())) {
-					if (e.isDirectory())
-						continue;
+				File source = getFile();
+				Collection<String> entries;
+				if (source != null && source.isFile()) {
+					f = new ZipFile(source);
+					entries = new ArrayList<>();
+					for (ZipEntry e : new EnumerationIterable<ZipEntry>(f.entries())) {
+						if (!e.isDirectory())
+							entries.add(e.getName());
+					}
+				} else {
+					entries = getResourceEntries();
+				}
+				for (String entry : entries) {
 					File saveTo = null;
-					if (populateExamples && e.getName().startsWith(SCRIPTSFOLDER + "/")) {
-						String fileName = e.getName().substring(e.getName().indexOf("/") + 1);
+					if (populateExamples && entry.startsWith(SCRIPTSFOLDER + "/")) {
+						String fileName = entry.substring(entry.indexOf("/") + 1);
 						// All example scripts must be disabled for jar security.
 						if (!fileName.startsWith(ScriptLoader.DISABLED_SCRIPT_PREFIX))
 							fileName = ScriptLoader.DISABLED_SCRIPT_PREFIX + fileName;
 						saveTo = new File(scriptsFolder, fileName);
 					} else if (populateLanguageFiles
-							&& e.getName().startsWith("lang/")
-							&& !e.getName().endsWith("default.lang")) {
-						String fileName = e.getName().substring(e.getName().lastIndexOf("/") + 1);
+							&& entry.startsWith("lang/")
+							&& !entry.endsWith("default.lang")) {
+						String fileName = entry.substring(entry.lastIndexOf("/") + 1);
 						saveTo = new File(lang, fileName);
-					} else if (e.getName().equals("config.sk")) {
+					} else if (entry.equals("config.sk")) {
 						if (!config.exists())
 							saveTo = config;
-//					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
-//						File af = new File(getDataFolder(), e.getName());
+//					} else if (entry.startsWith("aliases-") && entry.endsWith(".sk") && !entry.contains("/")) {
+//						File af = new File(getDataFolder(), entry);
 //						if (!af.exists())
 //							saveTo = af;
-					} else if (e.getName().startsWith("features.sk")) {
+					} else if (entry.startsWith("features.sk")) {
 						if (!features.exists())
 							saveTo = features;
 					}
 					if (saveTo != null) {
-						InputStream in = f.getInputStream(e);
+						InputStream in = f != null ? f.getInputStream(f.getEntry(entry)) : getResource(entry);
 						try {
 							assert in != null;
 							FileUtils.save(in, saveTo);
