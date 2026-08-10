@@ -20,7 +20,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish
-        run: ./gradlew publish
+        run: ./gradlew minestom:publishMinestomPublishPublicationToMavenRepository
         env:
           ORG_GRADLE_PROJECT_repoHapilyUsername: ${{ secrets.REPO_HAPILY_USERNAME }}
           ORG_GRADLE_PROJECT_repoHapilyPassword: ${{ secrets.REPO_HAPILY_PASSWORD }}
