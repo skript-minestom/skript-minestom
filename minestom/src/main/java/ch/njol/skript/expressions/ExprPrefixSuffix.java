@@ -7,7 +7,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.minestom.server.entity.Player;
 import org.jspecify.annotations.Nullable;
 
@@ -32,8 +32,7 @@ public class ExprPrefixSuffix extends SimplePropertyExpression<Player, String> {
 
 	@Override
 	public @Nullable String convert(Player from) {
-		LuckPermsPlayer player = (LuckPermsPlayer) from;
-		return prefix ? player.getPrefix() : player.getSuffix();
+		return prefix ? LuckPermsLookup.getPrefix(from) : LuckPermsLookup.getSuffix(from);
 	}
 
 	@Override

@@ -15,6 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -43,6 +46,15 @@ public class Bukkit {
 	public static void setServer(Server server) {
 		if (server == null) throw new IllegalStateException("Server has already been set!");
 		Bukkit.server = server;
+	}
+
+	public static File getServerDirectory() {
+		if (server == null) throw new IllegalStateException("Server has not been defined yet!");
+		return server.getServerDirectory();
+	}
+
+	public static void setServerDirectory(File serverDirectory) {
+		server.setServerDirectory(serverDirectory);
 	}
 
 	public static java.util.logging.Logger getLogger() {

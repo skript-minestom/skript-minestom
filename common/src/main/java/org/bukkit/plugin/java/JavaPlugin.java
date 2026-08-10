@@ -53,7 +53,7 @@ public abstract class JavaPlugin extends PluginBase {
 	}
 
 	public File getDataFolder() {
-		if (dataFolder == null) dataFolder = new File(getName());
+		if (dataFolder == null) dataFolder = new File(Bukkit.getServerDirectory(), getName());
 		return dataFolder;
 	}
 

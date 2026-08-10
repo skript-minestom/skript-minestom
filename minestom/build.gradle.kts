@@ -1,12 +1,12 @@
 plugins {
 	id("com.gradleup.shadow") version "9.3.0"
 	application
-	java
+	`java-library`
 	`maven-publish`
 }
 
 group = "com.github.hapily04"
-version = "1.0.0-alpha.21"
+version = rootProject.version
 
 repositories {
     mavenCentral()
@@ -21,13 +21,13 @@ repositories {
 }
 
 dependencies {
-	implementation("net.minestom:minestom-sm:2026.08.08-26.2")
-	implementation("net.kyori:adventure-text-minimessage:5.2.0")
+	api("net.minestom:minestom-sm:2026.08.08-26.2")
+	api("net.kyori:adventure-text-minimessage:5.2.0")
 	implementation("dev.hollowcube:polar:1.16.0")
 	implementation("it.unimi.dsi:fastutil:8.5.18") // fix polar error
-	implementation("com.conceptmc:luckperms-minestom:5.5-SNAPSHOT")
+	api("com.conceptmc:luckperms-minestom:5.5-SNAPSHOT")
 	implementation("com.h2database:h2:2.2.224") // fix luckperms cause it's lowkey being stupid
-	implementation("dev.lu15:spark-minestom:1.10-SNAPSHOT")
+	api("dev.lu15:spark-minestom:1.10-SNAPSHOT")
 	implementation("org.spongepowered:configurate-hocon:3.7.2") // configuration using hocon
 	implementation("org.jline:jline:3.28.0") // part of terminal implementation
 	compileOnly("org.jetbrains:annotations:26.0.2")
@@ -35,7 +35,7 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic:1.5.32")
 	implementation("com.google.code.gson:gson:2.11.0")
 	implementation("mx.kenzie:mirror:5.0.3")
-	implementation(project(":common"))
+	api(project(":common"))
 	implementation("org.apache.commons:commons-lang3:3.20.0") // fix skript dependency
 }
 

@@ -5,7 +5,7 @@ import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.TimingLogHandler;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.util.OpenCloseable;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.Argument;
@@ -25,7 +25,7 @@ public class EnableCommand extends Command {
 
 	public EnableCommand() {
 		super("enable");
-		setCondition((sender, _) -> LuckPermsPlayer.hasPermission(sender, "skript.enable"));
+		setCondition((sender, _) -> LuckPermsLookup.hasPermission(sender, "skript.enable"));
 		setDefaultExecutor((sender, _) -> sender.sendMessage(ENABLE_USAGE));
 		Argument<String[]> fileArg = new ArgumentStringArray("to_enable")
 			.setSuggestionCallback((_, ctx, suggestion) -> initSuggestions(suggestion, ctx.getInput(), false));

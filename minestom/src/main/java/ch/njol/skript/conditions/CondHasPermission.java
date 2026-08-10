@@ -11,9 +11,8 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.ConsoleSender;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,10 +51,7 @@ public class CondHasPermission extends Condition {
 	public boolean check(final Event e) {
 		return senders.check(e,
 			s -> permissions.check(e,
-				perm -> {
-					if (s instanceof ConsoleSender) return true;
-					return ((LuckPermsPlayer) s).hasPermission(perm);
-				}), isNegated());
+				perm -> LuckPermsLookup.hasPermission(s, perm)), isNegated());
 	}
 
 	@Override
