@@ -45,6 +45,7 @@ public abstract class JavaPlugin extends PluginBase {
 	public final void init(PluginDescriptionFile description, PluginClassLoader loader) {
 		this.description = description;
 		this.loader = loader;
+		configFile = new File(getDataFolder(), "config.yml");
 	}
 
 	public @Nullable InputStream getResource(@NotNull String filename) {
