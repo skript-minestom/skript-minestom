@@ -23,8 +23,7 @@ public final class LuckPermsLookup {
     private static LuckPerms adapterSource;
     private static PlayerAdapter<Player> playerAdapter;
 
-    private LuckPermsLookup() {
-    }
+    private LuckPermsLookup() {}
 
     private static @Nullable PlayerAdapter<Player> getPlayerAdapter() {
         LuckPerms luckPerms = SkriptMinestom.getLuckPerms();

@@ -138,8 +138,7 @@ public class SkriptMinestom {
 	}
 
 	/**
-	 * Boots Skript, registering its event listeners on {@code node} instead of the global
-	 * event handler — lets an embedding server scope Skript to its own {@link EventNode}.
+	 * Boots Skript, registering its event listeners on the provided {@link EventNode}.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static void initSkript(EventNode<net.minestom.server.event.Event> node) throws URISyntaxException {
@@ -197,7 +196,6 @@ public class SkriptMinestom {
 		}
 	}
 
-	/** Registers the {@code !}-prefixed effect-command chat listener on {@code node}. */
 	public static void initEffectCommands(EventNode<net.minestom.server.event.Event> node) {
 		node.addListener(PlayerChatEvent.class, event -> {
 			if (!SkriptConfig.enableEffectCommands.value()) return;
@@ -246,7 +244,6 @@ public class SkriptMinestom {
 
 	/**
 	 * Registers {@code /skript} and routes unknown commands to {@link UnknownCommandEvent}.
-	 * The callback is a single-slot setter, so this replaces any already set.
 	 */
 	public static void initCommands() {
 		CommandManager commandManager = MinecraftServer.getCommandManager();
@@ -254,7 +251,6 @@ public class SkriptMinestom {
 		commandManager.setUnknownCommandCallback((sender, command) -> Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command)));
 	}
 
-	/** Registers {@code /stop}. Kept out of {@link #initCommands()} as an embedding server usually has its own. */
 	public static void initStopCommand() {
 		MinecraftServer.getCommandManager().register(new StopCommand());
 	}
@@ -270,10 +266,7 @@ public class SkriptMinestom {
 	}
 
 	/**
-	 * Disables the shim Skript plugin (and any registered addons), which is what runs
-	 * {@code Skript.onDisable()} and flushes variables to disk. Does not touch Spark,
-	 * LuckPerms, the terminal, or kick players — see {@link #scheduleShutdownTasks()} for the
-	 * full standalone-server shutdown sequence.
+	 * Runs the shutdown sequence for strictly the Skript plugin and the installed skript-minestom addons only.
 	 */
 	public static void shutdown() {
 		PluginManager pluginManager = Bukkit.getPluginManager();
