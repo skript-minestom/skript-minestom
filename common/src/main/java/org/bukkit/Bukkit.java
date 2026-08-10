@@ -15,6 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -31,6 +34,8 @@ public class Bukkit {
 	private static ServicesManager servicesManager = null;
 	private static Ticker ticker = new DefaultTicker();
 	private static Server server = null;
+	private static File serverDirectory = null;
+	private static boolean serverDirectoryUsed = false;
 
 	public static PluginManager getPluginManager() {
 		return pluginManager;
@@ -43,6 +48,28 @@ public class Bukkit {
 	public static void setServer(Server server) {
 		if (server == null) throw new IllegalStateException("Server has already been set!");
 		Bukkit.server = server;
+	}
+
+	public static File getServerDirectory() {
+		if (serverDirectory == null) serverDirectory = resolveServerDirectory();
+		serverDirectoryUsed = true;
+		return serverDirectory;
+	}
+
+	public static void setServerDirectory(File serverDirectory) {
+		if (serverDirectoryUsed) throw new IllegalStateException("Server directory has already been used!");
+		Bukkit.serverDirectory = serverDirectory;
+	}
+
+	private static File resolveServerDirectory() {
+		CodeSource source = Bukkit.class.getProtectionDomain().getCodeSource();
+		if (source != null) {
+			try {
+				File location = new File(source.getLocation().toURI());
+				if (location.isFile()) return location.getParentFile();
+			} catch (URISyntaxException | IllegalArgumentException ignored) {}
+		}
+		return new File(System.getProperty("user.dir"));
 	}
 
 	public static java.util.logging.Logger getLogger() {

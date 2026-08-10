@@ -2,15 +2,13 @@ package com.github.hapily04.skriptminestom.util;
 
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.Map;
 
 public class FileUtils {
-
-	private static final File SERVER_DIRECTORY = new File(FileUtils.class.getProtectionDomain().getCodeSource()
-			.getLocation().getFile()).getParentFile();
 
 	private FileUtils() {}
 
@@ -66,7 +64,11 @@ public class FileUtils {
 	}
 
 	public static File getServerDirectory() {
-		return SERVER_DIRECTORY;
+		return Bukkit.getServerDirectory();
+	}
+
+	public static void setServerDirectory(File serverDirectory) {
+		Bukkit.setServerDirectory(serverDirectory);
 	}
 
 }
