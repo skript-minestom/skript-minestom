@@ -1,6 +1,5 @@
 package org.skriptlang.skript.addon;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.skriptlang.skript.Skript;
 import org.skriptlang.skript.localization.Localizer;
@@ -8,13 +7,14 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import org.skriptlang.skript.util.Registry;
 import org.skriptlang.skript.util.ViewProvider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
  * A Skript addon is an extension to Skript that expands its features.
  * Typically, an addon instance may be obtained through {@link Skript#registerAddon(Class, String)}.
  */
-@ApiStatus.Experimental
 public interface SkriptAddon extends ViewProvider<SkriptAddon> {
 
 	/**
@@ -85,13 +85,18 @@ public interface SkriptAddon extends ViewProvider<SkriptAddon> {
 	/**
 	 * A helper method for loading addon modules.
 	 * Modules will be loaded as described by {@link AddonModule}.
+	 * An {@link AddonModule} will not load if {@link AddonModule#canLoad(SkriptAddon)} returns false.
 	 * @param modules The modules to load.
 	 */
 	default void loadModules(AddonModule... modules) {
-		for (AddonModule module : modules) {
+		List<AddonModule> filtered = Arrays.stream(modules)
+			.filter(addonModule -> addonModule.canLoad(this))
+			.toList();
+
+		for (AddonModule module : filtered) {
 			module.init(this);
 		}
-		for (AddonModule module : modules) {
+		for (AddonModule module : filtered) {
 			module.load(this);
 		}
 	}
