@@ -4,6 +4,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -24,5 +25,9 @@ public interface Server {
 	String getName();
 
 	Player getPlayer(UUID uuid);
+
+	File getServerDirectory();
+
+	void setServerDirectory(File serverDirectory);
 
 }

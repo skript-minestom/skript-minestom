@@ -76,6 +76,8 @@ public class SkriptMinestom {
 	private static volatile Thread schedulerThread;
 
 	static void main() {
+		Bukkit.setServer(new BukkitServer()); // serverDirectory is resolved from this, so it needs to be set immediately
+
 		properties = PropertyUtils.loadServerProperties();
 		initMinestomProperties();
 		MinecraftServer server = MinecraftServer.init(PropertyUtils.getAuth(properties));
@@ -149,7 +151,6 @@ public class SkriptMinestom {
 			schedulerThread = Thread.currentThread();
 			tick.run();
 		}, TaskSchedule.tick(1), TaskSchedule.tick(1))); // tick on minestom's thread
-		Bukkit.setServer(new BukkitServer());
 		Bukkit.getScheduler(); // initialize scheduler
 
 		PluginManager pluginManager = Bukkit.getPluginManager();

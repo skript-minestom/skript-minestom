@@ -34,8 +34,6 @@ public class Bukkit {
 	private static ServicesManager servicesManager = null;
 	private static Ticker ticker = new DefaultTicker();
 	private static Server server = null;
-	private static File serverDirectory = null;
-	private static boolean serverDirectoryUsed = false;
 
 	public static PluginManager getPluginManager() {
 		return pluginManager;
@@ -51,25 +49,12 @@ public class Bukkit {
 	}
 
 	public static File getServerDirectory() {
-		if (serverDirectory == null) serverDirectory = resolveServerDirectory();
-		serverDirectoryUsed = true;
-		return serverDirectory;
+		if (server == null) throw new IllegalStateException("Server has not been defined yet!");
+		return server.getServerDirectory();
 	}
 
 	public static void setServerDirectory(File serverDirectory) {
-		if (serverDirectoryUsed) throw new IllegalStateException("Server directory has already been used!");
-		Bukkit.serverDirectory = serverDirectory;
-	}
-
-	private static File resolveServerDirectory() {
-		CodeSource source = Bukkit.class.getProtectionDomain().getCodeSource();
-		if (source != null) {
-			try {
-				File location = new File(source.getLocation().toURI());
-				if (location.isFile()) return location.getParentFile();
-			} catch (URISyntaxException | IllegalArgumentException ignored) {}
-		}
-		return new File(System.getProperty("user.dir"));
+		server.setServerDirectory(serverDirectory);
 	}
 
 	public static java.util.logging.Logger getLogger() {
