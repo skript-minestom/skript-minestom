@@ -45,11 +45,11 @@ public class ExprBlocks extends SimpleExpression<BlockVec> {
 
 	static {
 		Skript.registerExpression(ExprBlocks.class, BlockVec.class, ExpressionType.COMBINED,
-			"[(all [[of] the]|the)] blocks %direction% [%points%] [in [(world|instance)] %instance%]",
-			"[(all [[of] the]|the)] blocks from %point% [on] %direction% [in [(world|instance)] %instance%]",
-			"[(all [[of] the]|the)] blocks from %point% to %point% [in [(world|instance)] %instance%]",
-			"[(all [[of] the]|the)] blocks between %point% and %point% [in [(world|instance)] %instance%]",
-			"[(all [[of] the]|the)] blocks within %point% and %point% [in [(world|instance)] %instance%]",
+			"[(all [[of] the]|the)] blocks %direction% [%points%] [in [(world|instance)] %-instance%]",
+			"[(all [[of] the]|the)] blocks from %point% [on] %direction% [in [(world|instance)] %-instance%]",
+			"[(all [[of] the]|the)] blocks from %point% to %point% [in [(world|instance)] %-instance%]",
+			"[(all [[of] the]|the)] blocks between %point% and %point% [in [(world|instance)] %-instance%]",
+			"[(all [[of] the]|the)] blocks within %point% and %point% [in [(world|instance)] %-instance%]",
 			"[(all [[of] the]|the)] blocks (in|within) %chunk%");
 	}
 
@@ -101,23 +101,28 @@ public class ExprBlocks extends SimpleExpression<BlockVec> {
 	@Override
 	@Nullable
 	protected BlockVec[] get(Event event) {
-		if (pattern != 5 && instance == null) return new BlockVec[0];
 		if (this.direction != null && !from.isSingle()) {
-			assert this.instance != null;
-			Instance instance = this.instance.getSingle(event);
+			Instance instance = this.instance == null ? null : this.instance.getSingle(event);
 			Direction direction = this.direction.getSingle(event);
-			if (direction == null)
+			if (direction == null && pattern <= 1)
 				return new BlockVec[0];
-			assert instance != null; // only null for chunks and chunk getting isn't here
 			return from.stream(event)
 				.filter(Point.class::isInstance)
 				.map(Point.class::cast)
 				.filter(point -> {
-
-					Chunk chunk = instance.getChunkAt(point);
-					return chunk != null && chunk.isLoaded();
+					if (instance != null) { // ensure chunk is loaded if instance is provided
+						Chunk chunk = instance.getChunkAt(point);
+						return chunk != null && chunk.isLoaded();
+					}
+					return true;
 				})
-				.map(point -> direction.getRelative(point.asPos()))
+				.map(point -> {
+					if (pattern <= 1) {
+						assert direction != null; // we ensure direction isn't null above
+						return direction.getRelative(point.asPos());
+					}
+					return point;
+				})
 				.map(Point::asBlockVec)
 				.toArray(BlockVec[]::new);
 		}
@@ -130,7 +135,7 @@ public class ExprBlocks extends SimpleExpression<BlockVec> {
 	@Override
 	@org.eclipse.jdt.annotation.Nullable
 	public Class<?>[] acceptChange(Changer.ChangeMode mode) {
-		if (mode == Changer.ChangeMode.SET) return CollectionUtils.array(Block.class);
+		if (mode == Changer.ChangeMode.SET && instance != null) return CollectionUtils.array(Block.class); // can only change if instance isn't null
 		return null;
 	}
 
@@ -190,9 +195,7 @@ public class ExprBlocks extends SimpleExpression<BlockVec> {
 				Point loc2 = end.getSingle(event);
 				if (loc2 == null)
 					return null;
-				if (this.instance == null) return null;
-				Instance instance = this.instance.getSingle(event);
-				if (instance == null) return null;
+				Instance instance = this.instance == null ? null : this.instance.getSingle(event);
 				if (pattern == 4)
 					return new AABB(loc, loc2, instance).iterator();
 				return new BlockLineIterator(loc, loc2);

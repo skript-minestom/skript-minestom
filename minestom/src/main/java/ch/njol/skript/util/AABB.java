@@ -10,6 +10,7 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -36,9 +37,9 @@ public final class AABB implements Iterable<BlockVec> {
 	public AABB(@NotNull Point p1, @NotNull Point p2, @Nullable Instance instance) {
 		this.instance = instance;
 
-		// use exact coordinates (do NOT truncate decimals)
-		double x1 = p1.x(), y1 = p1.y(), z1 = p1.z();
-		double x2 = p2.x(), y2 = p2.y(), z2 = p2.z();
+		// block coordinates (same as Bukkit getBlockX/Y/Z) so ceil/floor iterator bounds stay valid
+		int x1 = p1.blockX(), y1 = p1.blockY(), z1 = p1.blockZ();
+		int x2 = p2.blockX(), y2 = p2.blockY(), z2 = p2.blockZ();
 
 		double minX = Math.min(x1, x2);
 		double maxX = Math.max(x1, x2);
@@ -163,7 +164,7 @@ public final class AABB implements Iterable<BlockVec> {
 	 * may want to add loaded checks if needed.
 	 */
 	@Override
-	public Iterator<BlockVec> iterator() {
+	public @NonNull Iterator<BlockVec> iterator() {
 		return new Iterator<>() {
 			private final int minX = (int) Math2.ceil(lowerBound.x());
 			private final int minY = (int) Math2.ceil(lowerBound.y());
