@@ -104,7 +104,6 @@ public class EvtClick extends SkriptEvent {
 			}
 			case PlayerUseItemWrapper wr -> {
 				if (click == LEFT) yield false;
-				if (o != null && click != ANY) yield false;
 				PlayerUseItemEvent e = wr.getEvent();
 				Player player = e.getPlayer();
 				ItemStack itemStack = e.getItemStack();
@@ -114,7 +113,6 @@ public class EvtClick extends SkriptEvent {
 			}
 			case PlayerStartDiggingWrapper wr -> {
 				if (click == RIGHT) yield false;
-				if (o == null) yield false;
 				PlayerStartDiggingEvent e = wr.getEvent();
 				Block block = e.getBlock();
 				Player player = e.getPlayer();
@@ -123,7 +121,6 @@ public class EvtClick extends SkriptEvent {
 			}
 			case PlayerHandAnimationWrapper wr -> {
 				if (click == RIGHT) yield false;
-				if (o != null) yield false;
 				PlayerHandAnimationEvent e = wr.getEvent();
 				Player player = e.getPlayer();
 				PlayerHand hand = e.getHand();
@@ -155,7 +152,7 @@ public class EvtClick extends SkriptEvent {
 	}
 
 	private boolean verifyBlock(Block blockToCheck, Block eventBlock) {
-		if (eventBlock.equals(eventBlock.defaultState())) return blockToCheck.compare(eventBlock);
+		if (eventBlock.stateId() == eventBlock.defaultState().stateId()) return blockToCheck.compare(eventBlock);
 		Map<String, String> eventBlockProperties = eventBlock.properties();
 		Map<String, String> blockToCheckProperties = blockToCheck.properties();
 		for (String s : eventBlockProperties.keySet()) {
