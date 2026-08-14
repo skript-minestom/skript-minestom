@@ -5,6 +5,7 @@ import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.config.Node;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Loopable;
@@ -18,6 +19,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
+import org.skriptlang.skript.log.runtime.SyntaxRuntimeErrorProducer;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -29,11 +31,18 @@ import java.util.function.Predicate;
  *
  * @see Skript#registerExpression(Class, Class, ExpressionType, String...)
  */
-public abstract class SimpleExpression<T> implements Expression<T> {
+public abstract class SimpleExpression<T> implements Expression<T>, SyntaxRuntimeErrorProducer {
 
 	private int time = 0;
+	private Node node;
 
 	protected SimpleExpression() {}
+
+	@Override
+	public boolean preInit() {
+		node = getParser().getNode();
+		return Expression.super.preInit();
+	}
 
 	@Override
 	public final @Nullable T getSingle(Event event) {
@@ -327,6 +336,11 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	@Override
 	public Expression<?> getSource() {
 		return this;
+	}
+
+	@Override
+	public Node getNode() {
+		return node;
 	}
 
 	@Override

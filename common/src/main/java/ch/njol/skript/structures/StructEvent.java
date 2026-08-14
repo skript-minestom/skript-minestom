@@ -1,25 +1,7 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.structures;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.NoDoc;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptEvent.ListeningBehavior;
@@ -27,18 +9,55 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.structure.Structure;
 
 import java.util.Locale;
 
-@NoDoc
+@Name("Event")
+@Description("""
+	The structure used for listening to events.
+	
+	Optionally allows specifying whether to listen to events that have been cancelled, \
+	and allows specifying with which priority to listen to events. \
+	Events are called in the following order of priorities.
+	
+	```
+	lowest -> low -> normal -> high -> highest -> monitor
+	```
+	
+	Modifying event-values or cancelling events is not supported when using the 'monitor' priority. \
+	It should only be used for monitoring the outcome of an event.
+	""")
+@Example("""
+	on load:
+		broadcast "loading!"
+	""")
+@Example("""
+	on join:
+		if {first-join::%player's uuid%} is not set:
+			set {first-join::%player's uuid%} to now
+	""")
+@Example("""
+	cancelled block break:
+		send "<red>You can't break that here" to player
+	""")
+@Example("""
+	on join with priority lowest:
+		# called first
+	
+	on join:
+		# called second
+
+	on join with priority highest:
+		# called last
+	""")
 public class StructEvent extends Structure {
 
 	static {
 		Skript.registerStructure(StructEvent.class,
-				"[on] [:uncancelled|:cancelled|any:(any|all)] <.+> [priority:with priority (:(lowest|low|normal|high|highest|monitor))]");
+			"[on] [:uncancelled|:cancelled|any:(any|all)] <.+> [priority:with priority (:(lowest|low|normal|high|highest|monitor))]");
 	}
 
 	private SkriptEvent event;
@@ -142,13 +161,13 @@ public class StructEvent extends Structure {
 		public ListeningBehavior getListenerBehavior() {
 			return behavior;
 		}
-      
-    	/**
+
+		/**
 		 * Clears all event-specific data from this instance.
 		 */
 		public void clear() {
 			priority = null;
-      		behavior = null;
+			behavior = null;
 		}
 
 	}

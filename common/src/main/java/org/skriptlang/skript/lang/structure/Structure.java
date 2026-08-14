@@ -4,8 +4,14 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.config.SimpleNode;
-import ch.njol.skript.lang.*;
+import ch.njol.skript.lang.Debuggable;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxElement;
+import ch.njol.skript.lang.SyntaxElementInfo;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -16,11 +22,15 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
+import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryData;
 import org.skriptlang.skript.lang.entry.EntryValidator;
+import org.skriptlang.skript.registration.DefaultSyntaxInfos;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -186,16 +196,18 @@ public abstract class Structure implements SyntaxElement, Debuggable {
 		if (!(node instanceof SimpleNode) && !(node instanceof SectionNode))
 			throw new IllegalArgumentException("only simple or section nodes may be parsed as a structure");
 		ParserInstance.get().getData(StructureData.class).node = node;
-
-		var iterator = Skript.instance().syntaxRegistry().syntaxes(org.skriptlang.skript.registration.SyntaxRegistry.STRUCTURE).iterator();
+		Collection<BukkitSyntaxInfos.Event<?>> syntaxes1 = Skript.instance().syntaxRegistry().syntaxes(BukkitSyntaxInfos.Event.KEY);
+		Collection<DefaultSyntaxInfos.Structure<?>> syntaxes = Skript.instance().syntaxRegistry().syntaxes(SyntaxRegistry.STRUCTURE);
+		var iterator = syntaxes.iterator();
 		if (node instanceof SimpleNode) { // filter out section only structures
 			iterator = new CheckedIterator<>(iterator, info -> info != null && info.nodeType().canBeSimple());
 		} else { // filter out simple only structures
 			iterator = new CheckedIterator<>(iterator, info -> info != null && info.nodeType().canBeSection());
 		}
+		System.out.print("event patterns: " + syntaxes1.size());
+		//syntaxes1.forEach(structure -> System.out.println(structure.patterns().getFirst()));
 		iterator = new ConsumingIterator<>(iterator, info -> ParserInstance.get().getData(StructureData.class).structureInfo =
 			(StructureInfo<?>) SyntaxElementInfo.fromModern(info));
-
 		try (ParseLogHandler parseLogHandler = SkriptLogger.startParseLogHandler()) {
 			Structure structure = SkriptParser.parseStatic(expr, iterator, ParseContext.EVENT, defaultError);
 			if (structure != null) {

@@ -5,6 +5,7 @@ import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.lang.SkriptEvent.ListeningBehavior;
 import ch.njol.skript.lang.SkriptEventInfo.ModernSkriptEventInfo;
+import com.google.common.collect.ImmutableList;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -15,11 +16,12 @@ import org.skriptlang.skript.lang.structure.StructureInfo;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.SequencedCollection;
 
 /**
  * @deprecated Use {@link BukkitSyntaxInfos.Event} ({@link BukkitSyntaxInfos.Event#builder(Class, String)} instead.
  */
-@Deprecated(since = "INSERT VERSION", forRemoval = true)
+@Deprecated(since = "2.14", forRemoval = true)
 public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo<E> permits ModernSkriptEventInfo {
 
 	public Class<? extends Event>[] events;
@@ -81,14 +83,17 @@ public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo
 	}
 
 	private static void validateEvents(String name, Class<? extends SkriptEvent> eventClass, Class<? extends Event>[] events) {
-		for (int i = 0; i < events.length; i++) {
-			for (int j = i + 1; j < events.length; j++) {
-				if (events[i].isAssignableFrom(events[j]) || events[j].isAssignableFrom(events[i])) {
-
-					throw new SkriptAPIException("The event " + name + " (" + eventClass.getName() + ") registers with super/subclasses " + events[i].getName() + " and " + events[j].getName());
-				}
-			}
-		}
+//		for (int i = 0; i < events.length; i++) {
+//			for (int j = i + 1; j < events.length; j++) {
+//				if (events[i].isAssignableFrom(events[j]) || events[j].isAssignableFrom(events[i])) {
+//					if (events[i].equals(PlayerInteractAtEntityEvent.class)
+//						|| events[j].equals(PlayerInteractAtEntityEvent.class))
+//						continue; // Spigot seems to have an exception for those two events...
+//
+//					throw new SkriptAPIException("The event " + name + " (" + eventClass.getName() + ") registers with super/subclasses " + events[i].getName() + " and " + events[j].getName());
+//				}
+//			}
+//		}
 	}
 
 	/**
@@ -235,7 +240,7 @@ public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo
 	 * @deprecated This class exists solely for compatibility reasons.
 	 */
 	@ApiStatus.Internal
-	@Deprecated(since = "INSERT VERSION", forRemoval = true)
+	@Deprecated(since = "2.14", forRemoval = true)
 	public static final class ModernSkriptEventInfo<E extends SkriptEvent>
 		extends SkriptEventInfo<E>
 		implements BukkitSyntaxInfos.Event<E> {
@@ -290,13 +295,13 @@ public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo
 		}
 
 		@Override
-		public Collection<String> since() {
+		public SequencedCollection<String> since() {
 			String[] since = getSince();
 			return since != null ? List.of(since) : List.of();
 		}
 
 		@Override
-		public Collection<String> description() {
+		public SequencedCollection<String> description() {
 			String[] description = getDescription();
 			return description != null ? List.of(description) : List.of();
 		}
@@ -304,7 +309,29 @@ public sealed class SkriptEventInfo<E extends SkriptEvent> extends StructureInfo
 		@Override
 		public Collection<String> examples() {
 			String[] examples = getExamples();
-			return examples != null ? List.of(examples) : List.of();
+			if (examples == null || examples.length == 0) {
+				return List.of();
+			}
+			ImmutableList.Builder<String> builder = ImmutableList.builder();
+			StringBuilder currentExample = new StringBuilder();
+			for (String example : examples) {
+				if (!example.startsWith("\t")) { // a new example
+					String nextExample = currentExample.toString();
+					if (!nextExample.isBlank()) {
+						builder.add(nextExample);
+					}
+					currentExample = new StringBuilder();
+					if (example.contains("\n")) { // assume this is one example
+						builder.add(example);
+						continue;
+					}
+				}
+				currentExample.append(example).append("\n");
+			}
+			if (!currentExample.isEmpty()) {
+				builder.add(currentExample.toString());
+			}
+			return builder.build();
 		}
 
 		@Override

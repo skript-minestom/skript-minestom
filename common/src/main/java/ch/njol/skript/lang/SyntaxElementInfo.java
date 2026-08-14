@@ -1,28 +1,29 @@
 package ch.njol.skript.lang;
 
-import ch.njol.skript.SkriptAPIException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.docs.Origin;
-import org.skriptlang.skript.lang.structure.StructureInfo;
 import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.lang.structure.StructureInfo;
+
+import ch.njol.skript.SkriptAPIException;
 import org.skriptlang.skript.util.Priority;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.SequencedCollection;
 
 /**
  * @param <E> the syntax element this info is for
  * @deprecated Use {@link SyntaxInfo} ({@link SyntaxInfo#builder(Class)}) instead.
  * Note that some syntax types have specific {@link SyntaxInfo} implementations that they require.
  */
-@Deprecated(since = "INSERT VERSION", forRemoval = true)
+@Deprecated(since = "2.14", forRemoval = true)
 public class SyntaxElementInfo<E extends SyntaxElement> implements SyntaxInfo<E> {
 
 	private final @Nullable SyntaxInfo<E> source;
@@ -138,7 +139,7 @@ public class SyntaxElementInfo<E extends SyntaxElement> implements SyntaxInfo<E>
 
 	@Override
 	@ApiStatus.Internal
-	public @Unmodifiable Collection<String> patterns() {
+	public @Unmodifiable SequencedCollection<String> patterns() {
 		if (source != null)
 			return source.patterns();
 		return List.of(getPatterns());

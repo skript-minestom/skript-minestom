@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.lang;
 
 import ch.njol.skript.ScriptLoader;
@@ -24,13 +6,17 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.SkriptEventHandler;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
+import ch.njol.skript.log.ParseLogHandler;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.structures.StructEvent.EventData;
-import ch.njol.skript.util.Utils;
-import org.bukkit.event.Cancellable;
+import ch.njol.util.coll.iterator.ConsumingIterator;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
-import org.eclipse.jdt.annotation.Nullable;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
+import ch.njol.skript.util.Utils;
+import org.bukkit.event.Cancellable;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
@@ -41,6 +27,8 @@ import java.util.Locale;
 /**
  * A SkriptEvent is like a condition. It is called when any of the registered events occurs.
  * An instance of this class should then check whether the event applies
+ * (e.g. the rightclick event is included in the PlayerInteractEvent which also includes lefclicks, thus the SkriptEvent {@link EvtClick} checks whether it was a rightclick or
+ * not).<br/>
  * It is also needed if the event has parameters.
  *
  * @see Skript#registerEvent(String, Class, Class, String...)
@@ -53,10 +41,8 @@ public abstract class SkriptEvent extends Structure {
 
 	private String expr;
 	private SectionNode source;
-	@Nullable
-	protected EventPriority eventPriority;
-	@Nullable
-	protected ListeningBehavior listeningBehavior;
+	protected @Nullable EventPriority eventPriority;
+	protected @Nullable ListeningBehavior listeningBehavior;
 	protected boolean supportsListeningBehavior;
 	private SkriptEventInfo<?> skriptEventInfo;
 
@@ -135,7 +121,6 @@ public abstract class SkriptEvent extends Structure {
 		if (!shouldLoadEvent())
 			return false;
 
-		// noinspection ConstantConditions - entry container cannot be null as this structure is not simple
 		if (Skript.debug() || source.debug())
 			Skript.debug(expr + " (" + this + "):");
 
@@ -249,7 +234,7 @@ public abstract class SkriptEvent extends Structure {
 	 * Override this method to allow Skript to not force synchronization.
 	 */
 	public boolean canExecuteAsynchronously() {
-		return true;
+		return false;
 	}
 
 	/**
@@ -262,7 +247,21 @@ public abstract class SkriptEvent extends Structure {
 
 	@Nullable
 	public static SkriptEvent parse(String expr, SectionNode sectionNode, @Nullable String defaultError) {
-		return (SkriptEvent) Structure.parse(expr, sectionNode, defaultError, Skript.getEvents().iterator());
+		ParserInstance.get().getData(StructureData.class).node = sectionNode;
+
+		var iterator = Skript.instance().syntaxRegistry().syntaxes(BukkitSyntaxInfos.Event.KEY).iterator();
+		iterator = new ConsumingIterator<>(iterator, info ->
+			ParserInstance.get().getData(StructureData.class).structureInfo = (SkriptEventInfo<?>) SyntaxElementInfo.fromModern(info));
+
+		try (ParseLogHandler parseLogHandler = SkriptLogger.startParseLogHandler()) {
+			SkriptEvent event = SkriptParser.parseStatic(expr, iterator, ParseContext.EVENT, defaultError);
+			if (event != null) {
+				parseLogHandler.printLog();
+				return event;
+			}
+			parseLogHandler.printError();
+			return null;
+		}
 	}
 
 	/**
