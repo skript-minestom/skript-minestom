@@ -14,9 +14,7 @@ import ch.njol.skript.util.NBTCompound;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import com.github.hapily04.skriptminestom.util.NBTUtils;
-import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagType;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.*;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 import org.skriptlang.skript.lang.arithmetic.Arithmetics;
@@ -107,7 +105,11 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 					List<Object> objects = null;
 					if (original != null && original.getClass().isArray()) objects = new ArrayList<>(List.of((Object[]) original));
 					BinaryTag newBinaryTag = switch (mode) {
-						case SET -> NBTUtils.TagType.convertFromSkript(delta);
+						case SET -> {
+							BinaryTag t = NBTUtils.TagType.convertFromSkript(delta);
+							if (expectedBinaryTag.equals(BinaryTagTypes.LIST) && !t.type().equals(BinaryTagTypes.LIST)) t = ListBinaryTag.builder().add(t).build();
+							yield t;
+						}
 						case ADD -> {
 							if (objects != null) {
 								objects.addAll(Arrays.asList(delta));
