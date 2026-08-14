@@ -411,7 +411,7 @@ public class MinestomClasses {
 
 				@Override
 				public @NotNull String toVariableNameString(@NotNull BlockVec o) {
-					return "blockvector: x" + o.x() + " y: " + o.y() + " z: " + o.z();
+					return "blockvector: x: " + o.x() + " y: " + o.y() + " z: " + o.z();
 				}
 			})
 			.serializer(new Serializer<>() {
