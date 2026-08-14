@@ -22,15 +22,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
-import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryData;
 import org.skriptlang.skript.lang.entry.EntryValidator;
-import org.skriptlang.skript.registration.DefaultSyntaxInfos;
-import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -196,16 +192,13 @@ public abstract class Structure implements SyntaxElement, Debuggable {
 		if (!(node instanceof SimpleNode) && !(node instanceof SectionNode))
 			throw new IllegalArgumentException("only simple or section nodes may be parsed as a structure");
 		ParserInstance.get().getData(StructureData.class).node = node;
-		Collection<BukkitSyntaxInfos.Event<?>> syntaxes1 = Skript.instance().syntaxRegistry().syntaxes(BukkitSyntaxInfos.Event.KEY);
-		Collection<DefaultSyntaxInfos.Structure<?>> syntaxes = Skript.instance().syntaxRegistry().syntaxes(SyntaxRegistry.STRUCTURE);
-		var iterator = syntaxes.iterator();
+
+		var iterator = Skript.instance().syntaxRegistry().syntaxes(org.skriptlang.skript.registration.SyntaxRegistry.STRUCTURE).iterator();
 		if (node instanceof SimpleNode) { // filter out section only structures
 			iterator = new CheckedIterator<>(iterator, info -> info != null && info.nodeType().canBeSimple());
 		} else { // filter out simple only structures
 			iterator = new CheckedIterator<>(iterator, info -> info != null && info.nodeType().canBeSection());
 		}
-		System.out.print("event patterns: " + syntaxes1.size());
-		//syntaxes1.forEach(structure -> System.out.println(structure.patterns().getFirst()));
 		iterator = new ConsumingIterator<>(iterator, info -> ParserInstance.get().getData(StructureData.class).structureInfo =
 			(StructureInfo<?>) SyntaxElementInfo.fromModern(info));
 		try (ParseLogHandler parseLogHandler = SkriptLogger.startParseLogHandler()) {

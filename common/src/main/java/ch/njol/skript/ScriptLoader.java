@@ -705,7 +705,6 @@ public class ScriptLoader {
 						Skript.info("loading trigger '" + line + "'");
 
 					Structure structure = Structure.parse(line, node, "Can't understand this structure: " + line);
-					System.out.println("HERE! " + line);
 
 					if (structure == null)
 						continue;
