@@ -213,6 +213,7 @@ public class SkriptMinestom {
 			if (sender instanceof ConsoleSender && SkriptConfig.enableEffectCommands.value()
 				&& command.startsWith(SkriptConfig.effectCommandToken.value())) {
 				parseAndExecuteEffectCommand(sender, command);
+				return;
 			}
 			Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command));
 		});
