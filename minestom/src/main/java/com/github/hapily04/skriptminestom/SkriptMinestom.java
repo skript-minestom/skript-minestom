@@ -41,6 +41,8 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
+import net.minestom.server.command.CommandSender;
+import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
@@ -204,27 +206,40 @@ public class SkriptMinestom {
 			String message = event.getRawMessage();
 			if (!message.startsWith(SkriptConfig.effectCommandToken.value())) return;
 			event.setCancelled(true);
-			message = message.substring(1);
-
-			EffectCommandEvent effectCommandEvent = new EffectCommandEvent(player, message);
-			Bukkit.getPluginManager().callEvent(effectCommandEvent);
-			if (effectCommandEvent.isCancelled()) return;
-			try (RedirectingLogHandler log = new RedirectingLogHandler(player, null)) {
-				SkriptLogger.startLogHandler(log);
-				ParserInstance parserInstance = ParserInstance.get();
-				parserInstance.setCurrentEvent("effect command", EffectCommandEvent.class);
-				Effect effect = Effect.parse(message, null);
-				TagResolver effectCommand = Placeholder.unparsed("effect_command", message);
-				if (effect != null) {
-					player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <base_grey>Executing effect command: <yellow><effect_command>", effectCommand));
-					if (SkriptConfig.logEffectCommands.value()) {
-						MinecraftServer.getCommandManager().getConsoleSender().sendMessage(player.getUsername() + " issued effect command: " + message);
-					}
-					TriggerItem.walk(effect, effectCommandEvent);
-					Variables.removeLocals(effectCommandEvent);
-				} else player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <error_color>Couldn't find an effect under '<yellow><effect_command><error_color>'.", effectCommand));
-			}
+			parseAndExecuteEffectCommand(player, message);
 		});
+
+		MinecraftServer.getCommandManager().setUnknownCommandCallback((sender, command) -> {
+			if (sender instanceof ConsoleSender && SkriptConfig.enableEffectCommands.value()
+				&& command.startsWith(SkriptConfig.effectCommandToken.value())) {
+				parseAndExecuteEffectCommand(sender, command);
+			}
+			Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command));
+		});
+	}
+
+	private static void parseAndExecuteEffectCommand(CommandSender sender, String input) {
+		input = input.substring(1);
+
+		EffectCommandEvent effectCommandEvent = new EffectCommandEvent(sender, input);
+		Bukkit.getPluginManager().callEvent(effectCommandEvent);
+		if (effectCommandEvent.isCancelled()) return;
+		try (RedirectingLogHandler log = new RedirectingLogHandler(sender, null)) {
+			SkriptLogger.startLogHandler(log);
+			ParserInstance parserInstance = ParserInstance.get();
+			parserInstance.setCurrentEvent("effect command", EffectCommandEvent.class);
+			Effect effect = Effect.parse(input, null);
+			TagResolver effectCommand = Placeholder.unparsed("effect_command", input);
+			if (effect != null) {
+				sender.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <base_grey>Executing effect command: <yellow><effect_command>", effectCommand));
+				if (SkriptConfig.logEffectCommands.value()) {
+					String senderIdentifier = sender instanceof Player player ? player.getUsername() : "Console";
+					MinecraftServer.getCommandManager().getConsoleSender().sendMessage(senderIdentifier + " issued effect command: " + input);
+				}
+				TriggerItem.walk(effect, effectCommandEvent);
+				Variables.removeLocals(effectCommandEvent);
+			} else sender.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("<skript_minestom_tag> <error_color>Couldn't find an effect under '<yellow><effect_command><error_color>'.", effectCommand));
+		}
 	}
 
 	private static void scheduleShutdownTasks() {
@@ -248,7 +263,7 @@ public class SkriptMinestom {
 	public static void initCommands() {
 		CommandManager commandManager = MinecraftServer.getCommandManager();
 		commandManager.register(new SkriptCommand());
-		commandManager.setUnknownCommandCallback((sender, command) -> Bukkit.getPluginManager().callEvent(new UnknownCommandEvent(sender, command)));
+		// unknown command callback moved to initEffectCommands
 	}
 
 	public static void initStopCommand() {
