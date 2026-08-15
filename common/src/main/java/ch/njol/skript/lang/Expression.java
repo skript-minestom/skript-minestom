@@ -1,27 +1,10 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.lang;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Changer.ChangerUtils;
+import ch.njol.skript.conditions.CondIsSet;
 import ch.njol.skript.lang.simplification.Simplifiable;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.lang.util.SimpleExpression;
@@ -29,9 +12,9 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.Variables;
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
 
 import java.util.*;
@@ -220,6 +203,19 @@ public interface Expression<T> extends SyntaxElement, Debuggable, Loopable<T>, S
 	}
 
 	/**
+	 * Whether this expression <b>might</b> return any of the following types.
+	 * @param returnTypes The types to test
+	 * @return true if any of the arguments are within the bounds of the return types
+	 */
+	default boolean canReturnAnyOf(Class<?>... returnTypes) {
+		for (Class<?> type : returnTypes) {
+			if (canReturn(type))
+				return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Returns true if this expression returns all possible values, false if it only returns some of them.
 	 * <p>
 	 * This method significantly influences {@link #check(Event, Predicate)}, {@link #check(Event, Predicate, boolean)} and {@link CondIsSet} and thus breaks conditions that use this
@@ -243,7 +239,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable, Loopable<T>, S
 	 * @param time -1 for past or 1 for future. 0 is never passed to this method as it represents the default state.
 	 * @return Whether this expression has distinct time states, e.g. a player never changes but a block can. This should be sensitive for the event (using
 	 *         {@link ch.njol.skript.lang.parser.ParserInstance#isCurrentEvent(Class)}).
-	 * @see SimpleExpression#setTime(int, Class, Expression[])
+	 * @see SimpleExpression#setTime(int, Class, Expression...)
 	 * @see SimpleExpression#setTime(int, Expression, Class...)
 	 * @see ch.njol.skript.lang.parser.ParserInstance#isCurrentEvent(Class...)
 	 */
@@ -422,8 +418,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable, Loopable<T>, S
 	 * @param delta Initial delta array.
 	 * @return Delta array to use for change.
 	 */
-	@Nullable
-	default Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
+	default Object @Nullable [] beforeChange(Expression<?> changed, Object @Nullable [] delta) {
 		if (delta == null || delta.length == 0) // Nothing to nothing
 			return null;
 
