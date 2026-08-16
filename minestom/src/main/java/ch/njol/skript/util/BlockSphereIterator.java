@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BlockSphereIterator extends CheckedIterator<BlockVec> {
 
-	public BlockSphereIterator(@NotNull Point center, double radius, @NotNull Instance instance) {
+	public BlockSphereIterator(@NotNull Point center, double radius, @Nullable Instance instance) {
 		super(
 			new AABB(
 				center,

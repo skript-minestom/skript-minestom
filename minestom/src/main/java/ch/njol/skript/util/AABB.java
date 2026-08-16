@@ -82,24 +82,22 @@ public final class AABB implements Iterable<BlockVec> {
 		this.upperBound = new Vec(maxX, maxY, maxZ);
 	}
 
-	public AABB(@NotNull Point center, double rX, double rY, double rZ, @NotNull Instance instance) {
+	public AABB(@NotNull Point center, double rX, double rY, double rZ, @Nullable Instance instance) {
 		assert rX >= 0 && rY >= 0 && rZ >= 0 : rX + "," + rY + "," + rZ;
 		this.instance = instance;
 
-		DimensionType type = instance.getCachedDimensionType();
-		int minY = type.minY();
-		int maxY = type.minY() + type.height() - 1; // correct even if minY != 0
+		double minY = center.y() - rY;
+		double maxY = center.y() + rY;
+		if (instance != null) {
+			DimensionType type = instance.getCachedDimensionType();
+			double dimMinY = type.minY();
+			double dimMaxY = type.minY() + type.height() - 1; // correct even if minY != 0
+			minY = Math.max(minY, dimMinY);
+			maxY = Math.min(maxY, dimMaxY);
+		}
 
-		this.lowerBound = new Vec(
-			center.x() - rX,
-			Math.max(center.y() - rY, minY),
-			center.z() - rZ
-		);
-		this.upperBound = new Vec(
-			center.x() + rX,
-			Math.min(center.y() + rY, maxY),
-			center.z() + rZ
-		);
+		this.lowerBound = new Vec(center.x() - rX, minY, center.z() - rZ);
+		this.upperBound = new Vec(center.x() + rX, maxY, center.z() + rZ);
 	}
 
 	public AABB(@NotNull Instance instance, @NotNull Vec v1, @NotNull Vec v2) {

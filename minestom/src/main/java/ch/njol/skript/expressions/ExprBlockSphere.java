@@ -36,8 +36,8 @@ import java.util.Iterator;
 public class ExprBlockSphere extends SimpleExpression<BlockVec> {
 	static {
 		Skript.registerExpression(ExprBlockSphere.class, BlockVec.class, ExpressionType.COMBINED,
-			"[(all [[of] the]|the)] blocks in radius %number% [(of|around) %point%] [in [(world|instance)] %instance%]",
-			"[(all [[of] the]|the)] blocks around %point% in radius %number% [in [(world|instance)] %instance%]");
+			"[(all [[of] the]|the)] blocks in radius %number% [(of|around) %point%] [in [(world|instance)] %-instance%]",
+			"[(all [[of] the]|the)] blocks around %point% in radius %number% [in [(world|instance)] %-instance%]");
 	}
 
 	@SuppressWarnings("null")
@@ -59,8 +59,8 @@ public class ExprBlockSphere extends SimpleExpression<BlockVec> {
 	public Iterator<BlockVec> iterator(final Event e) {
 		final Point l = center.getSingle(e);
 		final Number r = radius.getSingle(e);
-		final Instance i = instance.getSingle(e);
-		if (l == null || r == null || i == null)
+		final Instance i = instance == null ? null :instance.getSingle(e);
+		if (l == null || r == null)
 			return new EmptyIterator<>();
 		return new BlockSphereIterator(l, r.doubleValue(), i);
 	}
@@ -106,7 +106,7 @@ public class ExprBlockSphere extends SimpleExpression<BlockVec> {
 
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "the blocks in radius " + radius + " around " + center.toString(e, debug) + " in instance " + instance.toString(e, debug);
+		return "the blocks in radius " + radius + " around " + center.toString(e, debug) + (instance != null ? " in instance " + instance.toString(e, debug) : "");
 	}
 
 	@Override
