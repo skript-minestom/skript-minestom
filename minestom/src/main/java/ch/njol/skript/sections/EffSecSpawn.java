@@ -9,6 +9,7 @@ import ch.njol.skript.events.wrapper.EntitySpawnWrapper;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.NonTickingEntity;
+import ch.njol.skript.util.NonTickingLivingEntity;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import net.minestom.server.coordinate.Point;
@@ -48,8 +49,8 @@ public class EffSecSpawn extends EffectSection {
 										.addSection("after spawn", true)
 										.build();
 		Skript.registerSection(EffSecSpawn.class,
-			"(summon|spawn) [:navigable|:living|:non ticking] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]",
-			"(summon|spawn) %integer% [of] [:navigable|:living|:non ticking] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]");
+			"(summon|spawn) [:non ticking] [:navigable|:living] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]",
+			"(summon|spawn) %integer% [of] [:non ticking] [:navigable|:living] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]");
 	}
 
 	private Expression<Integer> amount;
@@ -63,6 +64,7 @@ public class EffSecSpawn extends EffectSection {
 	@Nullable
 	private Trigger afterSpawnTrigger;
 	private boolean sync = false;
+	private boolean nonTicking = false;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -72,7 +74,13 @@ public class EffSecSpawn extends EffectSection {
 		types = (Expression<EntityType>) expressions[matchedPattern];
 		points = Direction.combine((Expression<? extends Direction>) expressions[1+matchedPattern], (Expression<? extends Point>) expressions[2+matchedPattern]);
 		instances = (Expression<Instance>) expressions[3+matchedPattern];
-		if (!parseResult.tags.isEmpty()) type = parseResult.tags.getFirst();
+		nonTicking = parseResult.hasTag("non ticking");
+		sync = parseResult.hasTag("sync");
+		List<String> tags = parseResult.tags;
+		if (!tags.isEmpty()) {
+			int typeIndex = nonTicking ? 1 : 0;
+			type = tags.get(typeIndex);
+		}
 		if (sectionNode != null) {
 			EntryContainer container = ENTRY_VALIDATOR.validate(sectionNode);
 			if (container == null) return false;
@@ -85,7 +93,6 @@ public class EffSecSpawn extends EffectSection {
 				return false;
 			}
 		}
-		sync = parseResult.hasTag("sync");
 		return true;
 	}
 
@@ -106,9 +113,8 @@ public class EffSecSpawn extends EffectSection {
 					for (int i = 0; i < amount; i++) {
 						Entity entity = switch (this.type) {
 							case "navigable" -> new EntityCreature(type);
-							case "living" -> new LivingEntity(type);
-							case "non ticking" -> new NonTickingEntity(type);
-							case null, default -> new Entity(type);
+							case "living" -> nonTicking ? new NonTickingLivingEntity(type) : new LivingEntity(type);
+							case null, default -> nonTicking ? new NonTickingEntity(type) : new Entity(type);
 						};
 						if (NO_PHYSICS_TYPES.contains(entity.getEntityType())) {
 							entity.setNoGravity(true);
