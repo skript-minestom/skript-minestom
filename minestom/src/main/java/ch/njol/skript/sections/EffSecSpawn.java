@@ -79,7 +79,7 @@ public class EffSecSpawn extends EffectSection {
 		List<String> tags = parseResult.tags;
 		if (!tags.isEmpty()) {
 			int typeIndex = nonTicking ? 1 : 0;
-			type = tags.get(typeIndex);
+			if (tags.size() > 1) type = tags.get(typeIndex);
 		}
 		if (sectionNode != null) {
 			EntryContainer container = ENTRY_VALIDATOR.validate(sectionNode);
