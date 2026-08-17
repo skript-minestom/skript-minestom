@@ -4,12 +4,12 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.util.Tristate;
-import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.network.player.PlayerConnection;
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class LuckPermsPlayer extends Player {
@@ -29,6 +30,11 @@ public class LuckPermsPlayer extends Player {
     public LuckPermsPlayer(@Nullable LuckPerms luckPerms, @NotNull PlayerConnection connection, @NotNull GameProfile profile) {
         super(connection, profile);
         this.luckPerms = luckPerms;
+		if (luckPerms != null) {
+			UserManager userManager = luckPerms.getUserManager();
+			UUID uuid = profile.uuid();
+			if (!userManager.isLoaded(uuid)) userManager.loadUser(uuid).join(); // it's ok to block here because it's blocking async configuration
+		}
     }
 
     private @Nullable PlayerAdapter<Player> getPlayerAdapter() {
