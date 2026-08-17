@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.events.wrapper.EntitySpawnWrapper;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.util.Direction;
+import ch.njol.skript.util.NonTickingEntity;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import net.minestom.server.coordinate.Point;
@@ -27,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Name("Spawn Entity")
-@Description("Spawns one or more entities at a location.")
+@Description("Spawns one or more entities at a location. If an entity is non-ticking, some features like gravity may not work even if it's set to true.")
 @Examples("""
 	spawn living zombie at player's position:
 	    before spawn:
@@ -47,8 +48,8 @@ public class EffSecSpawn extends EffectSection {
 										.addSection("after spawn", true)
 										.build();
 		Skript.registerSection(EffSecSpawn.class,
-			"(summon|spawn) [(:navigable|:living)] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]",
-			"(summon|spawn) %integer% [of] [(:navigable|:living)] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]");
+			"(summon|spawn) [:navigable|:living|:non ticking] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]",
+			"(summon|spawn) %integer% [of] [:navigable|:living|:non ticking] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]");
 	}
 
 	private Expression<Integer> amount;
@@ -106,6 +107,7 @@ public class EffSecSpawn extends EffectSection {
 						Entity entity = switch (this.type) {
 							case "navigable" -> new EntityCreature(type);
 							case "living" -> new LivingEntity(type);
+							case "non ticking" -> new NonTickingEntity(type);
 							case null, default -> new Entity(type);
 						};
 						if (NO_PHYSICS_TYPES.contains(entity.getEntityType())) {
