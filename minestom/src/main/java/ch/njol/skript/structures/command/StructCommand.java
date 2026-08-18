@@ -326,11 +326,7 @@ public class StructCommand extends Structure {
 				}
 			} else {
 				if (c == ':') {
-					if (chars.isEmpty() || chars.peek() != ' ') {
-						Skript.error("Expected a space after colon while parsing argument.");
-						return null;
-					}
-					chars.pop();
+					if (!chars.isEmpty() && chars.peek() == ' ') chars.pop(); // pop extra space
 					name = sb.toString();
 					sb.setLength(0); // reset it as we will reuse it for building arg type
 					continue;
