@@ -45,7 +45,10 @@ import java.util.stream.Stream;
 	# Rough Syntax
 	command [/]<commandname> [<arguments>]:
 		aliases: # [OPTIONAL] list of other names the command can go by (no / in front)
-		condition: # [OPTIONAL] section allowing you to return a boolean of whether the sender should have access to the command
+		permission: # [OPTIONAL] allows you to set the required permission
+		permission message: # [OPTIONAL] allows you to define what message will be sent should they not have permission
+		executable by: # [OPTIONAL] allows you to define who can run the command (player/players/consnole)
+		condition: # [OPTIONAL] section/expression allows you to return a boolean of whether the sender should have access to the command
 		subcommand [/]<commandname> [<arguments>]: # [OPTIONAL] works exactly like a command, can have argument/subcommand sections within
 		arg[ument] <argument>: # [OPTIONAL] allows you to more finely tune or scope an argument. See the Command Argument section documentation for more details
 		trigger: # [OPTIONAL] all arguments defined on the initial command line will be run inside this section
