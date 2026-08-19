@@ -130,7 +130,7 @@ def java11 = 11
 
 def latestEnv = 'java21/paper-1.21.0.json'
 def latestJava = java25
-def oldestJava = java21
+def oldestJava = java25
 
 def latestJUnitEnv = 'java17/paper-1.20.4.json'
 def latestJUnitJava = java17

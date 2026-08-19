@@ -13,9 +13,13 @@ import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.sections.SecArgument;
 import ch.njol.skript.sections.SecSubcommand;
+import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.skript.variables.Variables;
+import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
+import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.Argument;
@@ -26,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
 import org.skriptlang.skript.lang.entry.KeyValueEntryData;
+import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
+import org.skriptlang.skript.lang.entry.util.ExpressionOrSectionEntryData;
 import org.skriptlang.skript.lang.structure.Structure;
 
 import java.util.*;
@@ -99,7 +105,10 @@ public class StructCommand extends Structure {
 				return split;
 			}
 		})
-		.addSection("condition", true)
+		.addEntry("permission", null, true)
+		.addEntryData(new ExpressionEntryData<>("permission message", null, true, ComponentWrapper.class))
+		.addEntry("executable by", null, true)
+		.addEntryData(new ExpressionOrSectionEntryData<>("condition", null, null, true, Boolean.class))
 		.addSection("trigger", true)
 		.unexpectedNodeTester(node -> {
 			String key = node.getKey();
@@ -245,19 +254,13 @@ public class StructCommand extends Structure {
 		String[] aliases = container.getOptional("aliases", String[].class, true);
 
 		ParserInstance parser = getParser();
-		parser.setCurrentEvent("command condition", CommandConditionEvent.class);
-		Trigger condition = getReturnableTrigger("command condition", container.getOptional("condition", SectionNode.class, false));
-		parser.setCurrentEvent("command condition", CommandTriggerEvent.class);
-		Trigger trigger = getTrigger("command /", container.getOptional("trigger", SectionNode.class, false));
-		parser.setCurrentEvent("command", ScriptCommandEvent.class);
+		parser.setCurrentEvent("command trigger", CommandTriggerEvent.class);
 		assert commandName != null; // has to be set in while loop
+		Trigger trigger = getTrigger("command /" + commandName, container.getOptional("trigger", SectionNode.class, false));
+		parser.setCurrentEvent("command", ScriptCommandEvent.class);
 		assert aliases != null; // default value of empty string array
 		Command command = new Command(commandName, aliases);
-		if (condition != null) command.setCondition((sender, commandString) -> {
-			CommandConditionEvent event = new CommandConditionEvent(sender, commandString);
-			TriggerItem.walk(condition, event);
-			return event.returnValue != null && event.returnValue;
-		});
+		if (!initCondition(command)) return null; // error initializing condition
 		if (!args.isEmpty()) command.addSyntax((sender, context) -> {
 			runCommandTrigger(trigger, sender, context, argArray);
 		}, argArray);
@@ -265,6 +268,57 @@ public class StructCommand extends Structure {
 			runCommandTrigger(trigger, sender, context);
 		});
 		return command;
+	}
+
+	private boolean initCondition(Command command) {
+		Expression<ComponentWrapper> permissionMessage = container.getOptional("permission message", Expression.class, false);
+		if (permissionMessage != null && !container.hasEntry("permission")) {
+			Skript.error("If a permission message is provided, a permission node must also be provided.");
+			return false;
+		}
+		String permission = container.getOptional("permission", String.class, false);
+
+		String executableBy = container.getOptional("executable by", String.class, false);
+		Class<? extends CommandSender> executableByClass = null;
+		if (executableBy != null) {
+			executableBy = executableBy.toLowerCase(Locale.ENGLISH);
+			switch (executableBy) {
+				case "player", "players" -> executableByClass = Player.class;
+				case "console" -> executableByClass = ConsoleSender.class;
+				default -> {
+					Skript.error("Unknown executor '" + executableBy + "' in 'executable by' entry while parsing command '" + command.getName() + "'.");
+					return false;
+				}
+			}
+		}
+		Class<? extends CommandSender> finalExecutableByClass = executableByClass;
+
+		getParser().setCurrentEvent("command condition", CommandConditionEvent.class);
+		ExpressionOrSectionEntryData.ExpressionOrSection<Boolean> conditionEntry =
+			container.getOptional("condition", ExpressionOrSectionEntryData.ExpressionOrSection.class, false);
+
+		Trigger condition = conditionEntry == null || conditionEntry.section() == null ? null
+			: getReturnableTrigger("command condition", conditionEntry.section());
+		Expression<? extends Boolean> conditionExpr = conditionEntry == null ? null : conditionEntry.expression();
+		command.setCondition((sender, commandString) -> {
+			CommandConditionEvent event = new CommandConditionEvent(sender, commandString);
+			if (condition != null) {
+				TriggerItem.walk(condition, event);
+				if (!(event.returnValue != null && event.returnValue)) return false;
+			} else if (conditionExpr != null && Boolean.FALSE.equals(conditionExpr.getSingle(event))) return false;
+
+			if (permission != null && !LuckPermsLookup.hasPermission(sender, permission)) {
+				if (commandString != null && permissionMessage != null) {
+					Component component = ComponentWrapper.getOrElse(permissionMessage, event, null);
+					if (component != null) sender.sendMessage(component);
+				}
+				return false;
+			}
+
+			if (finalExecutableByClass != null) return finalExecutableByClass.isAssignableFrom(sender.getClass());
+			return true;
+		});
+		return true;
 	}
 
 	private void runCommandTrigger(Trigger trigger, CommandSender sender, CommandContext context, Argument<?>... args) {
@@ -352,7 +406,7 @@ public class StructCommand extends Structure {
 					sb.append(c);
 					continue;
 				}
-				Skript.error("Unknown character '" + c + "' was found whilst trying to parse the name of a command.");
+				Skript.error("Unknown character '" + c + "' was found whilst trying to parse the name of an argument.");
 				return null;
 			}
 		}

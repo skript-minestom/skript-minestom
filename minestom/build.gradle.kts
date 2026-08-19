@@ -41,6 +41,13 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
 	options.release.set(25)
+	options.isFork = true // fixes 'Cause: error: release version 25 not supported'
+}
+
+java {
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(25))
+	}
 }
 
 val generateSources by tasks.registering(Copy::class) {
