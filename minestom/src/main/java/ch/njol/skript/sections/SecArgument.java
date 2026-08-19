@@ -130,7 +130,11 @@ public class SecArgument extends Section {
 						SectionNode sectionNode, List<TriggerItem> triggerItems) {
 		container = ENTRY_VALIDATOR.validate(sectionNode);
 		if (container == null) return false;
-		argument = StructCommand.parseArg(StructCommand.stringToArrayDeque(parseResult.regexes.getFirst().group().replaceFirst("<", "")));
+		String group = parseResult.regexes.getFirst().group();
+		char firstCharacter = group.charAt(0);
+		if (group.startsWith("\\[")) group = group.replace("[<", "");
+		else group = group.replace("<", "");
+		argument = StructCommand.parseArg(StructCommand.stringToArrayDeque(group), firstCharacter);
 		if (argument == null) return false; // errors already made in parseArg
 
 		String format = container.getOptional("format", String.class, false);
@@ -159,6 +163,10 @@ public class SecArgument extends Section {
 		// default expression can be unrelated to argument type rn. without reflection this may be impossible to detect
 		defaultExpression = (Expression<Object>) container.getOptional("default value", false);
 		if (defaultExpression != null) {
+			if (argument.getDefaultValue() != null) {
+				Skript.error("Argument was already marked as optional, so a default value should not be provided.");
+				return false;
+			}
 			if (LiteralUtils.hasUnparsedLiteral(defaultExpression)) defaultExpression = LiteralUtils.defendExpression(defaultExpression);
 			if (!LiteralUtils.canInitSafely(defaultExpression)) {
 				Skript.error("Invalid default value was provided.");

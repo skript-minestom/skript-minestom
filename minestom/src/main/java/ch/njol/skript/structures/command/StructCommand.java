@@ -231,8 +231,8 @@ public class StructCommand extends Structure {
 				String name = parseName(c, chars);
 				//if (name == null) return false; // an error occurred while parsing name
 				commandName = name;
-			} else if (c == '<') {
-				Argument<?> arg = parseArg(chars);
+			} else if (c == '<' || c == '[') {
+				Argument<?> arg = parseArg(chars, c);
 				if (arg == null) return null; // an error occurred while parsing arg
 				args.add(arg);
 			} else {
@@ -311,16 +311,33 @@ public class StructCommand extends Structure {
 		return name.toString();
 	}
 
-	public static Argument<?> parseArg(ArrayDeque<Character> chars) {
+	public static Argument<?> parseArg(ArrayDeque<Character> chars, char startingCharacter) {
 		StringBuilder sb = new StringBuilder();
 		String name = null;
 		String argType = null;
+
+		boolean optional = false;
+		if (startingCharacter == '[') {
+			optional = true;
+			if (chars.isEmpty() || chars.peek() != '<') {
+				Skript.error("Expected '<' after '[' while parsing an argument.");
+				return null;
+			}
+			chars.pop(); // we should have verified by here that next char is <, so pop it
+		}
 
 		while (!chars.isEmpty()) {
 			char c = chars.pop();
 			if (name != null) {
 				if (c != '>') sb.append(c);
 				else {
+					if (optional) {
+						if ((chars.isEmpty() || chars.peek() != ']')) {
+							Skript.error("Expected ending ']', but none was found while parsing command arg named '" + name + "'.");
+							return null;
+						}
+						chars.pop(); // pop last ]
+					}
 					argType = sb.toString();
 					break;
 				}
@@ -345,15 +362,16 @@ public class StructCommand extends Structure {
 			return null;
 		}
 
-		return buildArg(name, argType);
+		return buildArg(name, argType, optional);
 	}
 
-	private static Argument<?> buildArg(String name, String typeInput) {
+	private static Argument<?> buildArg(String name, String typeInput, boolean optional) {
 		String initialInput = typeInput.split(" ")[0];
 		for (ArgumentType type : ArgumentType.values()) {
 			if (!type.matchesInitialInput(initialInput)) continue;
 			Argument<?> arg = type.getProvider().apply(name, typeInput);
 			if (arg == null) continue;
+			if (optional) arg.setDefaultValue(() -> null);
 			return arg;
 		}
 		Skript.error("No argument type was found given '" + typeInput + "'.");
