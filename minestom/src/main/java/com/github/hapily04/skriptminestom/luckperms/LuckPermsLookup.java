@@ -3,6 +3,9 @@ package com.github.hapily04.skriptminestom.luckperms;
 import com.github.hapily04.skriptminestom.SkriptMinestom;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.context.ContextSet;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.InheritanceNode;
@@ -14,9 +17,8 @@ import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class LuckPermsLookup {
 
@@ -67,6 +69,18 @@ public final class LuckPermsLookup {
         return user == null ? "" : user.getPrimaryGroup();
     }
 
+	public static void setPrimaryGroup(@NotNull Player player, String groupName) {
+		User user = getUser(player);
+		LuckPerms luckPerms = SkriptMinestom.getLuckPerms();
+		if (user == null || luckPerms == null) return;
+		Group group = luckPerms.getGroupManager().getGroup(groupName);
+		if (group == null) return;
+		user.data().clear(NodeType.INHERITANCE::matches);
+		user.data().add(InheritanceNode.builder(group).build());
+		user.setPrimaryGroup(groupName);
+		luckPerms.getUserManager().saveUser(user);
+	}
+
     public static @NotNull List<String> getAllGroups(@NotNull Player player) {
         if (player instanceof LuckPermsPlayer luckPermsPlayer) return luckPermsPlayer.getAllGroups();
         LuckPerms luckPerms = SkriptMinestom.getLuckPerms();
@@ -81,6 +95,35 @@ public final class LuckPermsLookup {
         }
         return groups;
     }
+
+	public static void addGroups(@NotNull Player player, String... groups) {
+		User user = getUser(player);
+		LuckPerms luckPerms = SkriptMinestom.getLuckPerms();
+		if (user == null || luckPerms == null) return;
+		for (String groupName: groups) {
+			Group group = luckPerms.getGroupManager().getGroup(groupName);
+			if (group == null) return;
+			user.data().add(InheritanceNode.builder(group).build());
+		}
+		luckPerms.getUserManager().saveUser(user);
+	}
+
+	public static void removeGroups(@NotNull Player player, String... groups) {
+		User user = getUser(player);
+		LuckPerms luckPerms = SkriptMinestom.getLuckPerms();
+		if (user == null || luckPerms == null) return;
+		Set<String> groupsSet = Arrays.stream(groups).map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
+		List<InheritanceNode> toRemove = new ArrayList<>();
+		for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
+			if (groupsSet.contains(node.getGroupName().toLowerCase(Locale.ENGLISH))) {
+				toRemove.add(node); // effectively copying to avoid concurrentmodificationexception
+			}
+		}
+		for (InheritanceNode node : toRemove) {
+			user.data().remove(node); // removing instead of clearing nicely so that group remove event is called properly
+		}
+		luckPerms.getUserManager().saveUser(user);
+	}
 
     public static @NotNull String getPrefix(@NotNull Player player) {
         if (player instanceof LuckPermsPlayer luckPermsPlayer) return luckPermsPlayer.getPrefix();

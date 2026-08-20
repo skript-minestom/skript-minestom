@@ -1,5 +1,6 @@
 package ch.njol.skript.expressions;
 
+import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
@@ -9,9 +10,11 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.minestom.server.entity.Player;
 import org.bukkit.event.Event;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +54,31 @@ public class ExprGroup extends SimpleExpression<String> {
 			else groups.addAll(LuckPermsLookup.getAllGroups(player));
 		}
 		return groups.toArray(new String[0]);
+	}
+
+	@Override
+	public Class<?> @Nullable [] acceptChange(Changer.ChangeMode mode) {
+		if (mode == Changer.ChangeMode.REMOVE_ALL || mode == Changer.ChangeMode.DELETE) return null;
+		if (primary && (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET)) return CollectionUtils.array(String.class);
+		if (!primary) {
+			if (mode == Changer.ChangeMode.SET) return null;
+			return CollectionUtils.array(String[].class);
+		}
+		return null;
+	}
+
+	@Override
+	public void change(Event event, Object @Nullable [] delta, Changer.ChangeMode mode) {
+		String[] groups = delta == null ? null : (String[]) delta;
+		if (groups == null && mode != Changer.ChangeMode.RESET) return;
+		for (Player player : players.getArray(event)) {
+			if (mode == Changer.ChangeMode.RESET) LuckPermsLookup.setPrimaryGroup(player, "default");
+			else if (primary) LuckPermsLookup.setPrimaryGroup(player, groups[0]);
+			else {
+				if (mode == Changer.ChangeMode.ADD) LuckPermsLookup.addGroups(player, groups);
+				else LuckPermsLookup.removeGroups(player, groups);
+			}
+		}
 	}
 
 	@SuppressWarnings("null")
