@@ -10,8 +10,6 @@ import net.minestom.server.entity.EquipmentSlot;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-import java.util.Locale;
-
 public class EvtArmorChange extends SkriptEvent {
 
 	static {
