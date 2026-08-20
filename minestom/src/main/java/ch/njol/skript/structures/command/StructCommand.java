@@ -18,6 +18,7 @@ import ch.njol.skript.variables.Variables;
 import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
@@ -182,7 +183,18 @@ public class StructCommand extends Structure {
 			parser.deleteCurrentEvent();
 			return false;
 		}
-		MinecraftServer.getCommandManager().register(command);
+		CommandManager commandManager = MinecraftServer.getCommandManager();
+		String commandName = command.getName();
+		if (commandManager.commandExists(commandName)) {
+			Skript.error("A command named '" + commandName + "' already exists!");
+			return false;
+		}
+		for (String alias : command.getAliases()) {
+			if (!commandManager.commandExists(alias)) continue;
+			Skript.error("A command named '" + alias + "' already exists, please choose another alias!");
+			return false;
+		}
+		commandManager.register(command);
 		refreshPlayerCommands();
 		parser.deleteCurrentEvent();
 		return true;
