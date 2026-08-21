@@ -132,7 +132,7 @@ public class SecArgument extends Section {
 		if (container == null) return false;
 		String group = parseResult.regexes.getFirst().group();
 		char firstCharacter = group.charAt(0);
-		if (group.startsWith("\\[")) group = group.replace("[<", "");
+		if (group.startsWith("[")) group = group.replace("[", "");
 		else group = group.replace("<", "");
 		argument = StructCommand.parseArg(StructCommand.stringToArrayDeque(group), firstCharacter);
 		if (argument == null) return false; // errors already made in parseArg
