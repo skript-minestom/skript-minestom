@@ -5,7 +5,6 @@ import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
 
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class NumberUtils {
@@ -83,27 +82,6 @@ public class NumberUtils {
 		float z = (float)Math.atan2(siny_cosp, cosy_cosp);
 
 		return new Vec(x, y, z); // radians
-	}
-
-	// chatgpt
-	public static UUID fromNBTIntArray(int[] a) {
-		// Assume a.length == 4 (Minecraft guarantees this)
-		long msb = ((long) a[0] << 32) | (a[1] & 0xFFFFFFFFL);
-		long lsb = ((long) a[2] << 32) | (a[3] & 0xFFFFFFFFL);
-		return new UUID(msb, lsb);
-	}
-
-	// chatgpt
-	public static int[] toNBTIntArray(UUID uuid) {
-		long msb = uuid.getMostSignificantBits();
-		long lsb = uuid.getLeastSignificantBits();
-
-		return new int[] {
-			(int) (msb >> 32),
-			(int) msb,
-			(int) (lsb >> 32),
-			(int) lsb
-		};
 	}
 
 }

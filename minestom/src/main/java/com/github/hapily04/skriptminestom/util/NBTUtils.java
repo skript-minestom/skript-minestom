@@ -4,6 +4,7 @@ import ch.njol.skript.util.Item;
 import ch.njol.skript.util.NBTCompound;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.*;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponent;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.item.ItemStack;
@@ -19,29 +20,6 @@ import java.util.function.Function;
 import static com.github.hapily04.skriptminestom.util.ArrayUtils.*;
 
 public class NBTUtils {
-
-	// most methods outside of this one in this class are chatgpt
-	public static CompoundBinaryTag mergeItemNBT(CompoundBinaryTag originalItem, CompoundBinaryTag incomingNBT, ItemStack stack) {
-		CompoundBinaryTag.Builder itemBuilder = CompoundBinaryTag.builder();
-		itemBuilder.put(originalItem);
-		CompoundBinaryTag.Builder customDataBuilder = CompoundBinaryTag.builder();
-		String customDataKey = DataComponents.CUSTOM_DATA.name();
-		CompoundBinaryTag customData = originalItem.contains(customDataKey) ? originalItem.getCompound(customDataKey) : CompoundBinaryTag.empty();
-		customDataBuilder.put(customData);
-		CompoundBinaryTag.Builder componentBuilder = CompoundBinaryTag.builder();
-		CompoundBinaryTag components = originalItem.contains("components") ? originalItem.getCompound("components") : CompoundBinaryTag.empty();
-		for (String key : incomingNBT.keySet()) {
-			BinaryTag tag = incomingNBT.get(key);
-			assert tag != null; // we're going through the keyset it has to have a value
-			if (isItemComponentKey(key)) {
-				String componentKey = key.startsWith("minecraft:") ? key : ("minecraft:" + key);
-				mergeValue(componentBuilder, components, componentKey, tag);
-			} else mergeValue(customDataBuilder, customData, key, tag);
-		}
-		componentBuilder.put(customDataKey, customDataBuilder.build());
-		itemBuilder.put("components", componentBuilder.build());
-		return itemBuilder.build();
-	}
 
 	public static CompoundBinaryTag deepMerge(CompoundBinaryTag base, CompoundBinaryTag incoming) {
 		CompoundBinaryTag.Builder out = CompoundBinaryTag.builder();
@@ -229,7 +207,7 @@ public class NBTUtils {
 			CustomData customData = internalItem.get(DataComponents.CUSTOM_DATA);
 			compoundBinaryTag = customData != null ? customData.nbt() : CompoundBinaryTag.empty();
 		} else {
-			CompoundBinaryTag itemNBT = internalItem.toItemNBT();
+			CompoundBinaryTag itemNBT = internalItem.toItemNBT(MinecraftServer.getRegistries());
 			compoundBinaryTag = itemNBT.contains("components") ? itemNBT.getCompound("components") : CompoundBinaryTag.empty();
 		}
 		return new NBTCompound(compoundBinaryTag, item, custom);
@@ -286,10 +264,6 @@ public class NBTUtils {
 			this.objectConverter = objectConverter;
 			this.binaryTagConverter = binaryTagConverter;
 
-		}
-
-		public String getPrettyName() {
-			return toString().toLowerCase(Locale.ENGLISH).replace('_', ' ');
 		}
 
 		public BinaryTagType<?> getExpectedBinaryTag() {
