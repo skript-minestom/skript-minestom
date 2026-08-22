@@ -13,6 +13,7 @@ import ch.njol.util.coll.CollectionUtils;
 import ch.njol.yggdrasil.Fields;
 import com.github.hapily04.skriptminestom.util.NBTUtils;
 import com.github.hapily04.skriptminestom.util.NumberUtils;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.resource.ResourcePackStatus;
@@ -1091,6 +1092,42 @@ public class MinestomClasses {
 					return "scoreboard titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.getTitle()) + "\"";
 				}
 			}));
+		Classes.registerClass(new ClassInfo<>(BossBar.class, "bossbar")
+			.user("boss ?bars?")
+			.name("Boss Bar")
+			.description("The bar shown at the top of a player's screen.")
+			.examples("""
+				set {_bar} to new boss bar titled "<red>Dragon" with progress 50
+				add {_bar} to boss bars of all players""")
+			.defaultExpression(new EventValueExpression<>(BossBar.class))
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull BossBar o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull BossBar o) {
+					return "boss bar titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.name()) + "\"";
+				}
+			}));
+		Classes.registerClass(new EnumClassInfo<>(BossBarColor.class, "bossbarcolor")
+			.user("boss ?bar ?colou?rs?")
+			.name("Boss Bar Color")
+			.description("The color of a boss bar. Possible values: pink bar, blue bar, red bar, green bar, yellow bar, purple bar, white bar.")
+			.examples("set color of {_bar} to red bar")
+			.defaultExpression(new EventValueExpression<>(BossBarColor.class)));
+		Classes.registerClass(new EnumClassInfo<>(BossBar.Overlay.class, "bossbaroverlay")
+			.user("boss ?bar ?overlays?")
+			.name("Boss Bar Overlay")
+			.description("The notching of a boss bar. Possible values: progress, notched 6, notched 10, notched 12, notched 20.")
+			.examples("set overlay of {_bar} to notched 12")
+			.defaultExpression(new EventValueExpression<>(BossBar.Overlay.class)));
 		Classes.registerClass(new ClassInfo<>(Enchantment.class, "enchantment")
 			.user("enchantments?")
 			.name("Enchantment")
