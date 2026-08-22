@@ -7,6 +7,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.BossBarColor;
 import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.util.Kleenean;
 import net.kyori.adventure.bossbar.BossBar;
@@ -22,9 +23,9 @@ import org.jetbrains.annotations.Nullable;
 	A boss bar is not shown to anybody until it is shown to them.""")
 @Examples("""
 	set {_bar} to new boss bar titled "<red>Dragon"
-	show {_bar} to all players
+	add {_bar} to boss bars of all players
 
-	set {_bar} to new boss bar titled "Event starting" with progress 0 and with color green""")
+	set {_bar} to new boss bar titled "Event starting" with progress 0 and with color green bar""")
 @Keywords({"boss bar", "bossbar"})
 public class ExprBossBar extends SimpleExpression<BossBar> {
 
@@ -38,7 +39,7 @@ public class ExprBossBar extends SimpleExpression<BossBar> {
 	@Nullable
 	private Expression<Number> progress;
 	@Nullable
-	private Expression<BossBar.Color> color;
+	private Expression<BossBarColor> color;
 	@Nullable
 	private Expression<BossBar.Overlay> overlay;
 
@@ -47,7 +48,7 @@ public class ExprBossBar extends SimpleExpression<BossBar> {
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		title = (Expression<ComponentWrapper>) expressions[0];
 		progress = (Expression<Number>) expressions[1];
-		color = (Expression<BossBar.Color>) expressions[2];
+		color = (Expression<BossBarColor>) expressions[2];
 		overlay = (Expression<BossBar.Overlay>) expressions[3];
 		return true;
 	}
@@ -60,8 +61,8 @@ public class ExprBossBar extends SimpleExpression<BossBar> {
 		if (this.progress != null) progress = toProgress(this.progress.getSingle(event), BossBar.MAX_PROGRESS);
 		BossBar.Color color = BossBar.Color.WHITE;
 		if (this.color != null) {
-			BossBar.Color single = this.color.getSingle(event);
-			if (single != null) color = single;
+			BossBarColor single = this.color.getSingle(event);
+			if (single != null) color = single.getColor();
 		}
 		BossBar.Overlay overlay = BossBar.Overlay.PROGRESS;
 		if (this.overlay != null) {

@@ -1097,7 +1097,7 @@ public class MinestomClasses {
 			.description("The bar shown at the top of a player's screen.")
 			.examples("""
 				set {_bar} to new boss bar titled "<red>Dragon" with progress 50
-				show {_bar} to all players""")
+				add {_bar} to boss bars of all players""")
 			.defaultExpression(new EventValueExpression<>(BossBar.class))
 			.parser(new Parser<>() {
 				@Override
@@ -1115,12 +1115,12 @@ public class MinestomClasses {
 					return "boss bar titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.name()) + "\"";
 				}
 			}));
-		Classes.registerClass(new EnumClassInfo<>(BossBar.Color.class, "bossbarcolor")
+		Classes.registerClass(new EnumClassInfo<>(BossBarColor.class, "bossbarcolor")
 			.user("boss ?bar ?colou?rs?")
 			.name("Boss Bar Color")
-			.description("The color of a boss bar. Possible values: pink, blue, red, green, yellow, purple, white.")
-			.examples("set color of {_bar} to red")
-			.defaultExpression(new EventValueExpression<>(BossBar.Color.class)));
+			.description("The color of a boss bar. Possible values: pink bar, blue bar, red bar, green bar, yellow bar, purple bar, white bar.")
+			.examples("set color of {_bar} to red bar")
+			.defaultExpression(new EventValueExpression<>(BossBarColor.class)));
 		Classes.registerClass(new EnumClassInfo<>(BossBar.Overlay.class, "bossbaroverlay")
 			.user("boss ?bar ?overlays?")
 			.name("Boss Bar Overlay")

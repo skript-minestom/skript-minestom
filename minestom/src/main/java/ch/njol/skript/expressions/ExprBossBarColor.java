@@ -6,6 +6,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Keywords;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.util.BossBarColor;
 import ch.njol.util.coll.CollectionUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.event.Event;
@@ -14,26 +15,26 @@ import org.jspecify.annotations.Nullable;
 @Name("Boss Bar Color")
 @Description("The color of a boss bar. Changing it updates the bar for everybody already seeing it.")
 @Examples("""
-	set color of {_bar} to red
+	set color of {_bar} to red bar
 
 	if progress of {_bar} < 25:
-		set color of {_bar} to red""")
+		set color of {_bar} to red bar""")
 @Keywords({"boss bar", "bossbar", "color"})
-public class ExprBossBarColor extends SimplePropertyExpression<BossBar, BossBar.Color> {
+public class ExprBossBarColor extends SimplePropertyExpression<BossBar, BossBarColor> {
 
 	static {
-		register(ExprBossBarColor.class, BossBar.Color.class, "colo[u]r", "bossbars");
+		register(ExprBossBarColor.class, BossBarColor.class, "colo[u]r", "bossbars");
 	}
 
 	@Override
-	public BossBar.Color convert(BossBar from) {
-		return from.color();
+	public @Nullable BossBarColor convert(BossBar from) {
+		return BossBarColor.of(from.color());
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(Changer.ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, RESET -> CollectionUtils.array(BossBar.Color.class);
+			case SET, DELETE, RESET -> CollectionUtils.array(BossBarColor.class);
 			default -> null;
 		};
 	}
@@ -43,7 +44,7 @@ public class ExprBossBarColor extends SimplePropertyExpression<BossBar, BossBar.
 		BossBar.Color color = BossBar.Color.WHITE;
 		if (mode == Changer.ChangeMode.SET) {
 			if (delta == null || delta[0] == null) return;
-			color = (BossBar.Color) delta[0];
+			color = ((BossBarColor) delta[0]).getColor();
 		}
 		for (BossBar bossBar : getExpr().getArray(event)) {
 			bossBar.color(color);
@@ -56,8 +57,8 @@ public class ExprBossBarColor extends SimplePropertyExpression<BossBar, BossBar.
 	}
 
 	@Override
-	public Class<? extends BossBar.Color> getReturnType() {
-		return BossBar.Color.class;
+	public Class<? extends BossBarColor> getReturnType() {
+		return BossBarColor.class;
 	}
 
 }
