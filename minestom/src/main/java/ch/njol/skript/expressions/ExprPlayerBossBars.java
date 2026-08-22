@@ -79,7 +79,7 @@ public class ExprPlayerBossBars extends PropertyExpression<Player, BossBar> {
 		List<BossBar> bossBars = Arrays.stream(delta)
 			.filter(BossBar.class::isInstance)
 			.map(BossBar.class::cast)
-			.collect(Collectors.toList());
+			.toList();
 		if (mode == Changer.ChangeMode.SET) {
 			for (Player player : players) {
 				MinecraftServer.getBossBarManager().removeAllBossBars(player);

@@ -12,13 +12,14 @@ import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.util.Kleenean;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("New Boss Bar")
 @Description("""
 	Creates a new boss bar.
-	Progress is a percentage between 0 and 100 and is clamped to that range, defaulting to 100.
+	Progress is a number between 0 and 1 and is clamped to that range, defaulting to 1.
 	The color defaults to white and the overlay to progress.
 	A boss bar is not shown to anybody until it is shown to them.""")
 @Examples("""
@@ -97,11 +98,7 @@ public class ExprBossBar extends SimpleExpression<BossBar> {
 		if (percent == null) return defaultProgress;
 		double value = percent.doubleValue();
 		if (Double.isNaN(value)) return defaultProgress;
-		return (float) (Math.clamp(value, 0, 100) / 100);
-	}
-
-	public static double toPercent(float progress) {
-		return progress * 100D;
+		return (float) Math.clamp(value, 0, 1);
 	}
 
 }

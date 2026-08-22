@@ -22,7 +22,7 @@ import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 public class ExprBossBarTitle extends SimplePropertyExpression<BossBar, ComponentWrapper> {
 
 	static {
-		register(ExprBossBarTitle.class, ComponentWrapper.class, "title", "bossbars");
+		register(ExprBossBarTitle.class, ComponentWrapper.class, "[bar] title", "bossbars");
 	}
 
 	@Override

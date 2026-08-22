@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
 public class ExprBossBarColor extends SimplePropertyExpression<BossBar, BossBarColor> {
 
 	static {
-		register(ExprBossBarColor.class, BossBarColor.class, "colo[u]r", "bossbars");
+		register(ExprBossBarColor.class, BossBarColor.class, "[bar] colo[u]r", "bossbars");
 	}
 
 	@Override

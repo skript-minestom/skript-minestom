@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 public class ExprBossBarOverlay extends SimplePropertyExpression<BossBar, BossBar.Overlay> {
 
 	static {
-		register(ExprBossBarOverlay.class, BossBar.Overlay.class, "overlay", "bossbars");
+		register(ExprBossBarOverlay.class, BossBar.Overlay.class, "[bar] overlay", "bossbars");
 	}
 
 	@Override

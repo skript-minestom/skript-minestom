@@ -13,24 +13,23 @@ import org.jspecify.annotations.Nullable;
 
 @Name("Boss Bar Progress")
 @Description("""
-	How full a boss bar is, as a percentage between 0 and 100.
-	Values outside of that range are clamped rather than rejected, so subtracting 30 from a bar at 10% leaves it empty instead of erroring.
+	How full a boss bar is, as number between 0 and 1.
 	Changing it updates the bar for everybody already seeing it.""")
 @Examples("""
-	set progress of {_bar} to 50
+	set progress of {_bar} to 0.5
 
 	every second:
-		remove 5 from progress of {_bar}""")
+		subtract 0.05 from progress of {_bar}""")
 @Keywords({"boss bar", "bossbar"})
 public class ExprBossBarProgress extends SimplePropertyExpression<BossBar, Number> {
 
 	static {
-		register(ExprBossBarProgress.class, Number.class, "progress", "bossbars");
+		register(ExprBossBarProgress.class, Number.class, "[bar] progress", "bossbars");
 	}
 
 	@Override
 	public Number convert(BossBar from) {
-		return ExprBossBar.toPercent(from.progress());
+		return from.progress();
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class ExprBossBarProgress extends SimplePropertyExpression<BossBar, Numbe
 				case ADD, REMOVE -> {
 					if (value == null) yield bossBar.progress();
 					double change = mode == Changer.ChangeMode.ADD ? value.doubleValue() : -value.doubleValue();
-					yield ExprBossBar.toProgress(ExprBossBar.toPercent(bossBar.progress()) + change, bossBar.progress());
+					yield ExprBossBar.toProgress(bossBar.progress() + change, bossBar.progress());
 				}
 				case DELETE, RESET -> BossBar.MIN_PROGRESS;
 				default -> bossBar.progress();
