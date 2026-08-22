@@ -1,9 +1,11 @@
-package ch.njol.skript.structures.command;
+package ch.njol.skript.structures.command.arguments;
 
 import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.skript.util.Item;
 import ch.njol.skript.util.NBTCompound;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.arguments.*;
@@ -45,12 +47,13 @@ public enum ArgumentType {
 	STRING("string", ArgumentString::new),
 	WORD("word", ArgumentWord::new),
 	STRING_ARRAY("stringarray", ArgumentStringArray::new),
-	//COMMAND("command", ArgumentCommand::new), // works but doesn't predict properly clientside so considered broken
 
 	// enums
 	GAME_MODE("gamemode", GameMode.class),
+	SOUND_CATEGORY("soundcategory", Sound.Source.class),
 
 	// minecraft specific
+	//COMMAND("command", ArgumentCommand::new), // works but doesn't predict properly clientside so considered broken
 	PARTICLE("particle", ArgumentParticle::new), // doesn't seem to predict properly clientside but may be useful still
 	ENTITY_TYPE("entitytype", ArgumentEntityType::new),
 	BLOCK("block", ArgumentBlockState::new),
@@ -68,7 +71,14 @@ public enum ArgumentType {
 	NBT_COMPOUND("nbtcompound", ArgumentNbtCompoundTag::new),
 	RELATIVE_BLOCK_POSITION("blockposition", ArgumentRelativeBlockPosition::new),
 	VECTOR_3("vector", ArgumentRelativeVec3::new),
-	VECTOR_2("2dvector", ArgumentRelativeVec2::new);
+	VECTOR_2("2dvector", ArgumentRelativeVec2::new),
+
+	// resources
+	ATTRIBUTE_TYPE("attributetype", ArgumentAttribute::new),
+	BIOME("biome", ArgumentBiome::new),
+	DAMAGE_TYPE("damagetype", s -> new ArgumentResource(s, "minecraft:damage_type")),
+	ENCHANT("enchant", ArgumentEnchantment::new),
+	SOUND("sound", s -> new ArgumentResource(s, "minecraft:sound_event")),;
 
 	private final String expectedInitialInput;
 	private final BiFunction<String, String, Argument<?>> provider;
@@ -88,6 +98,7 @@ public enum ArgumentType {
 	}
 
 	public static Object convertToSkriptObject(Object o, CommandSender sender, Argument<?> arg) {
+		if (o instanceof Key key) return key.namespace();
 		if (o instanceof UUID uuid) return uuid.toString();
 		if (o instanceof ItemStack itemStack) return new Item(itemStack);
 		if (o instanceof Component component) return new ComponentWrapper(component);
