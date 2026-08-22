@@ -87,6 +87,7 @@ import java.util.stream.Collectors;
 
 import static ch.njol.skript.expressions.ExprAmbientSounds.getSoundEvent;
 import static ch.njol.skript.util.ComponentWrapper.toWrapper;
+import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
 import static com.github.hapily04.skriptminestom.util.MessageUtils.LEGACY_SERIALIZER;
 import static com.github.hapily04.skriptminestom.util.NumberUtils.timespanFrom;
 
@@ -733,7 +734,7 @@ public class MinestomClasses {
 
 				@Override
 				public @NotNull String toVariableNameString(@NotNull ComponentWrapper o) {
-					return LEGACY_SERIALIZER.serialize(o.getComponent());
+					return BASIC_MINI_MESSAGE.serialize(o.getComponent());
 				}
 			})
 			.serializer(new Serializer<>() {
