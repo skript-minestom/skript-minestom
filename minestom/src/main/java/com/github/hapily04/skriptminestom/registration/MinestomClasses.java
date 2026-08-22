@@ -768,11 +768,6 @@ public class MinestomClasses {
 					return false;
 				}
 			}));
-		// purely for serialization
-		Classes.registerClass(new ClassInfo<>(Component.class, "internalcomponent")
-			.name("Internal Component")
-			.description("Internal Adventure component type used for serialization.")
-			.serializeAs(ComponentWrapper.class));
 		Classes.registerClass(new ClassInfo<>(TagResolver.class, "tagresolver")
 			.user("tag ?resolvers?")
 			.name("Tag Resolver")
