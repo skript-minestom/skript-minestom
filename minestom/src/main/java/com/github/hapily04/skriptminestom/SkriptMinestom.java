@@ -106,6 +106,28 @@ public class SkriptMinestom {
 			scheduleShutdownTasks();
 			server.start(properties.getProperty(ADDRESS_KEY), Integer.parseInt(properties.getProperty(PropertyUtils.PORT_KEY)));
 			MinestomTerminal.start();
+
+
+			metrics = new Metrics(-1) // TODO change service id provided
+				.addCustomChart(new SingleLineChart("players", () -> MinecraftServer.getConnectionManager().getOnlinePlayerCount()))
+				.addCustomChart(new SimplePie("auth_type", () -> switch (properties.getProperty(AUTH_TYPE_KEY).toLowerCase(Locale.ENGLISH)) {
+					case "mojang" -> "mojang";
+					case "velocity" -> "velocity";
+					case "bungee", "bungeecord" -> "bungee";
+					default -> "offline";
+				}))
+				.addCustomChart(new SimplePie("dispatcher_threads", () -> {
+					String dispatcherThreads = properties.getProperty(DISPATCHER_THREADS);
+					if (NumberUtils.isInteger(dispatcherThreads)) return dispatcherThreads;
+					return "unknown";
+				}))
+				.addCustomChart(new SimplePie("skript_version", () -> Version.VERSION))
+				.addCustomChart(new SimplePie("minestom_build", Git::version))
+				.addCustomChart(new SimplePie("minecraft_version", () -> MinecraftServer.VERSION_NAME))
+				.addCustomChart(new SimplePie("addon_count", () -> String.valueOf(Skript.getAddons().size())))
+				.addCustomChart(new SimplePie("effect_commands", () -> SkriptConfig.enableEffectCommands.value().toString()))
+				.addCustomChart(new SimplePie("log_effect_commands", () -> SkriptConfig.logEffectCommands.value().toString()))
+				.addCustomChart(new SimplePie("number_accuracy", () -> SkriptConfig.numberAccuracy.value().toString()));
 		} catch (Throwable t) {
 			SkriptLogger.LOGGER.error("An error occurred while initializing Skript-Minestom:");
 			t.printStackTrace();
@@ -199,27 +221,6 @@ public class SkriptMinestom {
 				});
 			}
 		}
-
-		metrics = new Metrics(-1) // TODO change service id provided
-			.addCustomChart(new SingleLineChart("players", () -> MinecraftServer.getConnectionManager().getOnlinePlayerCount()))
-			.addCustomChart(new SimplePie("auth_type", () -> switch (properties.getProperty(AUTH_TYPE_KEY).toLowerCase(Locale.ENGLISH)) {
-				case "mojang" -> "mojang";
-				case "velocity" -> "velocity";
-				case "bungee", "bungeecord" -> "bungee";
-				default -> "offline";
-			}))
-			.addCustomChart(new SimplePie("dispatcher_threads", () -> {
-				String dispatcherThreads = properties.getProperty(DISPATCHER_THREADS);
-				if (NumberUtils.isInteger(dispatcherThreads)) return dispatcherThreads;
-				return "unknown";
-			}))
-			.addCustomChart(new SimplePie("skript_version", () -> Version.VERSION))
-			.addCustomChart(new SimplePie("minestom_build", Git::version))
-			.addCustomChart(new SimplePie("minecraft_version", () -> MinecraftServer.VERSION_NAME))
-			.addCustomChart(new SimplePie("addon_count", () -> String.valueOf(Skript.getAddons().size())))
-			.addCustomChart(new SimplePie("effect_commands", () -> SkriptConfig.enableEffectCommands.value().toString()))
-			.addCustomChart(new SimplePie("log_effect_commands", () -> SkriptConfig.logEffectCommands.value().toString()))
-			.addCustomChart(new SimplePie("number_accuracy", () -> SkriptConfig.numberAccuracy.value().toString()));
 	}
 
 	public static void initEffectCommands(EventNode<net.minestom.server.event.Event> node) {
