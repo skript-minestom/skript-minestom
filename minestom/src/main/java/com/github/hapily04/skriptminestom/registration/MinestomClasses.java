@@ -89,7 +89,6 @@ import java.util.stream.Collectors;
 import static ch.njol.skript.expressions.ExprAmbientSounds.getSoundEvent;
 import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
-import static com.github.hapily04.skriptminestom.util.MessageUtils.LEGACY_SERIALIZER;
 import static com.github.hapily04.skriptminestom.util.NumberUtils.timespanFrom;
 
 @SuppressWarnings("unchecked")
@@ -2304,7 +2303,7 @@ public class MinestomClasses {
 		 * Converters
 		 */
 		Converters.registerConverter(String.class, ComponentWrapper.class, from -> new ComponentWrapper(Component.text(from)));
-		Converters.registerConverter(ComponentWrapper.class, String.class, from -> LEGACY_SERIALIZER.serialize(from.getComponent()));
+		Converters.registerConverter(ComponentWrapper.class, String.class, from -> BASIC_MINI_MESSAGE.serialize(from.getComponent()));
 		Converters.registerConverter(CommandSender.class, Player.class, from -> {
 			if (from instanceof Player player) return player;
 			return null;
@@ -2392,8 +2391,8 @@ public class MinestomClasses {
 		 *	Comparators
 		 */
 		Comparators.registerComparator(ComponentWrapper.class, ComponentWrapper.class, (o1, o2) -> {
-			String s1 = LEGACY_SERIALIZER.serialize(o1.getComponent());
-			String s2 = LEGACY_SERIALIZER.serialize(o2.getComponent());
+			String s1 = BASIC_MINI_MESSAGE.serialize(o1.getComponent());
+			String s2 = BASIC_MINI_MESSAGE.serialize(o2.getComponent());
 			return Comparators.compare(s1, s2);
 		});
 		Comparators.registerComparator(CommandSender.class, EntityType.class, (o1, o2) -> {
