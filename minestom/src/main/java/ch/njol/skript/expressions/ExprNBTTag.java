@@ -35,11 +35,12 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprNBTTag.class, Object.class, ExpressionType.PROPERTY,
-			"%*tagtype% [nbt] tag[s] %strings% of %nbtcompounds%",
-			"%nbtcompounds%'[s] %*tagtype% [nbt] tag[s] %strings%");
+			"%tagtype% [nbt] tag[s] %strings% of %nbtcompounds%",
+			"%nbtcompounds%'[s] %tagtype% [nbt] tag[s] %strings%");
 	}
 
-	private NBTUtils.TagType tagType;
+	private NBTUtils.TagType literalTagType = null;
+	private Expression<NBTUtils.TagType> tagType;
 	private Expression<String> tags;
 	private Expression<NBTCompound> compoundExpr;
 
@@ -54,7 +55,8 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 			typeIndex = 1;
 			tagIndex = 2;
 		}
-		tagType = ((Literal<NBTUtils.TagType>) expressions[typeIndex]).getSingle();
+		tagType = (Expression<NBTUtils.TagType>) expressions[typeIndex];
+		if (tagType instanceof Literal<NBTUtils.TagType> literal) literalTagType = literal.getSingle();
 		tags = (Expression<String>) expressions[tagIndex];
 		compoundExpr = (Expression<NBTCompound>) expressions[compoundIndex];
 		return true;
@@ -64,6 +66,8 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 	@Override
 	protected @Nullable Object[] get(Event event) {
 		List<Object> tags = new ArrayList<>();
+		NBTUtils.TagType tagType = this.tagType.getSingle(event);
+		if (tagType == null) return new Object[0];
 		BinaryTagType<?> expectedBinaryTag = tagType.getExpectedBinaryTag();
 		NBTCompound[] compounds = compoundExpr.getArray(event);
 		for (String tag : this.tags.getArray(event)) {
@@ -87,7 +91,7 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 	@Override
 	public @Nullable Class<?>[] acceptChange(Changer.ChangeMode mode) {
 		return switch (mode) {
-			case REMOVE, ADD, SET -> CollectionUtils.array(tagType.getSkriptCompatibleClass());
+			case REMOVE, ADD, SET -> CollectionUtils.array(getReturnType());
 			case DELETE -> CollectionUtils.array(Object.class);
 			default -> null;
 		};
@@ -95,6 +99,8 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 
 	@Override
 	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
+		NBTUtils.TagType tagType = this.tagType.getSingle(event);
+		if (tagType == null) return;
 		BinaryTagType<?> expectedBinaryTag = tagType.getExpectedBinaryTag();
 		for (String tag : tags.getArray(event)) {
 			for (NBTCompound nbtCompound : compoundExpr.getArray(event)) {
@@ -163,12 +169,13 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 
 	@Override
 	public boolean isSingle() {
-		return compoundExpr.isSingle() && !tagType.getSkriptCompatibleClass().isArray();
+		if (!compoundExpr.isSingle()) return false;
+		return literalTagType != null && !literalTagType.getSkriptCompatibleClass().isArray();
 	}
 
 	@Override
 	public Class<?> getReturnType() {
-		return tagType.getSkriptCompatibleClass();
+		return literalTagType != null ? literalTagType.getSkriptCompatibleClass() : Object.class;
 	}
 
 	@Override
