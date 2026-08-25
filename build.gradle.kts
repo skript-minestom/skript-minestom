@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.github.hapily04.skriptminestom"
-version = "1.0.0-alpha.38"
+version = "1.0.0-alpha.39"
 
 repositories {
 	mavenCentral()
