@@ -15,7 +15,8 @@ import org.jspecify.annotations.Nullable;
 @Name("Panda Rolling State")
 @Description("""
 	The rolling state of a panda.
-	Entities that are not pandas are ignored.""")
+	Entities that are not pandas are ignored.
+	NOTE: If you set its rolling state to true, then want to make it roll again, you must first set its rolling state to false.""")
 @Examples("""
 	spawn a panda at player's position:
 		after spawn:
@@ -27,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 public class ExprPandaRolling extends SimplePropertyExpression<Entity, Boolean> {
 
 	static {
-		register(ExprPandaRolling.class, Boolean.class, "roll(ing|) [state]", "entities");
+		register(ExprPandaRolling.class, Boolean.class, "rolling [state]", "entities");
 	}
 
 	@Override
