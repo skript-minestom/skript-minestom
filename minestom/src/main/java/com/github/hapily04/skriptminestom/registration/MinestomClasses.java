@@ -2368,6 +2368,11 @@ public class MinestomClasses {
 		});
 		Converters.registerConverter(Color.class, AlphaColor.class, from -> from.withAlpha(255));
 		Converters.registerConverter(Item.class, Block.class, from -> from.getItem().material().block());
+		Converters.registerConverter(Block.class, Item.class, from -> {
+			Material material = from.material();
+			if (material == null) return null;
+			return new Item(ItemStack.of(material));
+		});
 
 		// unsure if these are necessary
 		Converters.registerConverter(ItemDisplayMeta.DisplayContext.class, ItemAnimation.class, from -> {
