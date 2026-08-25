@@ -1210,6 +1210,15 @@ public class MinestomClasses {
 					return false;
 				}
 			}));
+		Classes.registerClass(new EnumClassInfo<>(ItemFlag.class, "itemflag")
+			.user("item ?flags?")
+			.name("Item Flag")
+			.description("""
+				A part of an item's tooltip that can be hidden.
+				Possible values: hide enchants, hide attributes, hide unbreakable, hide destroys, hide placed on, hide dye, hide armor trim, hide stored enchants, hide additional tooltip.""")
+			.examples("""
+				give player diamond sword with the hide attributes item flag
+				add hide enchants to item flags of player's tool"""));
 		Classes.registerClass(new ClassInfo<>(Direction.class, "direction")
 			.user("directions?")
 			.name("Direction")
