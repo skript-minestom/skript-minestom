@@ -14,6 +14,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.scoreboard.Team;
+import net.minestom.server.scoreboard.TeamManager;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -51,8 +52,9 @@ public class ExprTeam extends SimpleExpression<Team> {
 	@Override
 	protected Team @Nullable [] get(Event event) {
 		List<Team> teams = new ArrayList<>();
+		TeamManager teamManager = MinecraftServer.getTeamManager();
 		for (String name : names.getArray(event)) {
-			Team team = MinecraftServer.getTeamManager().getTeam(name);
+			Team team = teamManager.getTeam(name);
 			if (team != null) teams.add(team);
 		}
 		return teams.toArray(new Team[0]);

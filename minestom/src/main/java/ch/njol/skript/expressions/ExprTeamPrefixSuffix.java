@@ -46,8 +46,7 @@ public class ExprTeamPrefixSuffix extends SimplePropertyExpression<Team, Compone
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(Changer.ChangeMode mode) {
-		if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET)
-			return CollectionUtils.array(ComponentWrapper.class);
+		if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET) return CollectionUtils.array(ComponentWrapper.class);
 		return null;
 	}
 
@@ -59,17 +58,14 @@ public class ExprTeamPrefixSuffix extends SimplePropertyExpression<Team, Compone
 			component = ((ComponentWrapper) delta[0]).getComponent();
 		}
 		for (Team team : getExpr().getArray(event)) {
-			if (suffix) {
-				team.updateSuffix(component);
-			} else {
-				team.updatePrefix(component);
-			}
+			if (suffix) team.updateSuffix(component);
+			else team.updatePrefix(component);
 		}
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return suffix ? "team suffix" : "team prefix";
+		return "team " + (suffix ? "suffix" : "prefix");
 	}
 
 	@Override

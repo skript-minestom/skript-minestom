@@ -11,6 +11,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.scoreboard.Team;
+import net.minestom.server.scoreboard.TeamManager;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -35,8 +36,9 @@ public class EffDeleteTeam extends Effect {
 
 	@Override
 	protected void execute(Event event) {
+		TeamManager teamManager = MinecraftServer.getTeamManager();
 		for (Team team : teams.getArray(event)) {
-			MinecraftServer.getTeamManager().deleteTeam(team);
+			teamManager.deleteTeam(team);
 		}
 	}
 

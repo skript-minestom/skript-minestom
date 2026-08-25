@@ -1101,6 +1101,7 @@ public class MinestomClasses {
 				set team color of {_team} to dark red
 				add player to members of {_team}""")
 			.defaultExpression(new EventValueExpression<>(Team.class))
+			.supplier(() -> MinecraftServer.getTeamManager().getTeams().iterator())
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {

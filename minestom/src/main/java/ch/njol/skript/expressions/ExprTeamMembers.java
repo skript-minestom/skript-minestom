@@ -10,14 +10,19 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.InstanceManager;
+import net.minestom.server.network.ConnectionManager;
 import net.minestom.server.scoreboard.Team;
+import net.minestom.server.scoreboard.TeamManager;
+import net.minestom.server.utils.entity.EntityFinder;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Name("Team Members")
 @Description("""
@@ -32,10 +37,10 @@ import java.util.List;
 	loop members of {_team}:
 		broadcast loop-value""")
 @Keywords({"team", "scoreboard", "member"})
-public class ExprTeamMembers extends PropertyExpression<Team, String> {
+public class ExprTeamMembers extends PropertyExpression<Team, Entity> {
 
 	static {
-		register(ExprTeamMembers.class, String.class, "[team] members", "teams");
+		register(ExprTeamMembers.class, Entity.class, "[team] members", "teams");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -46,18 +51,18 @@ public class ExprTeamMembers extends PropertyExpression<Team, String> {
 	}
 
 	@Override
-	protected String[] get(Event event, Team[] source) {
-		List<String> members = new ArrayList<>();
+	protected Entity[] get(Event event, Team[] source) {
+		List<Entity> members = new ArrayList<>();
 		for (Team team : source) {
-			members.addAll(team.getMembers());
+			members.addAll(getMembers(team));
 		}
-		return members.toArray(new String[0]);
+		return members.toArray(new Entity[0]);
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(Changer.ChangeMode mode) {
 		return switch (mode) {
-			case ADD, REMOVE, SET, DELETE, RESET -> CollectionUtils.array(Object[].class);
+			case ADD, REMOVE, SET, DELETE -> CollectionUtils.array(Entity[].class);
 			default -> null;
 		};
 	}
@@ -67,41 +72,28 @@ public class ExprTeamMembers extends PropertyExpression<Team, String> {
 		Team[] teams = getExpr().getArray(event);
 		if (teams.length == 0) return;
 
-		if (mode == Changer.ChangeMode.DELETE || mode == Changer.ChangeMode.RESET) {
+		if (mode == Changer.ChangeMode.DELETE) {
 			for (Team team : teams) {
-				team.removeMembers(new ArrayList<>(team.getMembers()));
+				clearMembers(team);
 			}
 			return;
 		}
 		if (delta == null) return;
 
-		List<String> names = new ArrayList<>();
-		for (Object object : delta) {
-			String name = toMemberName(object);
-			if (name != null) names.add(name);
-		}
-		if (names.isEmpty() && mode != Changer.ChangeMode.SET) return;
+		List<Object> entities = new ArrayList<>();
+		Collections.addAll(entities, delta);
+		if (entities.isEmpty() && mode != Changer.ChangeMode.SET) return;
 
 		for (Team team : teams) {
 			switch (mode) {
 				case SET -> {
-					team.removeMembers(new ArrayList<>(team.getMembers()));
-					team.addMembers(names);
+					clearMembers(team);
+					addMember(team, entities);
 				}
-				case ADD -> team.addMembers(names);
-				default -> team.removeMembers(names);
+				case ADD -> addMember(team, entities);
+				default -> removeTeam(team, entities);
 			}
 		}
-	}
-
-	/**
-	 * Minestom keys team members by name: a player by username, anything else by uuid.
-	 */
-	private static @Nullable String toMemberName(Object object) {
-		if (object instanceof Player player) return player.getUsername();
-		if (object instanceof Entity entity) return entity.getUuid().toString();
-		if (object instanceof String string) return string;
-		return null;
 	}
 
 	@Override
@@ -110,13 +102,49 @@ public class ExprTeamMembers extends PropertyExpression<Team, String> {
 	}
 
 	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
+	public Class<? extends Entity> getReturnType() {
+		return Entity.class;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		return "team members of " + getExpr().toString(event, debug);
+	}
+
+	private void addMember(Team team, List<Object> objects) {
+		for (Object o : objects) {
+			if (o instanceof Entity entity) entity.setTeam(team);
+		}
+	}
+
+	private void removeTeam(Team team, List<Object> objects) {
+		for (Object object : objects) {
+			if (object instanceof Entity entity && team.equals(entity.getTeam())) entity.setTeam(null);
+		}
+	}
+
+	private void clearMembers(Team team) {
+		for (Entity entity : getMembers(team)) {
+			if (entity != null && team.equals(entity.getTeam())) entity.setTeam(null);
+		}
+	}
+
+	private Set<Entity> getMembers(Team team) {
+		Set<Entity> members = new HashSet<>();
+		TeamManager teamManager = MinecraftServer.getTeamManager();
+		InstanceManager instanceManager = MinecraftServer.getInstanceManager();
+		for (String entity : teamManager.getEntities(team)) {
+			for (Instance instance : instanceManager.getInstances()) {
+				Entity e = instance.getEntityByUuid(UUID.fromString(entity)); // safe parse because getEntities() checks that
+				if (e != null) members.add(e);
+			}
+		}
+		ConnectionManager connectionManager = MinecraftServer.getConnectionManager();
+		for (String username : teamManager.getPlayers(team)) {
+			Player player = connectionManager.findOnlinePlayer(username);
+			if (player != null) members.add(player);
+		}
+		return members;
 	}
 
 }

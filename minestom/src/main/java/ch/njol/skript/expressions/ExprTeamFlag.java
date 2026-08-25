@@ -52,11 +52,8 @@ public class ExprTeamFlag extends SimplePropertyExpression<Team, Boolean> {
 		if (delta == null || delta[0] == null) return;
 		boolean value = (Boolean) delta[0];
 		for (Team team : getExpr().getArray(event)) {
-			if (seeInvisible) {
-				team.updateSeeInvisiblePlayers(value);
-			} else {
-				team.updateAllowFriendlyFire(value);
-			}
+			if (seeInvisible) team.updateSeeInvisiblePlayers(value);
+			else team.updateAllowFriendlyFire(value);
 		}
 	}
 
