@@ -59,6 +59,8 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.ping.ServerListPingType;
 import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.scoreboard.Sidebar;
+import net.minestom.server.scoreboard.Team;
+import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.sound.Music;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Taggable;
@@ -1086,6 +1088,47 @@ public class MinestomClasses {
 					return "scoreboard titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.getTitle()) + "\"";
 				}
 			}));
+		Classes.registerClass(new ClassInfo<>(Team.class, "team")
+			.user("teams?")
+			.name("Team")
+			.description("""
+				A scoreboard team. Teams control the color of member name tags and their glow outline, \
+				whether members push each other, name tag visibility, friendly fire and prefixes/suffixes.
+				Teams live in memory only and are not saved across restarts, so scripts should recreate them on load.""")
+			.examples("""
+				set {_team} to a new team named "red"
+				set team color of {_team} to dark red
+				add player to members of {_team}""")
+			.defaultExpression(new EventValueExpression<>(Team.class))
+			.supplier(() -> MinecraftServer.getTeamManager().getTeams().iterator())
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull Team o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull Team o) {
+					return o.getTeamName();
+				}
+			}));
+		Classes.registerClass(new EnumClassInfo<>(TeamsPacket.CollisionRule.class, "collisionrule")
+			.user("collision ?rules?")
+			.name("Collision Rule")
+			.description("Whether members of a team push each other. Possible values: always, never, push other teams, push own team.")
+			.examples("set collision rule of {_team} to never")
+			.defaultExpression(new EventValueExpression<>(TeamsPacket.CollisionRule.class)));
+		Classes.registerClass(new EnumClassInfo<>(TeamsPacket.NameTagVisibility.class, "nametagvisibility")
+			.user("name ?tag ?visibilit(y|ies)")
+			.name("Name Tag Visibility")
+			.description("Who can see the name tags of a team. Possible values: always, never, hide for other teams, hide for own team.")
+			.examples("set name tag visibility of {_team} to hide for other teams")
+			.defaultExpression(new EventValueExpression<>(TeamsPacket.NameTagVisibility.class)));
 		Classes.registerClass(new ClassInfo<>(BossBar.class, "bossbar")
 			.user("boss ?bars?")
 			.name("Boss Bar")
