@@ -58,12 +58,9 @@ public class EffMakeSay extends Effect {
 		for (Player player : players.getArray(event)) {
 			for (String message : messages) {
 				if (message.isEmpty()) continue;
-				if (message.startsWith("/")) {
-					// the command manager expects the command without its leading slash
-					MinecraftServer.getCommandManager().execute(player, message.substring(1));
-				} else {
-					chat(player, message);
-				}
+				// the command manager expects the command without its leading slash
+				if (message.startsWith("/")) MinecraftServer.getCommandManager().execute(player, message.substring(1));
+				else chat(player, message);
 			}
 		}
 	}
