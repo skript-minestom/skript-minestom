@@ -18,7 +18,6 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.network.ConnectionManager;
 import net.minestom.server.scoreboard.Team;
 import net.minestom.server.scoreboard.TeamManager;
-import net.minestom.server.utils.entity.EntityFinder;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 

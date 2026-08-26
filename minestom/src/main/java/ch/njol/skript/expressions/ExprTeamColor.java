@@ -6,13 +6,13 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Keywords;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.util.TeamColors;
 import ch.njol.util.coll.CollectionUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.color.TeamColor;
 import net.minestom.server.scoreboard.Team;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
-import ch.njol.skript.util.TeamColors;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.color.TeamColor;
 
 @Name("Team Color")
 @Description("""

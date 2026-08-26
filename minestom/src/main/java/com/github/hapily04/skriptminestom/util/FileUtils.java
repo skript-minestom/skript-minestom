@@ -2,7 +2,8 @@ package com.github.hapily04.skriptminestom.util;
 
 import org.bukkit.Bukkit;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public class FileUtils {
 

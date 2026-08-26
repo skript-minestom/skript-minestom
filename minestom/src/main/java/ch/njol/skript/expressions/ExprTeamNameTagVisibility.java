@@ -7,10 +7,10 @@ import ch.njol.skript.doc.Keywords;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
+import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.scoreboard.Team;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
-import net.minestom.server.network.packet.server.play.TeamsPacket;
 
 @Name("Team Name Tag Visibility")
 @Description("""
