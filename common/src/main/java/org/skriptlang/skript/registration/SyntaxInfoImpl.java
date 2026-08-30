@@ -10,12 +10,7 @@ import org.skriptlang.skript.docs.Origin;
 import org.skriptlang.skript.util.ClassUtils;
 import org.skriptlang.skript.util.Priority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.SequencedCollection;
+import java.util.*;
 import java.util.function.Supplier;
 
 class SyntaxInfoImpl<T extends SyntaxElement> implements SyntaxInfo<T> {

@@ -1,19 +1,18 @@
 package ch.njol.skript;
 
+import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.Version;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.localization.Localizer;
+import org.skriptlang.skript.registration.SyntaxRegistry;
+import org.skriptlang.skript.util.Registry;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
-
-import ch.njol.skript.util.Utils;
-import ch.njol.skript.util.Version;
-import org.skriptlang.skript.localization.Localizer;
-import org.skriptlang.skript.registration.SyntaxRegistry;
-import org.skriptlang.skript.util.Registry;
 
 /**
  * Utility class for Skript addons. Use {@link Skript#registerAddon(JavaPlugin)} to create a SkriptAddon instance for your plugin.

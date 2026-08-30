@@ -1,7 +1,9 @@
 package ch.njol.skript.structures;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.*;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptEvent.ListeningBehavior;

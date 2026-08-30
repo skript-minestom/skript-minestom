@@ -11,11 +11,11 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import ch.njol.skript.util.Date;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 
 import java.text.SimpleDateFormat;
 

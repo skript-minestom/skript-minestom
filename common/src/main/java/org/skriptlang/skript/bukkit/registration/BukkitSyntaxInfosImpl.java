@@ -11,13 +11,7 @@ import org.skriptlang.skript.docs.Origin;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.util.Priority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.SequencedCollection;
+import java.util.*;
 import java.util.function.Supplier;
 
 final class BukkitSyntaxInfosImpl {

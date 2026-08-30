@@ -93,7 +93,55 @@ public class Version implements Serializable, Comparable<Version> {
 
 		if (postfix == null)
 			return other.postfix == null ? 0 : 1;
-		return other.postfix == null ? -1 : postfix.compareTo(other.postfix);
+		if (other.postfix == null)
+			return -1;
+		return comparePostfix(postfix, other.postfix);
+	}
+
+	/**
+	 * Compares pre-release suffixes identifier by identifier (split on {@code '.'}).
+	 * Digit-only parts are compared as integers so {@code alpha.9} is less than {@code alpha.10}.
+	 * Non-numeric parts are compared lexicographically, so {@code alpha} is less than {@code beta}
+	 * without naming those channels.
+	 */
+	private static int comparePostfix(String a, String b) {
+		if (a.equals(b))
+			return 0;
+		String[] aParts = a.split("\\.", -1);
+		String[] bParts = b.split("\\.", -1);
+		int length = Math.max(aParts.length, bParts.length);
+		for (int i = 0; i < length; i++) {
+			if (i >= aParts.length)
+				return -1;
+			if (i >= bParts.length)
+				return 1;
+			int cmp = compareIdentifier(aParts[i], bParts[i]);
+			if (cmp != 0)
+				return cmp;
+		}
+		return 0;
+	}
+
+	private static int compareIdentifier(String a, String b) {
+		boolean aNumeric = isNumeric(a);
+		boolean bNumeric = isNumeric(b);
+		if (aNumeric && bNumeric)
+			return Integer.compare(Integer.parseInt(a), Integer.parseInt(b));
+		if (aNumeric)
+			return -1;
+		if (bNumeric)
+			return 1;
+		return a.compareTo(b);
+	}
+
+	private static boolean isNumeric(String s) {
+		if (s.isEmpty())
+			return false;
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isDigit(s.charAt(i)))
+				return false;
+		}
+		return true;
 	}
 
 	/**

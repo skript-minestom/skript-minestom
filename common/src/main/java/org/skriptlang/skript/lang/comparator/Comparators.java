@@ -11,11 +11,7 @@ import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.ConverterInfo;
 import org.skriptlang.skript.lang.converter.Converters;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Comparators are used to provide Skript with specific instructions for comparing two objects.

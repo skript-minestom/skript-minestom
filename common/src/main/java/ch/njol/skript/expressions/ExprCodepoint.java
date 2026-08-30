@@ -7,8 +7,8 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Literal;
-import org.jetbrains.annotations.Nullable;
 import ch.njol.skript.lang.simplification.SimplifiedLiteral;
+import org.jetbrains.annotations.Nullable;
 
 @Name("Character Codepoint")
 @Description("Returns the Unicode codepoint of a character")

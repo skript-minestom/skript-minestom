@@ -9,10 +9,8 @@ import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
 import org.skriptlang.skript.lang.converter.Converter;
@@ -20,6 +18,8 @@ import org.skriptlang.skript.lang.converter.Converters;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 import org.skriptlang.skript.util.Priority;
+
+import java.util.Arrays;
 
 /**
  * Represents an expression which represents a property of another one. Remember to set the expression with {@link #setExpr(Expression)} in
