@@ -76,11 +76,8 @@ public class EffSecSpawn extends EffectSection {
 		instances = (Expression<Instance>) expressions[3+matchedPattern];
 		nonTicking = parseResult.hasTag("non ticking");
 		sync = parseResult.hasTag("sync");
-		List<String> tags = parseResult.tags;
-		if (!tags.isEmpty()) {
-			int typeIndex = nonTicking ? 1 : 0;
-			if (tags.size() > 1) type = tags.get(typeIndex);
-		}
+		if (parseResult.hasTag("living")) type = "living";
+		else if (parseResult.hasTag("navigable")) type = "navigable";
 		if (sectionNode != null) {
 			EntryContainer container = ENTRY_VALIDATOR.validate(sectionNode);
 			if (container == null) return false;
