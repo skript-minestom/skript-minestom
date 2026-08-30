@@ -21,17 +21,17 @@ import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.lang.management.ManagementFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,28 +61,23 @@ public final class MinestomUpdateService {
 	private MinestomUpdateService() {}
 
 	/**
-	 * Deletes a previous jar marked for removal after an update restart,
-	 * and loads cached release notes for console display.
+	 * Deletes backup / leftover download files from a previous update, and loads cached release info.
 	 */
 	public static void cleanupAfterRestart() {
+		Path currentJar = currentJarPath();
+		if (currentJar != null) {
+			deleteQuietlyWithRetry(siblingJar(currentJar, ".bak"));
+			deleteQuietlyWithRetry(siblingJar(currentJar, ".new"));
+		}
+
 		UpdateState state = readState();
 		if (state == null) return;
 
-		if (state.oldJar != null && !state.oldJar.isBlank()) {
-			Path oldJar = Path.of(state.oldJar);
-			Path currentJar = currentJarPath();
-			if (currentJar == null || !oldJar.toAbsolutePath().normalize().equals(currentJar.toAbsolutePath().normalize())) {
-				deleteQuietlyWithRetry(oldJar);
-			}
-			state.oldJar = null;
-			writeState(state);
-		}
-
-		if (state.releaseNotes != null || state.newVersion != null) {
+		if (state.newVersion != null || state.htmlUrl != null) {
 			cachedNotes.set(new UpdateInfo(
 				state.newVersion != null ? state.newVersion : com.github.hapily04.skriptminestom.Version.VERSION,
 				state.releaseName != null ? state.releaseName : "",
-				state.releaseNotes != null ? state.releaseNotes : "",
+				"",
 				state.htmlUrl != null ? state.htmlUrl : RELEASES_PAGE,
 				null,
 				null
@@ -137,12 +132,13 @@ public final class MinestomUpdateService {
 			if (!LuckPermsLookup.hasPermission(player, permission)) return;
 
 			TagResolver version = Placeholder.unparsed("version", update.tagName());
-			TagResolver url = Placeholder.unparsed("url", update.htmlUrl() != null ? update.htmlUrl() : RELEASES_PAGE);
-			player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("""
-				<skript_minestom_tag> <yellow>A new version is available: <version>
-				  <base_grey>Download: <yellow><click:open_url:<url>><url>
-				  <base_grey>Run <yellow>/skript update <base_grey>then <yellow>/skript update confirm <base_grey>to install.""",
-				version, url));
+			String url = update.htmlUrl() != null ? update.htmlUrl() : RELEASES_PAGE;
+			player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize(
+				"<skript_minestom_tag> <yellow>A new version is available: <version>", version));
+			player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize("  <base_grey>Release notes: ")
+				.append(ReleaseNotesFormatter.releaseNotesLink(url)));
+			player.sendMessage(SKRIPT_MINI_MESSAGE.deserialize(
+				"  <base_grey>Run <yellow>/skript update <base_grey>then <yellow>/skript update confirm <base_grey>to install."));
 		});
 	}
 
@@ -196,13 +192,16 @@ public final class MinestomUpdateService {
 	}
 
 	/**
-	 * Downloads the update and relaunches on the updater thread.
-	 * Invokes {@code onFailure} on the next tick if something goes wrong before exit.
+	 * Downloads the update, replaces the running jar on shutdown, and shuts the server down
+	 * when possible so the process manager can restart with the same startup command (no second JVM).
+	 *
+	 * @param onSuccess invoked on the server thread with {@code true} if a shutdown will follow,
+	 *                  or {@code false} if the jar was installed but must be loaded by a manual restart
 	 */
-	public static void applyUpdateAsync(UpdateInfo update, Runnable onFailure) {
+	public static void applyUpdateAsync(UpdateInfo update, Consumer<Boolean> onSuccess, Runnable onFailure) {
 		EXECUTOR.execute(() -> {
 			try {
-				applyUpdate(update);
+				applyUpdate(update, onSuccess);
 			} catch (Exception e) {
 				SkriptLogger.LOGGER.error("Update failed: " + e.getMessage());
 				e.printStackTrace();
@@ -243,7 +242,7 @@ public final class MinestomUpdateService {
 		UpdateInfo info = new UpdateInfo(
 			state.newVersion != null ? state.newVersion : com.github.hapily04.skriptminestom.Version.VERSION,
 			state.releaseName != null ? state.releaseName : "",
-			state.releaseNotes != null ? state.releaseNotes : "",
+			"",
 			state.htmlUrl != null ? state.htmlUrl : RELEASES_PAGE,
 			null,
 			null
@@ -257,7 +256,7 @@ public final class MinestomUpdateService {
 		writeState(state);
 	}
 
-	private static void applyUpdate(UpdateInfo latest) throws IOException {
+	private static void applyUpdate(UpdateInfo latest, Consumer<Boolean> onSuccess) throws IOException {
 		if (latest.downloadUrl() == null || latest.assetName() == null)
 			throw new IOException("Latest release has no downloadable jar asset.");
 
@@ -265,49 +264,66 @@ public final class MinestomUpdateService {
 		if (currentJar == null || !Files.isRegularFile(currentJar))
 			throw new IOException("Could not resolve the currently running jar.");
 
-		Path targetJar = currentJar.getParent().resolve(latest.assetName());
-		if (targetJar.toAbsolutePath().normalize().equals(currentJar.toAbsolutePath().normalize()))
-			throw new IOException("Download target matches the running jar path; aborting.");
-
+		Path downloadedJar = siblingJar(currentJar, ".new");
 		SkriptLogger.LOGGER.info("Update: downloading " + latest.assetName() + "...");
-		download(latest.downloadUrl(), targetJar);
-		SkriptLogger.LOGGER.info("Update: download complete. Restarting into the new jar...");
+		download(latest.downloadUrl(), downloadedJar);
+		SkriptLogger.LOGGER.info("Update: download complete. Will replace " + currentJar.getFileName() + " on shutdown.");
 
-		writeState(new UpdateState(currentJar.toAbsolutePath().toString(), latest.tagName(), latest.releaseName(),
-			latest.body(), latest.htmlUrl(), true));
+		registerJarSwapShutdownHook(currentJar, downloadedJar);
 
-		relaunch(targetJar);
+		writeState(new UpdateState(null, latest.tagName(), latest.releaseName(), null, latest.htmlUrl(), true));
+
+		MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
+			boolean shuttingDown = canShutDownForRestart();
+			onSuccess.accept(shuttingDown);
+			if (shuttingDown) {
+				SkriptLogger.LOGGER.info("Update: shutting down so the server can restart with the updated jar.");
+				MinecraftServer.stopCleanly();
+			} else {
+				SkriptLogger.LOGGER.info("Update: installed to " + currentJar.getFileName()
+					+ ". Restart the server manually to load the new version.");
+			}
+		});
 	}
 
-	private static void relaunch(Path newJar) throws IOException {
-		Optional<String> command = ProcessHandle.current().info().command();
-		if (command.isEmpty())
-			throw new IOException("Could not determine the Java executable for relaunch.");
-
-		List<String> cmd = new ArrayList<>();
-		cmd.add(command.get());
-		cmd.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());
-		cmd.add("-jar");
-		cmd.add(newJar.toAbsolutePath().toString());
-
-		Optional<String[]> rawArgs = ProcessHandle.current().info().arguments();
-		if (rawArgs.isPresent()) {
-			String[] args = rawArgs.get();
-			boolean afterJar = false;
-			for (int i = 0; i < args.length; i++) {
-				if (afterJar) cmd.add(args[i]);
-				else if ("-jar".equals(args[i]) && i + 1 < args.length) {
-					i++;
-					afterJar = true;
-				}
+	/**
+	 * Replaces the running jar with the downloaded file during JVM shutdown, keeping the original filename.
+	 */
+	private static void registerJarSwapShutdownHook(Path targetJar, Path downloadedJar) {
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try {
+				swapJarFiles(targetJar, downloadedJar);
+			} catch (IOException e) {
+				SkriptLogger.LOGGER.error("Update: could not replace jar on shutdown: " + e.getMessage());
 			}
-		}
+		}, "skript-minestom-jar-swap"));
+	}
 
-		ProcessBuilder builder = new ProcessBuilder(cmd);
-		builder.directory(newJar.getParent() != null ? newJar.getParent().toFile() : new File(".").getAbsoluteFile());
-		builder.inheritIO();
-		builder.start();
-		System.exit(0);
+	private static void swapJarFiles(Path targetJar, Path downloadedJar) throws IOException {
+		if (!Files.isRegularFile(downloadedJar))
+			throw new IOException("Downloaded jar is missing: " + downloadedJar);
+
+		Path backup = siblingJar(targetJar, ".bak");
+		Files.deleteIfExists(backup);
+		if (Files.exists(targetJar))
+			Files.move(targetJar, backup, StandardCopyOption.REPLACE_EXISTING);
+		Files.move(downloadedJar, targetJar, StandardCopyOption.REPLACE_EXISTING);
+		SkriptLogger.LOGGER.info("Update: replaced " + targetJar.getFileName());
+	}
+
+	/**
+	 * Whether a clean shutdown is expected to let the process manager restart this server.
+	 * Avoids spawning a second JVM (which can OOM containers); {@link MinecraftServer#stopCleanly()} is used instead.
+	 */
+	private static boolean canShutDownForRestart() {
+		// /skript update confirm only runs while the server is listening; stopCleanly lets the
+		// process manager restart with the same command instead of spawning a second JVM.
+		return true;
+	}
+
+	private static Path siblingJar(Path jar, String suffix) {
+		String fileName = jar.getFileName().toString();
+		return jar.getParent().resolve(fileName + suffix);
 	}
 
 	static @Nullable UpdateInfo fetchLatestRelease() throws IOException {

@@ -19,11 +19,11 @@ public class UpdateCommand extends Command {
 	private static final Component CHECK_FAILED = SKRIPT_MINI_MESSAGE.deserialize(
 		"<skript_minestom_tag> <error_color>Could not check for updates. Try again later.");
 	private static final Component CONFIRM_HINT = SKRIPT_MINI_MESSAGE.deserialize(
-		"  <base_grey>Run <yellow>/skript update confirm <base_grey>to download and restart into this release.");
+		"<base_grey>Run <yellow>/skript update confirm <base_grey>to download and install this release.");
 	private static final Component NEED_UPDATE_FIRST = SKRIPT_MINI_MESSAGE.deserialize(
 		"<skript_minestom_tag> <error_color>Run <yellow>/skript update <error_color>first when an update is available.");
 	private static final Component DOWNLOADING = SKRIPT_MINI_MESSAGE.deserialize(
-		"<skript_minestom_tag> <base_grey>Downloading update and restarting...");
+		"<skript_minestom_tag> <base_grey>Downloading update...");
 	private static final Component APPLY_FAILED = SKRIPT_MINI_MESSAGE.deserialize(
 		"<skript_minestom_tag> <error_color>Update failed. Check the console for details.");
 
@@ -71,7 +71,15 @@ public class UpdateCommand extends Command {
 				return;
 			}
 			sender.sendMessage(DOWNLOADING);
-			MinestomUpdateService.applyUpdateAsync(update, () -> sender.sendMessage(APPLY_FAILED));
+			MinestomUpdateService.applyUpdateAsync(update, shuttingDown -> {
+				if (shuttingDown) {
+					sender.sendMessage(SKRIPT_MINI_MESSAGE.deserialize(
+						"<skript_minestom_tag> <success_color>Update installed. Shutting down so the server can restart with the new jar."));
+				} else {
+					sender.sendMessage(SKRIPT_MINI_MESSAGE.deserialize(
+						"<skript_minestom_tag> <success_color>Update installed. Restart the server manually to load the new version."));
+				}
+			}, () -> sender.sendMessage(APPLY_FAILED));
 		}, confirm);
 	}
 
