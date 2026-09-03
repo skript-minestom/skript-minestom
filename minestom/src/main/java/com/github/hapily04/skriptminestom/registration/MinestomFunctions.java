@@ -113,7 +113,9 @@ public class MinestomFunctions {
 				TagResolver[] resolvers = (TagResolver[]) params[1];
 				return new ComponentWrapper[]{toWrapper(BASIC_MINI_MESSAGE.deserialize(input, resolvers))};
 			}
-		}).description("Deserializes a MiniMessage string into a Component, with optional tag resolvers.").examples("send mm(\"<red>Hello <name>!\", resolver(\"name\", player's name))");
+		})
+			.description("Deserializes a MiniMessage string into a Component, with optional tag resolvers.\n You can also use <head64:texture> to input a custom head.")
+			.examples("send mm(\"<red>Hello <name>!\", resolver(\"name\", player's name))");
 		Functions.registerFunction(new JavaFunction<>("suggestionEntry", new Parameter[]{
 			new Parameter<>("entry", DefaultClasses.STRING, true, null),
 			new Parameter<>("tooltip", Classes.getExactClassInfo(ComponentWrapper.class), true, null) // todo provide default value of null
