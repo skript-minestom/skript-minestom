@@ -118,7 +118,7 @@ public class SkriptMinestom {
 			MinestomTerminal.start();
 
 
-			metrics = new Metrics(-1) // TODO change service id provided
+			metrics = new Metrics(33932)
 				.addCustomChart(new SingleLineChart("players", () -> MinecraftServer.getConnectionManager().getOnlinePlayerCount()))
 				.addCustomChart(new SimplePie("auth_type", () -> switch (properties.getProperty(AUTH_TYPE_KEY).toLowerCase(Locale.ENGLISH)) {
 					case "mojang" -> "mojang";

@@ -35,7 +35,7 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic:1.5.32")
 	implementation("com.google.code.gson:gson:2.11.0")
 	implementation("mx.kenzie:mirror:5.0.3")
-	api(project(":common"))
+	api(project(path = ":common", configuration = "shadow"))
 	implementation("org.apache.commons:commons-lang3:3.20.0") // fix skript dependency
 }
 

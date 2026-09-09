@@ -1224,7 +1224,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		SkriptLogger.log(new LogEntry(SkriptLogger.SEVERE, quality, error));
 	}
 
-	private final static String EXCEPTION_PREFIX = "#!#! ";
+	private final static String EXCEPTION_PREFIX = "| ";
 
 	/**
 	 * Used if something happens that shouldn't happen
