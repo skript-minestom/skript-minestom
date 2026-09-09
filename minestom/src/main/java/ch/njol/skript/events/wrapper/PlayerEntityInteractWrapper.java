@@ -3,6 +3,7 @@ package ch.njol.skript.events.wrapper;
 import ch.njol.skript.events.wrapper.marker.PlayerInstanceEventMarker;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Slot;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
@@ -19,9 +20,15 @@ public class PlayerEntityInteractWrapper extends EventWrapper<PlayerEntityIntera
 			PlayerHand hand = e.getHand();
 			return new Slot(player.getItemInHand(hand), player, hand == PlayerHand.MAIN ? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND);
 		}));
+		EventValues.registerEventValue(EventValue.simple(PlayerEntityInteractWrapper.class, PlayerHand.class,
+			from -> from.event.getHand()));
 		EventValues.registerEventValue(EventValue.builder(PlayerEntityInteractWrapper.class, Entity.class)
 			.patterns("clicked-entity")
-			.getter(from -> from.getEvent().getTarget())
+			.getter(from -> from.event.getTarget())
+			.build());
+		EventValues.registerEventValue(EventValue.builder(PlayerEntityInteractWrapper.class, Point.class)
+			.patterns("cursor-position")
+			.getter(from -> from.event.getInteractPosition())
 			.build());
 	}
 

@@ -38,23 +38,18 @@ language: english
 # (open the jar as zip or rename it to Skript.zip to access it)
 
 check for new version: true
-# Whether Skript should check for whether a new version of Skript is available when the server starts.
-# If this is set to true Skript will announce a new version to all players with the "skript.admin" permission.
-# If set to false you can still check for a new version with '/skript update check'.
-# Please note that Skript will not detect beta releases even if you are running one as they are not necessarily stable.
+# Whether Skript-Minestom should check for a newer release when the server starts.
+# If this is set to true, players with the permission set in 'update notification permission'
+# will be notified on join when a new version is available.
 
 update check interval: 12 hours
 # If 'check for new version' is enabled, this sets how often to check for a new update.
 # A first check will always be made when the server starts, after that checks will be made in intervals set by this option.
 # Set this to 0 to disable repeated checks, in which case only one check will be made when the server starts.
-# Please note that this option is currently the only means of making Skript check for an update more than once,
-# as '/skript update check' does only display the results of the last check if a check has been made before.
 
-release channel: @release-channel@
-# If 'check for new version' is enabled, this determines how stable the updates must be.
-# 'stable' means that only stable releases of Skript will be considered updates.
-# 'prerelease' means that development releases will also be checked for.
-# Initial value of this depends on the Skript version you first installed; it was '@release-channel@'.
+update notification permission: skript.admin
+# Players with this LuckPerms permission are told on join when a newer release is available.
+# Use /skript update then /skript update confirm to install an available update (restarts the server).
 
 enable effect commands: false
 effect command token: !
@@ -72,22 +67,9 @@ effect command token: !
 #	!create explosion of force 10000 - likely crashes the server or at least hangs it up for a long time
 #	!ban all players - as the effect implies
 
-allow ops to use effect commands: false
-# Whether server operators which do not have the permission "skript.effectcommands" should have access to effect commands.
-# This setting is mainly useful for servers that do not run any permissions plugin.
-
 log effect commands: false
 # Whether Skript should log the usage of effect commands.
 # They will be logged as [INFORMATION] in this format: '<player> issued effect command: <command>'
-
-
-load default aliases: true
-# Whether Skript should use the default, Skript-provided aliases for items.
-# Disabling this will cause all aliases to be automatically generated. Some items, like potions,
-# will likely not have aliases in this case.
-#
-# You can provide your own aliases by making an 'aliases' folder in the Skript directory and putting the alias files there.
-# The default aliases folder is available with Skript releases on GitHub.
 
 
 player variable fix: true
@@ -142,12 +124,6 @@ number accuracy: 2
 # Money bypasses this setting and is displayed as configured in your economy plugin if you have one.
 
 
-maximum target block distance: 100
-# How far to search for a player's targeted block in blocks/meters.
-# Lower values improve performance, but might reduce the usability of your scripts.
-# This value is limited by the server (e.g. by 'view-distance' in the server.properties), but is guaranteed to work up to 100 meters.
-
-
 case sensitive: false
 # Whether Skript's functions should be case sensitive or not.
 # This e.g. applies to the effect 'replace' and the conditions 'contains' and 'is/is not'.
@@ -156,11 +132,6 @@ case sensitive: false
 case-insensitive variables: true
 # Whether Skript's variables should be case sensitive or not.
 # When set to true, all variable names and indices case will be ignored.
-
-case-insensitive commands: false
-# Whether Skript should accept custom commands regardless of case.
-# When set to true, /test, /Test, and /TEST will all be equivalent.
-# This does not affect non-Skript commands.
 
 disable variable will not be saved warnings: false
 # Disables the "... i.e contents cannot be saved ..." warning when reloading and something in your scripts sets a variable(non local) to a value that is not serializable.
@@ -178,28 +149,6 @@ soft api exceptions: false
 # However, if Skript or addons of it are not working correctly, this might help.
 # You may also get told to enable this by Skript or addon developers - then do so.
 
-enable timings: false
-# When enabled, triggers in scripts will be present in timings reports.
-# Note that this requires Paper (https://papermc.io/downloads/paper) to work; on Bukkit/Spigot this option has no effect.
-# Warning: Paper no longer supports Timings as of 1.19.4. This option has no effect on versions 1.19.4 and above.
-# When false, timings are not enabled for scripts even if you're running Paper.
-
-parse links in chat messages: disabled
-# Controls how Skript will try to parse links in chat messages.
-# If 'disabled' or 'false', no links will be automatically parsed.
-# When 'strict', everything starting with http(s):// will be parsed as link.
-# When 'lenient', everything that contains a dot will be interpreted as a link.
-
-color codes reset formatting: true
-# With old Minecraft chat protocol, color codes used to reset formatting of text.
-# With JSON-based new chat protocol, this is not necessary, but can be done
-# manually for compatibility. This is done by default for compatibility.
-
-keep command last usage dates: false
-# When a cooldown is set on a command, the last usage date is kept in memory (or in a variable if cooldown storage is specified),
-# but when the player uses the command again after the cooldown period is over, the last usage will be deleted as it's no longer needed,
-# If you need to use the expression 'last usage date', then you'll want to enable this.
-
 script loader thread size: 0
 # Enables asynchronous script loading, which will load scripts in the background instead of blocking the server to load scripts.
 # Setting this to a value of 0 or lower will disabled asynchronous loading, and all scripts will be loaded on the main server thread.
@@ -210,21 +159,6 @@ script loader thread size: 0
 # You may also set this option to 'processor count' (without apostrophes) to use the number of available processors.
 # Do note that though, this option may cause issues with addons and possibly some scripts! Do NOT enable this option unless you have really long
 #   script load times AND you take the risk of lost data and full responsibility!
-
-disable hooks:
-	vault: false
-	regions:
-		grief prevention: false
-		precious stones: false
-		residence: false
-		worldguard: false
-# Controls whether Skript should attempt to hook into the plugins listed above.
-# If you change a setting here while the server is running, a restart is required for that change to take effect.
-# Do note that some addons may stop Skript from hooking into a plugin, even if the plugin's hook is not disabled here.
-
-player name regex pattern: [a-zA-Z0-9_]{1,16}
-# A regex pattern that is used to match player names.
-# This can be used if you are using Geyser, where some usernames are prefixed by a certain character.
 
 long parse time warning threshold: 0 seconds
 # This setting determines how long a statement can take to parse before Skript produces a warning

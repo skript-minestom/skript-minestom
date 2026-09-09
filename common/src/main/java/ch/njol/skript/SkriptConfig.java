@@ -18,12 +18,14 @@
  */
 package ch.njol.skript;
 
-import ch.njol.skript.config.*;
+import ch.njol.skript.config.Config;
+import ch.njol.skript.config.EnumParser;
+import ch.njol.skript.config.Option;
+import ch.njol.skript.config.OptionSection;
 import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
-import ch.njol.skript.update.ReleaseChannel;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Version;
@@ -63,51 +65,22 @@ public class SkriptConfig {
 				}
 			});
 	
-	static final Option<Boolean> checkForNewVersion = new Option<>("check for new version", false)
+	public static final Option<Boolean> checkForNewVersion = new Option<>("check for new version", false)
 			.setter(t -> {
 				SkriptUpdater updater = Skript.getInstance().getUpdater();
 				if (updater != null)
 					updater.setEnabled(t);
 			});
-	static final Option<Timespan> updateCheckInterval = new Option<>("update check interval", new Timespan(12 * 60 * 60 * 1000))
+	public static final Option<Timespan> updateCheckInterval = new Option<>("update check interval", new Timespan(12 * 60 * 60 * 1000))
 			.setter(t -> {
 				SkriptUpdater updater = Skript.getInstance().getUpdater();
 				if (updater != null)
 					updater.setCheckFrequency(t.getTicks());
 			});
-	static final Option<Integer> updaterDownloadTries = new Option<>("updater download tries", 7)
-			.optional(true);
-	static final Option<String> releaseChannel = new Option<>("release channel", "none")
-			.setter(t -> {
-				ReleaseChannel channel;
-				switch (t) {
-					case "alpha":
-					case "beta":
-						Skript.warning("'alpha' and 'beta' are no longer valid release channels. Use 'prerelease' instead.");
-					case "prerelease": // All development builds are valid
-						channel = new ReleaseChannel((name) -> true, t);
-						break;
-					case "stable":
-						// TODO a better option would be to check that it is not a pre-release through GH API
-						channel = new ReleaseChannel((name) -> !(name.contains("-")), t);
-						break;
-					case "none":
-						channel = new ReleaseChannel((name) -> false, t);
-						break;
-					default:
-						channel = new ReleaseChannel((name) -> false, t);
-						Skript.error("Unknown release channel '" + t + "'.");
-						break;
-				}
-				SkriptUpdater updater = Skript.getInstance().getUpdater();
-				if (updater != null) {
-					updater.setReleaseChannel(channel);
-				}
-			});
+	public static final Option<String> updateNotificationPermission = new Option<>("update notification permission", "skript.admin");
 
 	public static final Option<Boolean> enableEffectCommands = new Option<>("enable effect commands", false);
 	public static final Option<String> effectCommandToken = new Option<>("effect command token", "!");
-	public static final Option<Boolean> allowOpsToUseEffectCommands = new Option<>("allow ops to use effect commands", false);
 
 	/*
 	 * @deprecated Will be removed in 2.8.0. Use {@link #logEffectCommands} instead.
@@ -210,9 +183,6 @@ public class SkriptConfig {
 			.optional(true);
 	
 	public static final Option<Boolean> allowUnsafePlatforms = new Option<>("allow unsafe platforms", false)
-			.optional(true);
-	
-	public static final Option<Boolean> loadDefaultAliases = new Option<>("load default aliases", true)
 			.optional(true);
 
 	public static final Option<Boolean> executeFunctionsWithMissingParams = new Option<>("execute functions with missing parameters", true)

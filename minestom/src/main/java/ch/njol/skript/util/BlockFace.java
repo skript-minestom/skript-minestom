@@ -57,4 +57,12 @@ public enum BlockFace {
 		};
 	}
 
+	public static BlockFace from(net.minestom.server.instance.block.BlockFace blockFace) {
+		Vec dir = blockFace.toDirection().vec();
+		for (BlockFace face : values()) {
+			if (face.direction.equals(dir)) return face;
+		}
+		return null;
+	}
+
 }

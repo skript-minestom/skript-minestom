@@ -13,6 +13,7 @@ import ch.njol.util.coll.CollectionUtils;
 import ch.njol.yggdrasil.Fields;
 import com.github.hapily04.skriptminestom.util.NBTUtils;
 import com.github.hapily04.skriptminestom.util.NumberUtils;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.resource.ResourcePackStatus;
@@ -53,11 +54,13 @@ import net.minestom.server.item.ItemAnimation;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
+import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.network.player.ClientSettings;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.ping.ServerListPingType;
 import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.scoreboard.Sidebar;
+import net.minestom.server.scoreboard.Team;
 import net.minestom.server.sound.Music;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Taggable;
@@ -87,7 +90,7 @@ import java.util.stream.Collectors;
 
 import static ch.njol.skript.expressions.ExprAmbientSounds.getSoundEvent;
 import static ch.njol.skript.util.ComponentWrapper.toWrapper;
-import static com.github.hapily04.skriptminestom.util.MessageUtils.LEGACY_SERIALIZER;
+import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
 import static com.github.hapily04.skriptminestom.util.NumberUtils.timespanFrom;
 
 @SuppressWarnings("unchecked")
@@ -733,7 +736,7 @@ public class MinestomClasses {
 
 				@Override
 				public @NotNull String toVariableNameString(@NotNull ComponentWrapper o) {
-					return LEGACY_SERIALIZER.serialize(o.getComponent());
+					return BASIC_MINI_MESSAGE.serialize(o.getComponent());
 				}
 			})
 			.serializer(new Serializer<>() {
@@ -766,11 +769,6 @@ public class MinestomClasses {
 					return false;
 				}
 			}));
-		// purely for serialization
-		Classes.registerClass(new ClassInfo<>(Component.class, "internalcomponent")
-			.name("Internal Component")
-			.description("Internal Adventure component type used for serialization.")
-			.serializeAs(ComponentWrapper.class));
 		Classes.registerClass(new ClassInfo<>(TagResolver.class, "tagresolver")
 			.user("tag ?resolvers?")
 			.name("Tag Resolver")
@@ -1090,6 +1088,83 @@ public class MinestomClasses {
 					return "scoreboard titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.getTitle()) + "\"";
 				}
 			}));
+		Classes.registerClass(new ClassInfo<>(Team.class, "team")
+			.user("teams?")
+			.name("Team")
+			.description("""
+				A scoreboard team. Teams control the color of member name tags and their glow outline, \
+				whether members push each other, name tag visibility, friendly fire and prefixes/suffixes.
+				Teams live in memory only and are not saved across restarts, so scripts should recreate them on load.""")
+			.examples("""
+				set {_team} to a new team named "red"
+				set team color of {_team} to dark red
+				add player to members of {_team}""")
+			.defaultExpression(new EventValueExpression<>(Team.class))
+			.supplier(() -> MinecraftServer.getTeamManager().getTeams().iterator())
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull Team o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull Team o) {
+					return o.getTeamName();
+				}
+			}));
+		Classes.registerClass(new EnumClassInfo<>(TeamsPacket.CollisionRule.class, "collisionrule")
+			.user("collision ?rules?")
+			.name("Collision Rule")
+			.description("Whether members of a team push each other. Possible values: always, never, push other teams, push own team.")
+			.examples("set collision rule of {_team} to never")
+			.defaultExpression(new EventValueExpression<>(TeamsPacket.CollisionRule.class)));
+		Classes.registerClass(new EnumClassInfo<>(TeamsPacket.NameTagVisibility.class, "nametagvisibility")
+			.user("name ?tag ?visibilit(y|ies)")
+			.name("Name Tag Visibility")
+			.description("Who can see the name tags of a team. Possible values: always, never, hide for other teams, hide for own team.")
+			.examples("set name tag visibility of {_team} to hide for other teams")
+			.defaultExpression(new EventValueExpression<>(TeamsPacket.NameTagVisibility.class)));
+		Classes.registerClass(new ClassInfo<>(BossBar.class, "bossbar")
+			.user("boss ?bars?")
+			.name("Boss Bar")
+			.description("The bar shown at the top of a player's screen.")
+			.examples("""
+				set {_bar} to new boss bar titled "<red>Dragon" with progress 50
+				add {_bar} to boss bars of all players""")
+			.defaultExpression(new EventValueExpression<>(BossBar.class))
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull BossBar o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull BossBar o) {
+					return "boss bar titled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.name()) + "\"";
+				}
+			}));
+		Classes.registerClass(new EnumClassInfo<>(BossBarColor.class, "bossbarcolor")
+			.user("boss ?bar ?colou?rs?")
+			.name("Boss Bar Color")
+			.description("The color of a boss bar. Possible values: pink bar, blue bar, red bar, green bar, yellow bar, purple bar, white bar.")
+			.examples("set color of {_bar} to red bar")
+			.defaultExpression(new EventValueExpression<>(BossBarColor.class)));
+		Classes.registerClass(new EnumClassInfo<>(BossBar.Overlay.class, "bossbaroverlay")
+			.user("boss ?bar ?overlays?")
+			.name("Boss Bar Overlay")
+			.description("The notching of a boss bar. Possible values: progress, notched 6, notched 10, notched 12, notched 20.")
+			.examples("set overlay of {_bar} to notched 12")
+			.defaultExpression(new EventValueExpression<>(BossBar.Overlay.class)));
 		Classes.registerClass(new ClassInfo<>(Enchantment.class, "enchantment")
 			.user("enchantments?")
 			.name("Enchantment")
@@ -1177,6 +1252,13 @@ public class MinestomClasses {
 					return false;
 				}
 			}));
+		Classes.registerClass(new EnumClassInfo<>(ItemFlag.class, "itemflag")
+			.user("item ?flags?")
+			.name("Item Flag")
+			.description("A part of an item's tooltip that can be hidden.")
+			.examples("""
+				give player diamond sword with the hide attributes item flag
+				add hide enchants to item flags of player's tool"""));
 		Classes.registerClass(new ClassInfo<>(Direction.class, "direction")
 			.user("directions?")
 			.name("Direction")
@@ -2271,7 +2353,7 @@ public class MinestomClasses {
 		 * Converters
 		 */
 		Converters.registerConverter(String.class, ComponentWrapper.class, from -> new ComponentWrapper(Component.text(from)));
-		Converters.registerConverter(ComponentWrapper.class, String.class, from -> LEGACY_SERIALIZER.serialize(from.getComponent()));
+		Converters.registerConverter(ComponentWrapper.class, String.class, from -> BASIC_MINI_MESSAGE.serialize(from.getComponent()));
 		Converters.registerConverter(CommandSender.class, Player.class, from -> {
 			if (from instanceof Player player) return player;
 			return null;
@@ -2336,6 +2418,11 @@ public class MinestomClasses {
 		});
 		Converters.registerConverter(Color.class, AlphaColor.class, from -> from.withAlpha(255));
 		Converters.registerConverter(Item.class, Block.class, from -> from.getItem().material().block());
+		Converters.registerConverter(Block.class, Item.class, from -> {
+			Material material = from.material();
+			if (material == null) return null;
+			return new Item(ItemStack.of(material));
+		});
 
 		// unsure if these are necessary
 		Converters.registerConverter(ItemDisplayMeta.DisplayContext.class, ItemAnimation.class, from -> {
@@ -2359,8 +2446,8 @@ public class MinestomClasses {
 		 *	Comparators
 		 */
 		Comparators.registerComparator(ComponentWrapper.class, ComponentWrapper.class, (o1, o2) -> {
-			String s1 = LEGACY_SERIALIZER.serialize(o1.getComponent());
-			String s2 = LEGACY_SERIALIZER.serialize(o2.getComponent());
+			String s1 = BASIC_MINI_MESSAGE.serialize(o1.getComponent());
+			String s2 = BASIC_MINI_MESSAGE.serialize(o2.getComponent());
 			return Comparators.compare(s1, s2);
 		});
 		Comparators.registerComparator(CommandSender.class, EntityType.class, (o1, o2) -> {

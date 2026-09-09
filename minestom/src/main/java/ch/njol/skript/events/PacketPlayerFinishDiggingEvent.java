@@ -7,7 +7,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.listener.PlayerActionListener;
 import net.minestom.server.network.packet.client.play.ClientPlayerActionPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;

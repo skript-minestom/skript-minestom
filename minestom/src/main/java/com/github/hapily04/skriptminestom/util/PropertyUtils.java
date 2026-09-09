@@ -1,6 +1,7 @@
 package com.github.hapily04.skriptminestom.util;
 
 import net.minestom.server.Auth;
+import net.minestom.server.entity.Player;
 
 import java.io.File;
 import java.io.FileReader;
@@ -19,6 +20,7 @@ public class PropertyUtils {
 	public static final String CHUNK_VIEW_DISTANCE = "chunk-view-distance";
 	public static final String ENTITY_VIEW_DISTANCE = "entity-view-distance";
 	public static final String DISPATCHER_THREADS = "dispatcher-threads";
+	public static final String LOG_MINESTOM_EXCEPTIONS = "log-minestom-exceptions";
     public static final String SERVER_STOPPING_MINIMESSAGE = "server-stopping-minimessage";
 
 	private static final File SERVER_PROPERTIES_FILE = new File(FileUtils.getServerDirectory(), "server.properties");
@@ -48,6 +50,7 @@ public class PropertyUtils {
 		properties.setProperty(CHUNK_VIEW_DISTANCE, "12");
 		properties.setProperty(ENTITY_VIEW_DISTANCE, "12");
 		properties.setProperty(DISPATCHER_THREADS, "1");
+		properties.setProperty(LOG_MINESTOM_EXCEPTIONS, "true");
         properties.setProperty(SERVER_STOPPING_MINIMESSAGE, "<white>Server is stopping.");
 		return properties;
 	}

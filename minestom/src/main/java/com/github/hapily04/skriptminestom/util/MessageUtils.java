@@ -10,14 +10,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class MessageUtils {
-
-	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder()
-		.hexColors()
-		.character('§')
-		.build();
 
 	public static final MiniMessage BASIC_MINI_MESSAGE = MiniMessage.builder()
 		.postProcessor(component -> component.compact().decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE))

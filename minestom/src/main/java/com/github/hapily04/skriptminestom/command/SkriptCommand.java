@@ -1,5 +1,6 @@
 package com.github.hapily04.skriptminestom.command;
 
+import com.github.hapily04.skriptminestom.SkriptMinestom;
 import com.github.hapily04.skriptminestom.command.reload.ReloadCommand;
 import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;
 import net.kyori.adventure.text.Component;
@@ -17,6 +18,7 @@ public class SkriptCommand extends Command {
 		<skript_minestom_tag> <base_grey>Help
 		  <yellow>reload <all/folder/file/config> <base_grey>- Reload a scripts folder, script file, or the Skript config.
 		  <yellow>info <base_grey>- Show addon information & server information.
+		  <yellow>update [confirm] <base_grey>- Check for and update to a new Skript-Minestom release.
 		  <yellow>help <base_grey>- Show this help message.""");
 
     public SkriptCommand() {
@@ -27,6 +29,7 @@ public class SkriptCommand extends Command {
 		//addSubcommand(new DisableCommand());
 		//addSubcommand(new EnableCommand());
 		addSubcommand(new InfoCommand());
+		if (SkriptMinestom.isIsServerJar()) addSubcommand(new UpdateCommand());
 		addSubcommand(new HelpCommand());
 	}
 

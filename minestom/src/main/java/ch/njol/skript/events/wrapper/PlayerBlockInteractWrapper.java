@@ -4,6 +4,7 @@ import ch.njol.skript.events.wrapper.marker.BlockEventMarker;
 import ch.njol.skript.events.wrapper.marker.PlayerInstanceEventMarker;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Slot;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
@@ -19,6 +20,12 @@ public class PlayerBlockInteractWrapper extends EventWrapper<PlayerBlockInteract
 			PlayerHand hand = e.getHand();
 			return new Slot(player.getItemInHand(hand), player, hand == PlayerHand.MAIN ? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND);
 		}));
+		EventValues.registerEventValue(EventValue.simple(PlayerBlockInteractWrapper.class, PlayerHand.class,
+			from -> from.event.getHand()));
+		EventValues.registerEventValue(EventValue.builder(PlayerBlockInteractWrapper.class, Point.class)
+			.patterns("cursor-position")
+			.getter(from -> from.event.getCursorPosition())
+			.build());
 	}
 
 	public PlayerBlockInteractWrapper(PlayerBlockInteractEvent event) {

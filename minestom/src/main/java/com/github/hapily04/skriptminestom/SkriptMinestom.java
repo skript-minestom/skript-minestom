@@ -27,6 +27,7 @@ import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
 import com.github.hapily04.skriptminestom.registration.MinestomClasses;
 import com.github.hapily04.skriptminestom.registration.MinestomFunctions;
 import com.github.hapily04.skriptminestom.terminal.MinestomTerminal;
+import com.github.hapily04.skriptminestom.update.MinestomUpdateService;
 import com.github.hapily04.skriptminestom.util.FileUtils;
 import com.github.hapily04.skriptminestom.util.NumberUtils;
 import com.github.hapily04.skriptminestom.util.PropertyUtils;
@@ -58,6 +59,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.h2.util.Utils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -79,13 +81,18 @@ public class SkriptMinestom {
 	private static SparkMinestom spark;
 	private static Metrics metrics;
 	private static volatile Thread schedulerThread;
+	private static boolean isServerJar = false;
 
 	static void main() {
+		isServerJar = true;
 		Bukkit.setServer(new BukkitServer()); // serverDirectory is resolved from this, so it needs to be set immediately
 
 		properties = PropertyUtils.loadServerProperties();
 		initMinestomProperties();
 		MinecraftServer server = MinecraftServer.init(PropertyUtils.getAuth(properties));
+		if (!Utils.parseBoolean(properties.getProperty(LOG_MINESTOM_EXCEPTIONS), true, false)) {
+			MinecraftServer.getExceptionManager().setExceptionHandler(_ -> {});
+		}
 
 		luckPerms = initLuckPerms();
 		spark = initSpark();
@@ -102,6 +109,9 @@ public class SkriptMinestom {
 		initStopCommand();
 		try {
 			initSkript(MinecraftServer.getGlobalEventHandler());
+			MinestomUpdateService.cleanupAfterRestart();
+			MinestomUpdateService.runStartupCheck();
+			MinestomUpdateService.schedulePeriodicChecks();
 			initEffectCommands(MinecraftServer.getGlobalEventHandler());
 			scheduleShutdownTasks();
 			server.start(properties.getProperty(ADDRESS_KEY), Integer.parseInt(properties.getProperty(PropertyUtils.PORT_KEY)));
@@ -193,6 +203,7 @@ public class SkriptMinestom {
 			MarkerRegistration.register();
 		});
 		skript.setEnabled(true);
+		MinestomUpdateService.registerFinishedLoadingHook();
 		skript.onEnable(); // have to manually initialize, addons are initialized on their own
 		//Skript.getAddonInstance(true).UNSAFE_setLanguageFileDirectory("minestomlang"); // todo figure out how to do this if lang file is used
 		Skript.closeUnsafeSkript();
@@ -200,6 +211,7 @@ public class SkriptMinestom {
 		// init events
 		EventNode<net.minestom.server.event.Event> skriptEventNode = EventNode.all("skript-user-events").setPriority(50);
 		node.addChild(skriptEventNode);
+		MinestomUpdateService.registerJoinListener(node);
 		Set<Class<? extends Event>> listeningFor = new HashSet<>();
 		for (SkriptEventInfo<?> eventInfo : Skript.getEvents()) {
 			for (Class<? extends Event> bukkitEventClazz : eventInfo.events) {
@@ -333,6 +345,10 @@ public class SkriptMinestom {
 
 	public static @Nullable SparkMinestom getSpark() {
 		return spark;
+	}
+
+	public static boolean isIsServerJar() {
+		return isServerJar;
 	}
 
 }

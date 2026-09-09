@@ -13,6 +13,7 @@ import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.sections.SecArgument;
 import ch.njol.skript.sections.SecSubcommand;
+import ch.njol.skript.structures.command.arguments.ArgumentType;
 import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.skript.variables.Variables;
 import com.github.hapily04.skriptminestom.luckperms.LuckPermsLookup;

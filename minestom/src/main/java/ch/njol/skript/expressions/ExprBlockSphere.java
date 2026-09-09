@@ -80,7 +80,7 @@ public class ExprBlockSphere extends SimpleExpression<BlockVec> {
 	@Override
 	@org.eclipse.jdt.annotation.Nullable
 	public Class<?>[] acceptChange(Changer.ChangeMode mode) {
-		if (mode == Changer.ChangeMode.SET) return CollectionUtils.array(Block.class);
+		if (mode == Changer.ChangeMode.SET && instance != null) return CollectionUtils.array(Block.class);
 		return null;
 	}
 

@@ -9,9 +9,9 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 
 @Name("Character from Codepoint")
 @Description("Returns the character at the specified codepoint")

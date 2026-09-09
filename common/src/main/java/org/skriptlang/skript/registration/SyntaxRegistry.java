@@ -1,10 +1,6 @@
 package org.skriptlang.skript.registration;
 
-import ch.njol.skript.lang.Condition;
-import ch.njol.skript.lang.Effect;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Section;
-import ch.njol.skript.lang.Statement;
+import ch.njol.skript.lang.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.skriptlang.skript.docs.Origin;

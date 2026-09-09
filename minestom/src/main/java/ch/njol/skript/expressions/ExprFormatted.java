@@ -17,7 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
 
 @Name("Formatted")
-@Description("Format a string into a component")
+@Description("""
+	Format a string into a component.
+	You can also use <head64:texture> to input a custom head.""")
 @Example("send formatted \"<red>hello\" to player")
 public class ExprFormatted extends SimpleExpression<ComponentWrapper> {
 

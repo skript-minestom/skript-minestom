@@ -35,8 +35,6 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 /**
  * A {@link PatternElement} that contains a type to be matched with an expressions, for example {@code %number%}.
  */

@@ -18,7 +18,6 @@ import org.jetbrains.annotations.UnknownNullability;
 import org.skriptlang.skript.lang.converter.Converters;
 
 import java.util.*;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Name("Transformed List")

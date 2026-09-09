@@ -2,7 +2,6 @@ package ch.njol.util.coll;
 
 import ch.njol.util.Pair;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.reflect.Array;
 import java.util.*;

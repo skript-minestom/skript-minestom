@@ -63,6 +63,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -155,6 +156,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 
 	private static Runnable registration;
+	private static final List<Runnable> finishedLoadingCallbacks = new CopyOnWriteArrayList<>();
 
 	private static Version minecraftVersion = new Version(666), UNKNOWN_VERSION = new Version(666);
 	private static ServerPlatform serverPlatform = getServerPlatform(); // Start with unknown... onLoad changes this
@@ -518,6 +520,13 @@ public final class Skript extends JavaPlugin implements Listener {
 						));
 
 					Skript.info(m_finished_loading.toString());
+					for (Runnable callback : finishedLoadingCallbacks) {
+						try {
+							callback.run();
+						} catch (Exception e) {
+							throw Skript.exception(e);
+						}
+					}
 				} catch (Exception e) {
 					// Something went wrong, we need to make sure the exception is printed
 					throw Skript.exception(e);
@@ -532,6 +541,13 @@ public final class Skript extends JavaPlugin implements Listener {
 
 	public static void onRegistration(Runnable runnable) {
 		registration = runnable;
+	}
+
+	/**
+	 * Registers a callback invoked after scripts finish loading (after the "Finished loading." message).
+	 */
+	public static void onFinishedLoading(Runnable runnable) {
+		finishedLoadingCallbacks.add(runnable);
 	}
 
 	/**

@@ -11,6 +11,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Item;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 import net.minestom.server.inventory.AbstractInventory;
@@ -59,8 +60,8 @@ public class CondContains extends Condition {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		containers = exprs[0];
-		items = exprs[1];
+		containers = LiteralUtils.defendExpression(exprs[0]);
+		items = LiteralUtils.defendExpression(exprs[1]);
 
 		explicitSingle = matchedPattern == 2 && parseResult.mark != 1 || containers.isSingle();
 
@@ -71,7 +72,7 @@ public class CondContains extends Condition {
 		}
 
 		setNegated(matchedPattern % 2 == 1);
-		return true;
+		return LiteralUtils.canInitSafely(containers, items);
 	}
 
 	@Override
