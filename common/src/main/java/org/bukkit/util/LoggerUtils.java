@@ -12,14 +12,14 @@ public class LoggerUtils {
 	public static void log(Logger logger, Level level, String msg, Exception e) {
 		msg = ansify(msg);
 		if (level.equals(Level.SEVERE)) logger.error(msg, e);
-		else if (level.equals(Level.WARNING)) logger.info(msg, e);
+		else if (level.equals(Level.WARNING)) logger.warn(msg, e);
 		else logger.info(msg, e);
 	}
 
 	public static void log(Logger logger, Level level, String msg) {
 		msg = ansify(msg);
 		if (level.equals(Level.SEVERE)) logger.error(msg);
-		else if (level.equals(Level.WARNING)) logger.info(msg);
+		else if (level.equals(Level.WARNING)) logger.warn(msg);
 		else logger.info(msg);
 	}
 
