@@ -180,7 +180,7 @@ public abstract class SkriptLogger {
 			}
 		}
 		entry.logged();
-		LoggerUtils.log(LOGGER, Level.INFO, "<skript_minestom_tag> " + entry.toFormattedString());
+		LoggerUtils.log(LOGGER, entry.getLevel(), "<skript_minestom_tag> " + entry.toFormattedString());
 	}
 	
 	public static void logAll(Collection<LogEntry> entries) {
