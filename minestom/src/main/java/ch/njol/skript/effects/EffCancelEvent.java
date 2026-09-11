@@ -56,8 +56,11 @@ public class EffCancelEvent extends Effect {
 
 	@Override
 	public void execute(final Event e) {
-		net.minestom.server.event.Event trueEvent = ((EventWrapper<?>) e).getEvent();
-		if (trueEvent instanceof CancellableEvent cancellable) cancellable.setCancelled(cancel);
+		if (e instanceof EventWrapper<?> wrapper) {
+			if (wrapper.getEvent() instanceof CancellableEvent cancellable) cancellable.setCancelled(cancel);
+		} else if (e instanceof CancellableEvent cancellable) {
+			cancellable.setCancelled(cancel);
+		}
 	}
 
 	@Override
@@ -67,6 +70,7 @@ public class EffCancelEvent extends Effect {
 
 	public static boolean isCancellable(Class<? extends Event> event) {
 		if (Cancellable.class.isAssignableFrom(event)) return true;
+		if (CancellableEvent.class.isAssignableFrom(event)) return true;
 		Class<? extends net.minestom.server.event.Event> minestomEventClass = getMinestomEventType(event);
 		return minestomEventClass != null && CancellableEvent.class.isAssignableFrom(minestomEventClass);
 	}
