@@ -24,10 +24,10 @@ import org.jspecify.annotations.Nullable;
 		if item pickup state of event-entity is true:
 			give event-item to event-entity""")
 @Keywords({"pickup", "pick up", "item"})
-public class ExprCanPickupItems extends SimplePropertyExpression<Entity, Boolean> {
+public class ExprItemPickupState extends SimplePropertyExpression<Entity, Boolean> {
 
 	static {
-		register(ExprCanPickupItems.class, Boolean.class, "item pick[ ]up state", "entities");
+		register(ExprItemPickupState.class, Boolean.class, "item pick[ ]up[ability] [state]", "entities");
 	}
 
 	@Override

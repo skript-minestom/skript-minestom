@@ -80,11 +80,8 @@ public class ExprDroppedItem extends SimplePropertyExpression<Entity, Slot> {
 		ItemStack stack = mode == Changer.ChangeMode.SET ? (item == null ? null : item.getItem()) : ItemStack.AIR;
 		if (stack == null) return;
 		for (Entity entity : getExpr().getArray(event)) {
-			if (entity instanceof ItemEntity itemEntity) {
-				itemEntity.setItemStack(stack);
-			} else if (entity.getEntityMeta() instanceof ItemEntityMeta meta) {
-				meta.setItem(stack);
-			}
+			if (entity instanceof ItemEntity itemEntity) itemEntity.setItemStack(stack);
+			else if (entity.getEntityMeta() instanceof ItemEntityMeta meta) meta.setItem(stack);
 		}
 	}
 

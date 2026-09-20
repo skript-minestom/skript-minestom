@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 public class ExprPickableState extends SimplePropertyExpression<Entity, Boolean> {
 
 	static {
-		register(ExprPickableState.class, Boolean.class, "pickable state", "entities");
+		register(ExprPickableState.class, Boolean.class, "pickab(le|ility) [state]", "entities");
 	}
 
 	@Override

@@ -21,9 +21,9 @@ import java.util.concurrent.CompletableFuture;
 public abstract class EffSecEntitySpawn extends EffectSection {
 
 	private static final EntryValidator ENTRY_VALIDATOR = EntryValidator.builder()
-																		.addSection("before spawn", true)
-																		.addSection("after spawn", true)
-																		.build();
+		.addSection("before spawn", true)
+		.addSection("after spawn", true)
+		.build();
 
 	private @Nullable Trigger beforeSpawnTrigger;
 	private @Nullable Trigger afterSpawnTrigger;

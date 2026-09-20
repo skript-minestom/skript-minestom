@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
 public class ExprMergeableState extends SimplePropertyExpression<Entity, Boolean> {
 
 	static {
-		register(ExprMergeableState.class, Boolean.class, "mergeable state", "entities");
+		register(ExprMergeableState.class, Boolean.class, "mergeab(le|ility) [state]", "entities");
 	}
 
 	@Override
