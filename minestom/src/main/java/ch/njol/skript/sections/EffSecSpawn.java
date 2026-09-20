@@ -5,7 +5,6 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
-import ch.njol.skript.events.wrapper.EntitySpawnWrapper;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.NonTickingEntity;
@@ -17,16 +16,12 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.event.entity.EntitySpawnEvent;
 import net.minestom.server.instance.Instance;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
-import org.skriptlang.skript.lang.entry.EntryContainer;
-import org.skriptlang.skript.lang.entry.EntryValidator;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Name("Spawn Entity")
 @Description("Spawns one or more entities at a location. If an entity is non-ticking, some features like gravity may not work even if it's set to true.")
@@ -36,18 +31,13 @@ import java.util.concurrent.CompletableFuture;
 	        set name of entity to "Custom Zombie"
 	    after spawn:
 	        broadcast "Zombie spawned!\"""")
-public class EffSecSpawn extends EffectSection {
+public class EffSecSpawn extends EffSecEntitySpawn {
 
-	private static final EntryValidator ENTRY_VALIDATOR;
 	private static final Set<EntityType> NO_PHYSICS_TYPES = Set.of(EntityType.INTERACTION, EntityType.MARKER,
 		EntityType.ITEM_DISPLAY, EntityType.TEXT_DISPLAY, EntityType.BLOCK_DISPLAY, EntityType.PAINTING, EntityType.ITEM_FRAME,
 		EntityType.GLOW_ITEM_FRAME, EntityType.OMINOUS_ITEM_SPAWNER, EntityType.AREA_EFFECT_CLOUD, EntityType.EYE_OF_ENDER);
 
 	static {
-		ENTRY_VALIDATOR = EntryValidator.builder()
-										.addSection("before spawn", true)
-										.addSection("after spawn", true)
-										.build();
 		Skript.registerSection(EffSecSpawn.class,
 			"(summon|spawn) [:non ticking] [:navigable|:living] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]",
 			"(summon|spawn) %integer% [of] [:non ticking] [:navigable|:living] %entitytypes% [%directions% %points%] [in [(world|instance)[s]] %instances%] [:sync]");
@@ -59,10 +49,6 @@ public class EffSecSpawn extends EffectSection {
 	private Expression<Instance> instances;
 	@Nullable
 	private String type;
-	@Nullable
-	private Trigger beforeSpawnTrigger;
-	@Nullable
-	private Trigger afterSpawnTrigger;
 	private boolean sync = false;
 	private boolean nonTicking = false;
 
@@ -76,21 +62,12 @@ public class EffSecSpawn extends EffectSection {
 		instances = (Expression<Instance>) expressions[3+matchedPattern];
 		nonTicking = parseResult.hasTag("non ticking");
 		sync = parseResult.hasTag("sync");
-		if (parseResult.hasTag("living")) type = "living";
-		else if (parseResult.hasTag("navigable")) type = "navigable";
-		if (sectionNode != null) {
-			EntryContainer container = ENTRY_VALIDATOR.validate(sectionNode);
-			if (container == null) return false;
-			SectionNode beforeSpawn = container.getOptional("before spawn", SectionNode.class, false);
-			if (beforeSpawn != null) beforeSpawnTrigger = loadCode(beforeSpawn, "before spawn", EntitySpawnWrapper.class);
-			SectionNode afterSpawn = container.getOptional("after spawn", SectionNode.class, false);
-			if (afterSpawn != null) afterSpawnTrigger = loadCode(afterSpawn, "after spawn", EntitySpawnWrapper.class);
-			if (beforeSpawn == null && afterSpawn == null) {
-				Skript.error("You can't run abstract code within this section! Either put it under 'before spawn' or 'after spawn'.");
-				return false;
-			}
+		List<String> tags = parseResult.tags;
+		if (!tags.isEmpty()) {
+			int typeIndex = nonTicking ? 1 : 0;
+			if (tags.size() > 1) type = tags.get(typeIndex);
 		}
-		return true;
+		return loadSpawnSections(sectionNode);
 	}
 
 	@Override
@@ -117,22 +94,7 @@ public class EffSecSpawn extends EffectSection {
 							entity.setNoGravity(true);
 							entity.setHasPhysics(false);
 						}
-						if (beforeSpawnTrigger != null) {
-							Event e = new EntitySpawnWrapper(new EntitySpawnEvent(entity, instance));
-							Variables.setLocalVariables(e, variables);
-							TriggerItem.walk(beforeSpawnTrigger, e);
-							mostRecentLocals = Variables.copyLocalVariables(e);
-						}
-						Object finalMostRecentLocals = mostRecentLocals;
-						CompletableFuture<Void> future = entity.setInstance(instance, point)
-															   .whenComplete((_, throwable) -> {
-							if (throwable != null || afterSpawnTrigger == null) return;
-							Event e = new EntitySpawnWrapper(new EntitySpawnEvent(entity, instance));
-							Variables.setLocalVariables(e, finalMostRecentLocals);
-							TriggerItem.walk(afterSpawnTrigger, e);
-							Variables.removeLocals(e);
-						});
-						if (sync) future.join();
+						mostRecentLocals = spawn(entity, instance, point, variables, sync);
 					}
 				}
 			}
