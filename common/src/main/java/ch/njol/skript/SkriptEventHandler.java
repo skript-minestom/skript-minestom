@@ -109,6 +109,7 @@ public final class SkriptEventHandler {
 		// So the time will be logged even if no triggers pass check(), which is still useful information.
 		logEventStart(event, priority);
 
+		List<Trigger> matching = new ArrayList<>();
 		for (Trigger trigger : triggers) {
 			SkriptEvent triggerEvent = trigger.getEvent();
 
@@ -120,8 +121,19 @@ public final class SkriptEventHandler {
 			if (!triggerEvent.getListeningBehavior().matches(isCancelled))
 				continue;
 
-			// execute the trigger
-			execute(trigger, event);
+			matching.add(trigger);
+		}
+
+		int index = 0;
+		while (index < matching.size() && matching.get(index).getEvent().canExecuteAsynchronously())
+			execute(matching.get(index++), event);
+		if (index < matching.size()) {
+			List<Trigger> remaining = matching.subList(index, matching.size());
+			Task.callSync(() -> {
+				for (Trigger trigger : remaining)
+					execute(trigger, event);
+				return null;
+			});
 		}
 
 		logEventEnd();
