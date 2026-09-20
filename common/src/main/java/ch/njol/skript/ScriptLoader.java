@@ -277,6 +277,10 @@ public class ScriptLoader {
 		return asyncLoaderSize > 0;
 	}
 
+	private static boolean isLoaderThread() {
+		return Thread.currentThread() instanceof AsyncLoaderThread;
+	}
+
 	/**
 	 * Checks if scripts are loaded in multiple threads instead of one thread.
 	 * If true, {@link #isAsync()} will also be true.
@@ -517,17 +521,17 @@ public class ScriptLoader {
 
 		ScriptInfo scriptInfo = new ScriptInfo();
 
-		List<LoadingScriptInfo> scripts = new ArrayList<>();
+		LoadingScriptInfo[] loaded = new LoadingScriptInfo[configs.size()];
 
 		List<CompletableFuture<Void>> scriptInfoFutures = new ArrayList<>();
-		for (Config config : configs) {
+		for (int i = 0; i < configs.size(); i++) {
+			Config config = configs.get(i);
 			if (config == null)
 				throw new NullPointerException();
 
+			int index = i;
 			CompletableFuture<Void> future = makeFuture(() -> {
-				LoadingScriptInfo info = loadScript(config);
-				scripts.add(info);
-				scriptInfo.add(new ScriptInfo(1, info.structures.size()));
+				loaded[index] = loadScript(config);
 				return null;
 			}, openCloseable);
 
@@ -536,6 +540,12 @@ public class ScriptLoader {
 
 		return CompletableFuture.allOf(scriptInfoFutures.toArray(new CompletableFuture[0]))
 			.thenApply(ignored -> {
+				List<LoadingScriptInfo> scripts = new ArrayList<>();
+				for (LoadingScriptInfo info : loaded) {
+					scripts.add(info);
+					scriptInfo.add(new ScriptInfo(1, info.structures.size()));
+				}
+
 				// TODO in the future this won't work when parallel loading is fixed
 				// It does now though so let's avoid calling getParser() a bunch.
 				ParserInstance parser = getParser();
@@ -740,7 +750,7 @@ public class ScriptLoader {
 				.forEach(event -> event.onInit(script));
 			return null;
 		};
-		if (isAsync()) { // Need to delegate to main thread
+		if (isLoaderThread()) { // Need to delegate to main thread
 			Task.callSync(callable);
 		} else { // We are in main thread, execute immediately
 			try {
