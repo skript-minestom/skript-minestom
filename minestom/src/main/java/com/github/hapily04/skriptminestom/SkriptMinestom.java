@@ -16,6 +16,7 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
+import ch.njol.skript.util.dialog.DialogCallbacks;
 import ch.njol.skript.variables.Variables;
 import com.github.hapily04.skriptminestom.bukkit.BukkitServer;
 import com.github.hapily04.skriptminestom.command.SkriptCommand;
@@ -232,6 +233,7 @@ public class SkriptMinestom {
 				});
 			}
 		}
+		DialogCallbacks.listen(skriptEventNode);
 	}
 
 	public static void initEffectCommands(EventNode<net.minestom.server.event.Event> node) {
