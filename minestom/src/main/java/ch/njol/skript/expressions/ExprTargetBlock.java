@@ -39,7 +39,7 @@ public class ExprTargetBlock extends PropertyExpression<Entity, Point> {
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		setExpr((Expression<? extends Entity>) expressions[0]);
-		range = (Expression<Number>) expressions[1 - matchedPattern];
+		range = (Expression<Number>) expressions[1];
 		return true;
 	}
 
