@@ -64,7 +64,6 @@ public class ExprSingleOptionInput extends SimpleExpression<DialogInput> {
 		return new DialogInput[]{new DialogInput.SingleOption(key, width, options, label, true)};
 	}
 
-	/** More than one initial option makes the record constructor throw; keep the first, demote the rest. */
 	private static List<DialogInput.SingleOption.Option> dropExtraInitial(String key, List<DialogInput.SingleOption.Option> options) {
 		boolean seenInitial = false;
 		List<DialogInput.SingleOption.Option> corrected = null;

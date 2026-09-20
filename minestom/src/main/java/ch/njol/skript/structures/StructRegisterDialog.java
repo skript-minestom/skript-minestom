@@ -44,7 +44,6 @@ public class StructRegisterDialog extends Structure {
 			"register dialog list <.+>");
 	}
 
-	/** Throwaway event to evaluate the resolved entries against; never fired through the event bus. */
 	private static final class RegisterDialogEvent extends Event {
 		@Override
 		public HandlerList getHandlers() {
@@ -108,7 +107,6 @@ public class StructRegisterDialog extends Structure {
 			Skript.error("A dialog is already registered under '" + key.asString() + "' by something other than a script.");
 			return false;
 		}
-		// The gate above only rejects a different script; two structures in one script can share a key.
 		Structure ownerStructure = SkriptDialogs.getOwnerStructure(key);
 		if (ownerStructure != null && ownerStructure != this) {
 			Skript.error("A dialog is already registered under '" + key.asString()
@@ -126,10 +124,8 @@ public class StructRegisterDialog extends Structure {
 	@Override
 	public void unload() {
 		if (key == null) return;
-		if (SkriptDialogs.getOwnerStructure(key) != this) return; // this structure doesn't own the key (anymore); don't touch it
+		if (SkriptDialogs.getOwnerStructure(key) != this) return;
 		SkriptDialogs.remove(key);
-		// remove() renumbers the IDs of every entry after this one, so keep sending dialogs by Key or as
-		// direct values (DialogWrapper#toHolder) rather than by numeric ID.
 		MinecraftServer.getDialogRegistry().remove(key);
 	}
 

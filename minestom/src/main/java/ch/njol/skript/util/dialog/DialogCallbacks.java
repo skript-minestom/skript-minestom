@@ -24,24 +24,16 @@ public class DialogCallbacks {
 
 	private static final Map<Key, ScriptedButton> CALLBACKS = new ConcurrentHashMap<>();
 
-	// One timestamp rather than a per-key record: the key is client-controlled, so a forged key per
-	// click would otherwise grow a set without bound.
 	private static final long UNMATCHED_WARNING_INTERVAL_MILLIS = 60_000L;
 	private static volatile long lastUnmatchedWarningMillis = 0L;
 
-	/** Scripts with an unload handler attached, so a script registering many buttons only gets one. */
 	private static final Set<Script> UNLOAD_HOOKED_SCRIPTS = ConcurrentHashMap.newKeySet();
 
 	public record ScriptedButton(Trigger trigger, Script script) { }
 
-	/**
-	 * Derived from script file name plus line, not a counter, so parser backtracking and reloads
-	 * overwrite the same entry instead of leaking a new one per retry.
-	 */
 	public static Key nextKey(@Nullable Script script, Node node) {
 		String scriptPart = scriptPart(script);
 		int line = node.getLine();
-		// -1 only for dynamically created nodes, which a parsed section node never is.
 		String linePart = line >= 0 ? String.valueOf(line) : "n" + System.identityHashCode(node);
 		return Key.key(NAMESPACE, PREFIX + scriptPart + "/" + linePart);
 	}
@@ -75,7 +67,6 @@ public class DialogCallbacks {
 		return NAMESPACE.equals(key.namespace()) && key.value().startsWith(PREFIX);
 	}
 
-	/** Clicks whose key is not a callback key are left alone, so {@code EvtDialogClick} fires for them. */
 	public static void listen(EventNode<net.minestom.server.event.Event> node) {
 		node.addListener(PlayerCustomClickEvent.class, event -> {
 			Key key = event.getKey();

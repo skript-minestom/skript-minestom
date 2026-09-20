@@ -9,11 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Dialogs registered by scripts, kept apart from Minestom's registry so reloads and lookups do not
- * depend on registry state. The owning script and structure are recorded so neither another script
- * nor a second structure in the same script can overwrite a key it does not own.
- */
 public class SkriptDialogs {
 
 	public record Entry(DialogWrapper dialog, Script owner, Structure ownerStructure) { }

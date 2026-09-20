@@ -59,13 +59,11 @@ public class ExprSecDialogButton extends SectionExpression<ButtonWrapper> {
 			return false;
 		}
 		callbackKey = DialogCallbacks.nextKey(getParser().getCurrentScript(), sectionNode);
-		// the casts pick the before/after-loading overload over the deprecated one, which a bare null also matches
 		trigger = loadCode(sectionNode, "dialog button", (Runnable) null, (Runnable) null, DialogClickEvent.class);
 		DialogCallbacks.register(callbackKey, trigger, getParser().getCurrentScript());
 		return true;
 	}
 
-	/** 'running code' is the code, so the syntax is meaningless without a section. */
 	@Override
 	public boolean isSectionOnly() {
 		return true;

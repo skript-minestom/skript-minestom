@@ -6,16 +6,10 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.log.SkriptLogger;
 import net.minestom.server.dialog.DialogInput;
 
-/**
- * {@link DialogInput}'s record constructors throw for a key outside {@code [A-Za-z0-9_]+}, which
- * would abort the whole trigger. Input expressions check here instead: at parse time for a literal
- * key, at runtime otherwise.
- */
 public final class DialogInputValidation {
 
 	private DialogInputValidation() {}
 
-	/** An empty key passes, matching {@code validateKey}, whose loop is a no-op for it. */
 	public static boolean isValidKey(String key) {
 		for (int i = 0; i < key.length(); i++) {
 			char c = key.charAt(i);
@@ -24,7 +18,6 @@ public final class DialogInputValidation {
 		return true;
 	}
 
-	/** @return false if a literal key is invalid; the caller should fail {@code init}. */
 	public static boolean checkLiteralKey(Expression<String> keyExpression, String syntaxName) {
 		if (keyExpression instanceof Literal<String> literal) {
 			String key = literal.getSingle();

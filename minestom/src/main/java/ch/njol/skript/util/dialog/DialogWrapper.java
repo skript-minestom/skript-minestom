@@ -21,19 +21,17 @@ public class DialogWrapper {
 	private boolean canCloseWithEscape = true;
 	private boolean pause = false;
 	private DialogAfterAction afterAction = DialogAfterAction.CLOSE;
-	// Copy-on-write: a dialog in a global variable can be shown on one tick thread while a button
-	// callback mutates it on another, and List.copyOf over a plain ArrayList can throw mid-mutation.
 	private final List<DialogBody> bodies = new CopyOnWriteArrayList<>();
 	private final List<DialogInput> inputs = new CopyOnWriteArrayList<>();
 
-	private @Nullable ButtonWrapper button;      // notice
-	private @Nullable ButtonWrapper yesButton;   // confirmation
-	private @Nullable ButtonWrapper noButton;    // confirmation
-	private final List<ButtonWrapper> buttons = new CopyOnWriteArrayList<>(); // multi action
+	private @Nullable ButtonWrapper button;
+	private @Nullable ButtonWrapper yesButton;
+	private @Nullable ButtonWrapper noButton;
+	private final List<ButtonWrapper> buttons = new CopyOnWriteArrayList<>();
 	private @Nullable ButtonWrapper exitButton;
 	private int columns = 2;
 	private int buttonWidth = 150;
-	private final List<DialogWrapper> children = new CopyOnWriteArrayList<>(); // dialog list
+	private final List<DialogWrapper> children = new CopyOnWriteArrayList<>();
 
 	private @Nullable Key key;
 
@@ -124,8 +122,6 @@ public class DialogWrapper {
 	public DialogMetadata toMetadata() {
 		boolean pause = this.pause;
 		if (pause && afterAction == DialogAfterAction.NONE) {
-			// resolve() rejects this pair when both entries are literals, but a variable can still produce it
-			// at runtime, and DialogMetadata throws on it. Force it off rather than abort the trigger.
 			SkriptLogger.LOGGER.warn("A dialog had 'pause: true' together with 'after action: none'; forcing pause off.");
 			pause = false;
 		}
@@ -144,7 +140,6 @@ public class DialogWrapper {
 		};
 	}
 
-	/** {@link Dialog} extends {@code Holder.Direct<Dialog>}, so a built dialog is already a holder. */
 	public Holder<Dialog> toHolder() {
 		return toMinestom();
 	}

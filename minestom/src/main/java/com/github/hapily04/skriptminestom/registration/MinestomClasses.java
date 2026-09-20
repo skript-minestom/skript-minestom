@@ -1221,7 +1221,6 @@ public class MinestomClasses {
 			.user("dialog ?actions?")
 			.name("Dialog Action")
 			.description("An action performed when a dialog button is clicked.")
-			// No syntax yields a bare DialogAction, so there is no script snippet to show.
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {

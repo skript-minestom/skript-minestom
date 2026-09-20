@@ -108,7 +108,6 @@ public class ExprSecDialog extends SectionExpression<DialogWrapper> {
 		return VALIDATORS.get(kind);
 	}
 
-	/** Entry expressions fetched once at parse time. Fields not applicable to the kind stay null. */
 	public record DialogEntries(
 		Expression<ComponentWrapper> title,
 		@Nullable Expression<ComponentWrapper> externalTitle,
@@ -127,11 +126,6 @@ public class ExprSecDialog extends SectionExpression<DialogWrapper> {
 		@Nullable Expression<DialogWrapper> dialogs
 	) { }
 
-	/**
-	 * Resolving at parse time is what makes an unparseable entry a clean parse error rather than an
-	 * uncaught exception on first execution.
-	 * @return null if a required entry failed to resolve; the caller should fail the parse.
-	 */
 	public static @Nullable DialogEntries resolve(DialogKind kind, EntryContainer container) {
 		Expression<ComponentWrapper> title = optional(container, "title");
 		if (title == null) {
@@ -198,7 +192,6 @@ public class ExprSecDialog extends SectionExpression<DialogWrapper> {
 		return (Expression<T>) container.getOptional(key, Expression.class, false);
 	}
 
-	/** Shared with the 'register dialog' structure. */
 	public static DialogWrapper build(DialogKind kind, DialogEntries entries, Event event) {
 		DialogWrapper dialog = new DialogWrapper(kind);
 		dialog.setTitle(ComponentWrapper.getOrElse(entries.title(), event, Component.empty()));
@@ -282,7 +275,6 @@ public class ExprSecDialog extends SectionExpression<DialogWrapper> {
 		return DialogKind.SERVER_LINKS;
 	}
 
-	/** The entries carry the dialog's content, so there is nothing to build without them. */
 	@Override
 	public boolean isSectionOnly() {
 		return true;

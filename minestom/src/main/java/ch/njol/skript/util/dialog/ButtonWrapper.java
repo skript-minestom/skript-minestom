@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class ButtonWrapper {
 
-	// volatile: a button in a global variable can be read on one tick thread while another mutates it.
 	private volatile Component label;
 	private volatile @Nullable Component tooltip;
 	private volatile int width = DialogActionButton.DEFAULT_WIDTH;
@@ -43,7 +42,6 @@ public class ButtonWrapper {
 		this.callbackKey = null;
 	}
 
-	/** Dynamic custom action, so the client sends the dialog's input values back with the click. */
 	public void setTrigger(Trigger trigger, Key callbackKey) {
 		this.trigger = trigger;
 		this.callbackKey = callbackKey;
