@@ -8,6 +8,8 @@ import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.*;
+import ch.njol.skript.util.dialog.ButtonWrapper;
+import ch.njol.skript.util.dialog.DialogWrapper;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.yggdrasil.Fields;
@@ -36,6 +38,10 @@ import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.dialog.DialogAction;
+import net.minestom.server.dialog.DialogAfterAction;
+import net.minestom.server.dialog.DialogBody;
+import net.minestom.server.dialog.DialogInput;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
@@ -1165,6 +1171,139 @@ public class MinestomClasses {
 			.description("The notching of a boss bar. Possible values: progress, notched 6, notched 10, notched 12, notched 20.")
 			.examples("set overlay of {_bar} to notched 12")
 			.defaultExpression(new EventValueExpression<>(BossBar.Overlay.class)));
+		Classes.registerClass(new ClassInfo<>(DialogWrapper.class, "dialog")
+			.user("dialogs?")
+			.name("Dialog")
+			.description("A dialog screen shown to a player.")
+			.examples("""
+				set {_d} to new notice dialog:
+					title: "<gold>Welcome"
+				show {_d} to player""")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull DialogWrapper o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull DialogWrapper o) {
+					return o.getKind().getName() + " dialog titled \""
+						+ LegacyComponentSerializer.legacyAmpersand().serialize(o.getTitle()) + "\"";
+				}
+			}));
+		Classes.registerClass(new ClassInfo<>(DialogBody.class, "dialogbody")
+			.user("dialog ?bod(y|ies)")
+			.name("Dialog Body")
+			.description("A piece of content shown in a dialog's body.")
+			.examples("set {_body} to new plain message body \"<gray>Choose an item\"")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull DialogBody o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull DialogBody o) {
+					return "dialog body";
+				}
+			}));
+		Classes.registerClass(new ClassInfo<>(DialogInput.class, "dialoginput")
+			.user("dialog ?inputs?")
+			.name("Dialog Input")
+			.description("An input control shown in a dialog.")
+			.examples("set {_input} to new text input named \"nick\" labeled \"Nickname\"")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull DialogInput o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull DialogInput o) {
+					return "dialog input " + inputKeyOf(o);
+				}
+			}));
+		Classes.registerClass(new ClassInfo<>(ButtonWrapper.class, "dialogbutton")
+			.user("dialog ?buttons?")
+			.name("Dialog Button")
+			.description("A button shown in a dialog.")
+			.examples("set {_button} to new dialog button labeled \"<green>Buy\" running command \"buy\"")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull ButtonWrapper o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull ButtonWrapper o) {
+					return "dialog button labeled \"" + LegacyComponentSerializer.legacyAmpersand().serialize(o.getLabel()) + "\"";
+				}
+			}));
+		Classes.registerClass(new ClassInfo<>(DialogAction.class, "dialogaction")
+			.user("dialog ?actions?")
+			.name("Dialog Action")
+			.description("An action performed when a dialog button is clicked.")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull DialogAction o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull DialogAction o) {
+					return o.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+				}
+			}));
+		Classes.registerClass(new ClassInfo<>(DialogInput.SingleOption.Option.class, "dialogoption")
+			.user("dialog ?options?")
+			.name("Dialog Option")
+			.description("An option in a dialog's single option input.")
+			.examples("set {_easy} to new dialog option \"easy\" labeled \"<green>Easy\" selected")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull DialogInput.SingleOption.Option o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull DialogInput.SingleOption.Option o) {
+					return o.id();
+				}
+			}));
+		Classes.registerClass(new EnumClassInfo<>(DialogAfterAction.class, "dialogafteraction")
+			.user("dialog ?after ?actions?")
+			.name("Dialog After Action")
+			.description("What happens after a dialog button is clicked. Possible values: close, none, wait for response."));
 		Classes.registerClass(new ClassInfo<>(Enchantment.class, "enchantment")
 			.user("enchantments?")
 			.name("Enchantment")
@@ -2547,5 +2686,13 @@ public class MinestomClasses {
 		return string.toLowerCase(Locale.ENGLISH).replace("minecraft:", "").replace('_', ' ');
 	}
 
+	private static String inputKeyOf(DialogInput input) {
+		return switch (input) {
+			case DialogInput.Boolean boolInput -> boolInput.key();
+			case DialogInput.NumberRange numberRange -> numberRange.key();
+			case DialogInput.SingleOption singleOption -> singleOption.key();
+			case DialogInput.Text text -> text.key();
+		};
+	}
 
 }
