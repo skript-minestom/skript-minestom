@@ -175,7 +175,9 @@ public class ExprNBTTag extends SimpleExpression<Object> {
 
 	@Override
 	public Class<?> getReturnType() {
-		return literalTagType != null ? literalTagType.getSkriptCompatibleClass() : Object.class;
+		if (literalTagType == null) return Object.class;
+		Class<?> type = literalTagType.getSkriptCompatibleClass();
+		return type.isArray() ? type.getComponentType() : type;
 	}
 
 	@Override
