@@ -25,7 +25,7 @@ public class ExprBooleanInput extends SimpleExpression<DialogInput> {
 
 	static {
 		Skript.registerExpression(ExprBooleanInput.class, DialogInput.class, ExpressionType.COMBINED,
-			"[new] boolean input [named] %string% [labeled %-component%] [initially (initialtrue:true|false)] "
+			"[new] boolean input [named] %string% [labeled %-component%] [initially %-boolean%] "
 				+ "[with true value %-string%] [with false value %-string%]");
 	}
 
@@ -33,16 +33,16 @@ public class ExprBooleanInput extends SimpleExpression<DialogInput> {
 	private @Nullable Expression<ComponentWrapper> label;
 	private @Nullable Expression<String> onTrue;
 	private @Nullable Expression<String> onFalse;
-	private boolean initial;
+	private @Nullable Expression<Boolean> initial;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		key = (Expression<String>) expressions[0];
 		label = (Expression<ComponentWrapper>) expressions[1];
-		onTrue = (Expression<String>) expressions[2];
-		onFalse = (Expression<String>) expressions[3];
-		initial = parseResult.hasTag("initialtrue");
+		initial = (Expression<Boolean>) expressions[2];
+		onTrue = (Expression<String>) expressions[3];
+		onFalse = (Expression<String>) expressions[4];
 		return DialogInputValidation.checkLiteralKey(key, "boolean input");
 	}
 
@@ -52,7 +52,7 @@ public class ExprBooleanInput extends SimpleExpression<DialogInput> {
 		if (key == null) return null;
 		if (!DialogInputValidation.checkRuntimeKey(key, "boolean input")) return null;
 		Component label = ComponentWrapper.getOrElse(this.label, event, Component.text(key));
-		return new DialogInput[]{new DialogInput.Boolean(key, label, initial,
+		return new DialogInput[]{new DialogInput.Boolean(key, label, initial != null && Boolean.TRUE.equals(initial.getSingle(event)),
 			stringOr(onTrue, event, "true"), stringOr(onFalse, event, "false"))};
 	}
 

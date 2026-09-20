@@ -14,7 +14,7 @@ import static ch.njol.skript.util.ComponentWrapper.toWrapper;
 
 @Name("Dialog Title")
 @Description("The title of a dialog. Changing it only affects dialogs shown after the change.")
-@Examples("set title of {_d} to \"<gold>Shop\"")
+@Examples("set title of {_d} to mm(\"<gold>Shop\")")
 @Keywords({"dialog"})
 public class ExprDialogTitle extends SimplePropertyExpression<DialogWrapper, ComponentWrapper> {
 

@@ -31,14 +31,14 @@ import java.util.List;
 	a click for it at any time with arbitrary input values, not just the player it was shown to.
 	Always validate anything read from 'dialog input' before trusting it.""")
 @Examples("""
-	set {_buy} to new dialog button labeled "<green>Buy" running code:
+	set {_buy} to new dialog button labeled mm("<green>Buy") running code:
 		send "You bought %dialog input ""qty""% items!" to player""")
 @Keywords({"dialog", "button"})
 public class ExprSecDialogButton extends SectionExpression<ButtonWrapper> {
 
 	static {
 		Skript.registerExpression(ExprSecDialogButton.class, ButtonWrapper.class, ExpressionType.COMBINED,
-			"[new] dialog button labeled %component% [with tooltip %-component%] [with width %-number%] running code");
+			"[new] dialog button labeled %component% [with tooltip %-component%] [with width %-number%] running [code]");
 	}
 
 	private Expression<ComponentWrapper> label;
@@ -59,7 +59,7 @@ public class ExprSecDialogButton extends SectionExpression<ButtonWrapper> {
 			return false;
 		}
 		callbackKey = DialogCallbacks.nextKey(getParser().getCurrentScript(), sectionNode);
-		trigger = loadCode(sectionNode, "dialog button", (Runnable) null, (Runnable) null, DialogClickEvent.class);
+		trigger = loadCode(sectionNode, "dialog button", null, (Runnable) null, DialogClickEvent.class);
 		DialogCallbacks.register(callbackKey, trigger, getParser().getCurrentScript());
 		return true;
 	}

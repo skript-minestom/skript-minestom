@@ -20,7 +20,7 @@ import java.util.List;
 @Name("Dialog Bodies")
 @Description("The body elements of a dialog. Supports set, add, remove, and clear.")
 @Examples("""
-	add (new plain message body "<gray>Sold out") to bodies of {_d}
+	add (new plain message body mm("<gray>Sold out")) to bodies of {_d}
 	clear bodies of {_d}""")
 @Keywords({"dialog", "body"})
 public class ExprDialogBodies extends SimpleExpression<DialogBody> {
@@ -69,7 +69,7 @@ public class ExprDialogBodies extends SimpleExpression<DialogBody> {
 					if (delta == null) break;
 					for (Object o : delta) bodies.remove(o);
 				}
-				default -> { }
+				default -> {}
 			}
 		}
 	}

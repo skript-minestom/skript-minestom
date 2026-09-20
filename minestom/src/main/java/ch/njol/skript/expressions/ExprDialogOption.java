@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 	The id is what comes back in the click payload; the label is what the player sees and
 	defaults to the id. Marking an option as selected makes it the initial choice.""")
 @Examples("""
-	set {_easy} to new dialog option "easy" labeled "<green>Easy" selected
-	set {_hard} to new dialog option "hard" labeled "<red>Hard\"""")
+	set {_easy} to new dialog option "easy" labeled mm("<green>Easy") selected
+	set {_hard} to new dialog option "hard" labeled mm("<red>Hard")""")
 @Keywords({"dialog", "option"})
 public class ExprDialogOption extends SimpleExpression<DialogInput.SingleOption.Option> {
 

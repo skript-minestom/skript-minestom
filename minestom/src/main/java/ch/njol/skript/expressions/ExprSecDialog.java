@@ -52,7 +52,7 @@ import java.util.Map;
 	Server links: exit button -> dialog button, columns -> number, button width -> number""")
 @Examples("""
 	set {_shop} to new multi action dialog:
-		title: "<gold>Shop"
+		title: mm("<gold>Shop")
 		body: {_greeting}
 		inputs: {_qty}
 		buttons: {_buy}, {_cancel}
@@ -60,7 +60,7 @@ import java.util.Map;
 	show {_shop} to player
 
 	show (new notice dialog:
-		title: "<gold>Welcome") to player""")
+		title: mm("<gold>Welcome")) to player""")
 @Keywords({"dialog"})
 public class ExprSecDialog extends SectionExpression<DialogWrapper> {
 

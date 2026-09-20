@@ -42,9 +42,8 @@ public class EffShowDialog extends Effect {
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		close = matchedPattern == 1;
-		if (close) {
-			players = (Expression<Player>) expressions[0];
-		} else {
+		if (close) players = (Expression<Player>) expressions[0];
+		else {
 			dialog = (Expression<Object>) expressions[0];
 			players = (Expression<Player>) expressions[1];
 		}
@@ -54,14 +53,18 @@ public class EffShowDialog extends Effect {
 	@Override
 	protected void execute(Event event) {
 		if (close) {
-			for (Player player : players.getArray(event)) player.closeDialog();
+			for (Player player : players.getArray(event)) {
+				player.closeDialog();
+			}
 			return;
 		}
 		Object value = dialog.getSingle(event);
 		if (value == null) return;
 		Dialog resolved = resolve(value);
 		if (resolved == null) return;
-		for (Player player : players.getArray(event)) player.showDialog(resolved);
+		for (Player player : players.getArray(event)) {
+			player.showDialog(resolved);
+		}
 	}
 
 	private @Nullable Dialog resolve(Object value) {

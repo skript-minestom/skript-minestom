@@ -34,7 +34,7 @@ import org.skriptlang.skript.lang.structure.Structure;
 	runtime-built dialogs as values instead.""")
 @Examples("""
 	register multi action dialog "myserver:shop":
-		title: "<gold>Shop"
+		title: mm("<gold>Shop")
 		buttons: (new dialog button labeled "Buy" running command "buy")""")
 public class StructRegisterDialog extends Structure {
 

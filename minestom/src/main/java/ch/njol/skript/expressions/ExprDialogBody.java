@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 	Creates a body element for a dialog: either a block of text or an item with an optional description.
 	Width defaults to 200 and item size defaults to 16 by 16.""")
 @Examples("""
-	set {_text} to new plain message body "<gray>Choose an item"
-	set {_icon} to new item body of diamond sword with description "<gold>Legendary\"""")
+	set {_text} to new plain message body mm("<gray>Choose an item")
+	set {_icon} to new item body of diamond sword with description mm("<gold>Legendary")""")
 @Keywords({"dialog", "body"})
 public class ExprDialogBody extends SimpleExpression<DialogBody> {
 

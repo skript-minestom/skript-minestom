@@ -67,7 +67,7 @@ public class ExprDialogInputs extends SimpleExpression<DialogInput> {
 					if (delta == null) break;
 					for (Object o : delta) inputs.remove(o);
 				}
-				default -> { }
+				default -> {}
 			}
 		}
 	}
