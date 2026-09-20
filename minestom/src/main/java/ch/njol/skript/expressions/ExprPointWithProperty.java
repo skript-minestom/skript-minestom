@@ -13,6 +13,8 @@ import net.minestom.server.coordinate.Point;
 import org.bukkit.event.Event;
 import org.jspecify.annotations.Nullable;
 
+import static ch.njol.skript.util.VectorMath.fromSkriptYaw;
+
 @Name("Point with Property")
 @Description("A point with a specific property (x, y, z, yaw, pitch) modified.")
 @Examples("set {_p} to player's position with yaw 90")
@@ -47,7 +49,7 @@ public class ExprPointWithProperty extends SimpleExpression<Point> {
 			case "x" -> point.withX(propertyValue.doubleValue());
 			case "y" -> point.withY(propertyValue.doubleValue());
 			case "z" -> point.withZ(propertyValue.doubleValue());
-			case "yaw" -> point.asPos().withYaw(propertyValue.floatValue());
+			case "yaw" -> point.asPos().withYaw(fromSkriptYaw(propertyValue.floatValue()));
 			case "pitch" -> point.asPos().withPitch(propertyValue.floatValue());
 			default -> point; // should never get here anyway
 		};

@@ -1,7 +1,10 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.*;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Keywords;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -12,7 +15,6 @@ import ch.njol.skript.util.ComponentWrapper;
 import ch.njol.util.Kleenean;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 

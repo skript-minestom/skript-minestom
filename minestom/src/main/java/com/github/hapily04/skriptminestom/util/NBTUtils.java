@@ -14,7 +14,10 @@ import net.minestom.server.tag.Taggable;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.github.hapily04.skriptminestom.util.ArrayUtils.*;

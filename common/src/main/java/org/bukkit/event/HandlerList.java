@@ -53,7 +53,7 @@ public class HandlerList {
 			int priorityA = a.getPriority().ordinal();
 			int priorityB = b.getPriority().ordinal();
 
-			return Integer.compare(priorityB, priorityA);
+			return Integer.compare(priorityA, priorityB);
 		});
 		return baked;
 	}

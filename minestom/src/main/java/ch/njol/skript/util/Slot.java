@@ -2,6 +2,7 @@ package ch.njol.skript.util;
 
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.EquipmentHandler;
 import net.minestom.server.item.ItemStack;
@@ -25,6 +26,10 @@ public class Slot extends Item {
 
 	public Slot(ItemStack item, EquipmentHandler handler, EquipmentSlot slot) {
 		this(item, new EquipmentUpdater(handler, slot));
+	}
+
+	public Slot(ItemStack item, EquipmentHandler handler, PlayerHand hand) {
+		this(item, new EquipmentUpdater(handler, hand));
 	}
 
 	@Override
@@ -95,6 +100,10 @@ public class Slot extends Item {
 		public EquipmentUpdater(EquipmentHandler container, EquipmentSlot slot) {
 			this.container = container;
 			this.slot = slot;
+		}
+
+		public EquipmentUpdater(EquipmentHandler container, PlayerHand hand) {
+			this(container, EquipmentSlot.valueOf(hand.toString() + "_HAND"));
 		}
 
 		@Override

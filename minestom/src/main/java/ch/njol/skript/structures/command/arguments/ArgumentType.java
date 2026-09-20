@@ -98,7 +98,7 @@ public enum ArgumentType {
 	}
 
 	public static Object convertToSkriptObject(Object o, CommandSender sender, Argument<?> arg) {
-		if (o instanceof Key key) return key.namespace();
+		if (o instanceof Key key) return key.asString();
 		if (o instanceof UUID uuid) return uuid.toString();
 		if (o instanceof ItemStack itemStack) return new Item(itemStack);
 		if (o instanceof Component component) return new ComponentWrapper(component);

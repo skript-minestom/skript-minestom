@@ -1,7 +1,7 @@
 package ch.njol.skript.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.events.wrapper.*;
+import ch.njol.skript.events.wrapper.PlayerFinishDiggingWrapper;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser;

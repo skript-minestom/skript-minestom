@@ -116,7 +116,7 @@ public class EffMessage extends Effect {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "send " + messageExpr.toString(e, debug) + " to " + recipients.toString(e, debug);
+		return "send " + messageExpr.toString(e, debug) + (recipients != null ? " to " + recipients.toString(e, debug) : "");
 	}
 
 }

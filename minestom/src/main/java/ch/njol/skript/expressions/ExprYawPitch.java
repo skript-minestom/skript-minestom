@@ -52,13 +52,13 @@ public class ExprYawPitch extends PropertyExpression<Object, Number> {
 	}
 
 	private Number getYawPitch(Pos pos) {
-		if (match == 1) return pos.yaw();
+		if (match == 1) return skriptYaw(pos.yaw());
 		return pos.pitch();
 	}
 
 	private Number getYawPitch(Vec vec) {
 		if (match == 1) return skriptYaw(getYaw(vec));
-		return skriptPitch(getPitch(vec));
+		return getPitch(vec);
 	}
 
 	@Override

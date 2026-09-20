@@ -1,15 +1,14 @@
 package ch.njol.skript.lang;
 
+import ch.njol.skript.SkriptAPIException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.docs.Origin;
-import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.lang.structure.StructureInfo;
-
-import ch.njol.skript.SkriptAPIException;
+import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.util.Priority;
 
 import java.lang.reflect.InvocationTargetException;

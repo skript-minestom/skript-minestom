@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-	api("net.minestom:minestom-sm:2026.08.21-26.2")
+	api("net.minestom:minestom-sm:2026.08.30-26.2")
 	api("net.kyori:adventure-text-minimessage:5.2.0")
 	implementation("dev.hollowcube:polar:1.16.0")
 	implementation("it.unimi.dsi:fastutil:8.5.18") // fix polar error
@@ -35,7 +35,7 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic:1.5.32")
 	implementation("com.google.code.gson:gson:2.11.0")
 	implementation("mx.kenzie:mirror:5.0.3")
-	api(project(":common"))
+	api(project(path = ":common", configuration = "shadow"))
 	implementation("org.apache.commons:commons-lang3:3.20.0") // fix skript dependency
 }
 

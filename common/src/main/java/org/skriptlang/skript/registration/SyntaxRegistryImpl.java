@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.skriptlang.skript.docs.Origin;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;

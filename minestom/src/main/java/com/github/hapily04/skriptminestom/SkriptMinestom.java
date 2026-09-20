@@ -3,6 +3,8 @@ package com.github.hapily04.skriptminestom;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.SkriptConfig;
+import ch.njol.skript.bstats.charts.SimplePie;
+import ch.njol.skript.bstats.charts.SingleLineChart;
 import ch.njol.skript.events.EffectCommandEvent;
 import ch.njol.skript.events.UnknownCommandEvent;
 import ch.njol.skript.events.minestom.CustomConnectEvent;
@@ -25,7 +27,9 @@ import com.github.hapily04.skriptminestom.luckperms.LuckPermsPlayer;
 import com.github.hapily04.skriptminestom.registration.MinestomClasses;
 import com.github.hapily04.skriptminestom.registration.MinestomFunctions;
 import com.github.hapily04.skriptminestom.terminal.MinestomTerminal;
+import com.github.hapily04.skriptminestom.update.MinestomUpdateService;
 import com.github.hapily04.skriptminestom.util.FileUtils;
+import com.github.hapily04.skriptminestom.util.NumberUtils;
 import com.github.hapily04.skriptminestom.util.PropertyUtils;
 import me.lucko.luckperms.common.config.generic.adapter.EnvironmentVariableConfigAdapter;
 import me.lucko.luckperms.common.config.generic.adapter.MultiConfigurationAdapter;
@@ -39,6 +43,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.minestom.server.Git;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.CommandSender;
@@ -53,16 +58,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.h2.util.Utils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.hapily04.skriptminestom.util.MessageUtils.BASIC_MINI_MESSAGE;
 import static com.github.hapily04.skriptminestom.util.MessageUtils.SKRIPT_MINI_MESSAGE;
@@ -75,14 +78,20 @@ public class SkriptMinestom {
 	private static Properties properties;
 	private static LuckPerms luckPerms;
 	private static SparkMinestom spark;
+	private static Metrics metrics;
 	private static volatile Thread schedulerThread;
+	private static boolean isServerJar = false;
 
 	static void main() {
+		isServerJar = true;
 		Bukkit.setServer(new BukkitServer()); // serverDirectory is resolved from this, so it needs to be set immediately
 
 		properties = PropertyUtils.loadServerProperties();
 		initMinestomProperties();
 		MinecraftServer server = MinecraftServer.init(PropertyUtils.getAuth(properties));
+		if (!Utils.parseBoolean(properties.getProperty(LOG_MINESTOM_EXCEPTIONS), true, false)) {
+			MinecraftServer.getExceptionManager().setExceptionHandler(_ -> {});
+		}
 
 		luckPerms = initLuckPerms();
 		spark = initSpark();
@@ -99,10 +108,35 @@ public class SkriptMinestom {
 		initStopCommand();
 		try {
 			initSkript(MinecraftServer.getGlobalEventHandler());
+			MinestomUpdateService.cleanupAfterRestart();
+			MinestomUpdateService.runStartupCheck();
+			MinestomUpdateService.schedulePeriodicChecks();
 			initEffectCommands(MinecraftServer.getGlobalEventHandler());
 			scheduleShutdownTasks();
 			server.start(properties.getProperty(ADDRESS_KEY), Integer.parseInt(properties.getProperty(PropertyUtils.PORT_KEY)));
 			MinestomTerminal.start();
+
+
+			metrics = new Metrics(33932)
+				.addCustomChart(new SingleLineChart("players", () -> MinecraftServer.getConnectionManager().getOnlinePlayerCount()))
+				.addCustomChart(new SimplePie("auth_type", () -> switch (properties.getProperty(AUTH_TYPE_KEY).toLowerCase(Locale.ENGLISH)) {
+					case "mojang" -> "mojang";
+					case "velocity" -> "velocity";
+					case "bungee", "bungeecord" -> "bungee";
+					default -> "offline";
+				}))
+				.addCustomChart(new SimplePie("dispatcher_threads", () -> {
+					String dispatcherThreads = properties.getProperty(DISPATCHER_THREADS);
+					if (NumberUtils.isInteger(dispatcherThreads)) return dispatcherThreads;
+					return "unknown";
+				}))
+				.addCustomChart(new SimplePie("skript_version", () -> Version.VERSION))
+				.addCustomChart(new SimplePie("minestom_build", Git::version))
+				.addCustomChart(new SimplePie("minecraft_version", () -> MinecraftServer.VERSION_NAME))
+				.addCustomChart(new SimplePie("addon_count", () -> String.valueOf(Skript.getAddons().size())))
+				.addCustomChart(new SimplePie("effect_commands", () -> SkriptConfig.enableEffectCommands.value().toString()))
+				.addCustomChart(new SimplePie("log_effect_commands", () -> SkriptConfig.logEffectCommands.value().toString()))
+				.addCustomChart(new SimplePie("number_accuracy", () -> SkriptConfig.numberAccuracy.value().toString()));
 		} catch (Throwable t) {
 			SkriptLogger.LOGGER.error("An error occurred while initializing Skript-Minestom:");
 			t.printStackTrace();
@@ -168,6 +202,7 @@ public class SkriptMinestom {
 			MarkerRegistration.register();
 		});
 		skript.setEnabled(true);
+		MinestomUpdateService.registerFinishedLoadingHook();
 		skript.onEnable(); // have to manually initialize, addons are initialized on their own
 		//Skript.getAddonInstance(true).UNSAFE_setLanguageFileDirectory("minestomlang"); // todo figure out how to do this if lang file is used
 		Skript.closeUnsafeSkript();
@@ -175,6 +210,7 @@ public class SkriptMinestom {
 		// init events
 		EventNode<net.minestom.server.event.Event> skriptEventNode = EventNode.all("skript-user-events").setPriority(50);
 		node.addChild(skriptEventNode);
+		MinestomUpdateService.registerJoinListener(node);
 		Set<Class<? extends Event>> listeningFor = new HashSet<>();
 		for (SkriptEventInfo<?> eventInfo : Skript.getEvents()) {
 			for (Class<? extends Event> bukkitEventClazz : eventInfo.events) {
@@ -282,7 +318,7 @@ public class SkriptMinestom {
 	}
 
 	/**
-	 * Runs the shutdown sequence for strictly the Skript plugin and the installed skript-minestom addons only.
+	 * Runs the shutdown sequence for strictly the Skript plugin, installed skript-minestom addons, and bStats only.
 	 */
 	public static void shutdown() {
 		PluginManager pluginManager = Bukkit.getPluginManager();
@@ -293,6 +329,8 @@ public class SkriptMinestom {
 		for (SkriptAddon addon : addons) {
 			pluginManager.disablePlugin(addon.plugin);
 		}
+
+		if (metrics != null) metrics.shutdown();
 	}
 
 	public static @Nullable LuckPerms getLuckPerms() {
@@ -306,6 +344,10 @@ public class SkriptMinestom {
 
 	public static @Nullable SparkMinestom getSpark() {
 		return spark;
+	}
+
+	public static boolean isIsServerJar() {
+		return isServerJar;
 	}
 
 }

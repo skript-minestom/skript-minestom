@@ -6,7 +6,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
-import java.util.*;
 
 /**
  * Handles passing runtime errors between producers and consumers via a frame collection system.

@@ -8,6 +8,10 @@ import java.util.*;
 
 public record Enchantment(RegistryKey<net.minestom.server.item.enchant.Enchantment> enchantment, int level) {
 
+	public Enchantment {
+		level = Math.min(level, 255);
+	}
+
 	public static void add(Item to, boolean notify, Enchantment... enchants) {
 		EnchantmentList enchantmentList = to.getItem().get(DataComponents.ENCHANTMENTS);
 		Map<RegistryKey<net.minestom.server.item.enchant.Enchantment>, Integer> map;
