@@ -72,6 +72,10 @@ application {
 	mainClass = "com.github.hapily04.skriptminestom.SkriptMinestom"
 }
 
+shadow {
+	addShadowVariantIntoJavaComponent = false // fat jar is published separately as skript-minestom
+}
+
 publishing {
 	publications {
 		create<MavenPublication>("minestomPublish") {
@@ -81,16 +85,6 @@ publishing {
 
 			artifact(tasks.shadowJar) {
 				classifier = "" // no -all
-			}
-		}
-	}
-
-	repositories {
-		maven {
-			url = uri("https://maven.hapily.me/snapshots")
-			credentials {
-				username = providers.gradleProperty("repoHapilyUsername").orNull
-				password = providers.gradleProperty("repoHapilyPassword").orNull
 			}
 		}
 	}
