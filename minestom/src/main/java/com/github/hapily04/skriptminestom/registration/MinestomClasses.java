@@ -51,6 +51,7 @@ import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.SharedInstance;
+import net.minestom.server.instance.Weather;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.EquipmentHandler;
@@ -1884,6 +1885,77 @@ public class MinestomClasses {
 			.description("A sleep or spawn rule used when creating a bed rule.")
 			.examples("set {_rule} to new bed rule with sleep rule monsters and with spawn rule spawn")
 			.defaultExpression(new EventValueExpression<>(BedRule.Rule.class)));
+		Classes.registerClass(new ClassInfo<>(Weather.class, "weather")
+			.user("weathers?")
+			.name("Weather")
+			.description("The weather of an instance, made up of a rain level and a thunder level, both between 0 and 1.")
+			.examples("set weather of {_instance} to thundering weather")
+			.parser(new Parser<>() {
+				@Nullable
+				public Weather parse(@NotNull String s, @NotNull ParseContext context) {
+					return switch (s.toLowerCase(Locale.ENGLISH)) {
+						case "clear weather", "sun weather", "sunny weather" -> Weather.CLEAR;
+						case "rain weather", "rainy weather", "raining weather" -> Weather.RAIN;
+						case "thunder weather", "thundering weather", "storm weather", "stormy weather" -> Weather.THUNDER;
+						default -> null;
+					};
+				}
+
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return true;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull Weather o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull Weather o) {
+					if (o.equals(Weather.CLEAR)) return "clear weather";
+					if (o.equals(Weather.RAIN)) return "rainy weather";
+					if (o.equals(Weather.THUNDER)) return "thundering weather";
+					return "weather with rain level " + o.rainLevel() + " and thunder level " + o.thunderLevel();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public @NotNull Fields serialize(@NotNull Weather o) {
+					Fields fields = new Fields();
+					fields.putPrimitive("rain", o.rainLevel());
+					fields.putPrimitive("thunder", o.thunderLevel());
+					return fields;
+				}
+
+				@Override
+				public void deserialize(@NotNull Weather o, @NotNull Fields f) {
+					assert false;
+				}
+
+				@Override
+				protected @NotNull Weather deserialize(@NotNull Fields f) throws StreamCorruptedException {
+					float rain = f.getPrimitive("rain", float.class);
+					float thunder = f.getPrimitive("thunder", float.class);
+					if (!isLevel(rain) || !isLevel(thunder))
+						throw new StreamCorruptedException("Weather levels have to be between 0 and 1");
+					return new Weather(rain, thunder);
+				}
+
+				private boolean isLevel(float level) {
+					return level >= 0 && level <= 1;
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return false;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			}));
 		Classes.registerClass(new EnumClassInfo<>(Sound.Source.class, "soundcategory")
 			.user("sound ?categor(y|ies)")
 			.name("Sound Category")
