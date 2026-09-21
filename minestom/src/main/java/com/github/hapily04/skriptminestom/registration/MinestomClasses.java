@@ -63,6 +63,8 @@ import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.network.player.ClientSettings;
 import net.minestom.server.particle.Particle;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.ping.ServerListPingType;
 import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.scoreboard.Sidebar;
@@ -1957,6 +1959,128 @@ public class MinestomClasses {
 				}
 			})
 			.supplier(Attribute.values().toArray(new Attribute[0])));
+		Classes.registerClass(new ClassInfo<>(PotionEffect.class, "potioneffecttype")
+			.user("potion ?effect ?types?")
+			.name("Potion Effect Type")
+			.description("The type of a potion effect, such as speed or poison.")
+			.examples("apply speed 2 to player for 10 seconds")
+			.usage(PotionEffect.values().stream().map(effect -> effect.key().value()).collect(Collectors.joining(", ")))
+			.parser(new Parser<>() {
+				public PotionEffect parse(@NotNull String s, @NotNull ParseContext context) {
+					s = s.toLowerCase(Locale.ENGLISH).replace(' ', '_');
+					if (!s.contains("minecraft:")) s = "minecraft:" + s;
+					if (!Key.parseable(s)) return null;
+					PotionEffect effect = PotionEffect.fromKey(s);
+					if (effect != null) return effect;
+					String singular = Utils.isPlural(s).updated();
+					return Key.parseable(singular) ? PotionEffect.fromKey(singular) : null;
+				}
+
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return true;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull PotionEffect o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull PotionEffect o) {
+					return keyToString(o.key());
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public @NotNull Fields serialize(@NotNull PotionEffect o) {
+					Fields f = new Fields();
+					f.putObject("type", o.key().asString());
+					return f;
+				}
+
+				@Override
+				public void deserialize(@NotNull PotionEffect o, @NotNull Fields f) {
+					assert false;
+				}
+
+				@Override
+				protected @NotNull PotionEffect deserialize(@NotNull Fields f) throws StreamCorruptedException {
+					String key = f.getObject("type", String.class);
+					PotionEffect effect = key == null ? null : PotionEffect.fromKey(key);
+					if (effect == null) throw new StreamCorruptedException("Unknown potion effect type " + key);
+					return effect;
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return false;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			})
+			.supplier(PotionEffect.values().toArray(new PotionEffect[0])));
+		Classes.registerClass(new ClassInfo<>(Potion.class, "potion")
+			.user("potions?")
+			.name("Potion")
+			.description("A potion effect with a level, a duration and its particle and icon settings.")
+			.examples("set {_potion} to new potion of poison 3 for 5 seconds")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull Potion o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull Potion o) {
+					String potion = keyToString(o.effect().key()) + " " + (o.amplifier() + 1);
+					if (o.duration() == Potion.INFINITE_DURATION) return potion + " forever";
+					return potion + " for " + Classes.toString(Potions.timespanOf(o.duration()));
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public @NotNull Fields serialize(@NotNull Potion o) {
+					Fields f = new Fields();
+					f.putObject("type", o.effect().key().asString());
+					f.putPrimitive("amplifier", o.amplifier());
+					f.putPrimitive("duration", o.duration());
+					f.putPrimitive("flags", o.flags());
+					return f;
+				}
+
+				@Override
+				public void deserialize(@NotNull Potion o, @NotNull Fields f) {
+					assert false;
+				}
+
+				@Override
+				protected @NotNull Potion deserialize(@NotNull Fields f) throws StreamCorruptedException {
+					String key = f.getObject("type", String.class);
+					PotionEffect effect = key == null ? null : PotionEffect.fromKey(key);
+					if (effect == null) throw new StreamCorruptedException("Unknown potion effect type " + key);
+					return new Potion(effect, f.getPrimitive("amplifier", int.class),
+						f.getPrimitive("duration", int.class), f.getPrimitive("flags", byte.class));
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return false;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			}));
 		Classes.registerClass(new ClassInfo<>(NamedTextColor.class, "namedtextcolor")
 			.user("named ?text ?colors?")
 			.name("Named Text Color")
