@@ -683,6 +683,32 @@ public class MinestomClasses {
 				}
 			})
 			.supplier(Block.values().toArray(new Block[0])));
+		Classes.registerClass(new ClassInfo<>(Raycast.class, "raycast")
+			.user("ray ?casts?")
+			.name("Raycast")
+			.description("The result of casting a ray, holding what it hit and where. A raycast points at a live " +
+				"entity and instance, so it can't be stored in a variable that survives a restart.")
+			.examples("set {_ray} to block raycast from player")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull Raycast o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull Raycast o) {
+					if (o.hitBlock() != null)
+						return "raycast hitting " + Classes.toString(o.hitBlock()) + " at " + Classes.toString(o.hitBlockPosition());
+					if (o.hitEntity() != null)
+						return "raycast hitting " + Classes.toString(o.hitEntity());
+					return "raycast hitting nothing within " + Classes.toString(o.range()) + " blocks";
+				}
+			}));
 		Classes.registerClass(new EnumClassInfo<>(GameMode.class, "gamemode")
 			.user("game ?modes?")
 			.name("Game Mode")

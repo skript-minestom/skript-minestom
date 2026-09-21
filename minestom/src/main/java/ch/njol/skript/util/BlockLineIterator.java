@@ -17,6 +17,8 @@ import java.util.NoSuchElementException;
  */
 public final class BlockLineIterator implements Iterator<BlockVec> {
 
+	private static final double EPSILON = 1.0E-9;
+
 	private Vec current;
 	private final Vec end;
 	private final Vec centeredEnd;
@@ -92,14 +94,17 @@ public final class BlockLineIterator implements Iterator<BlockVec> {
 	 */
 	static double stepsToNextFace(@NotNull Vec start, @NotNull Vec step, @NotNull Vec center) {
 		// signum(step) * 0.5 + center - start, then component-wise / step (JOML-equivalent)
-		double nx = (center.x() + 0.5 * Math.signum(step.x()) - start.x()) / step.x();
-		double ny = (center.y() + 0.5 * Math.signum(step.y()) - start.y()) / step.y();
-		double nz = (center.z() + 0.5 * Math.signum(step.z()) - start.z()) / step.z();
-		// get min component, ignoring NaN
-		if (Double.isNaN(nx)) nx = Double.POSITIVE_INFINITY;
-		if (Double.isNaN(ny)) ny = Double.POSITIVE_INFINITY;
-		if (Double.isNaN(nz)) nz = Double.POSITIVE_INFINITY;
+		// an axis the ray doesn't travel along never reaches a face, so it can't be the closest one
+		double nx = stepsToFace(center.x(), start.x(), step.x());
+		double ny = stepsToFace(center.y(), start.y(), step.y());
+		double nz = stepsToFace(center.z(), start.z(), step.z());
 		return Math.min(nx, Math.min(ny, nz));
+	}
+
+	private static double stepsToFace(double center, double start, double step) {
+		if (Math.abs(step) < EPSILON) return Double.POSITIVE_INFINITY;
+		double steps = (center + 0.5 * Math.signum(step) - start) / step;
+		return Double.isNaN(steps) ? Double.POSITIVE_INFINITY : steps;
 	}
 
 	/**
