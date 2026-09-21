@@ -51,6 +51,7 @@ import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.SharedInstance;
+import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.EquipmentHandler;
@@ -1884,6 +1885,76 @@ public class MinestomClasses {
 			.description("A sleep or spawn rule used when creating a bed rule.")
 			.examples("set {_rule} to new bed rule with sleep rule monsters and with spawn rule spawn")
 			.defaultExpression(new EventValueExpression<>(BedRule.Rule.class)));
+		Classes.registerClass(new ClassInfo<>(WorldBorder.class, "worldborder")
+			.user("world ?borders?")
+			.name("World Border")
+			.description("The world border of an instance, made up of a diameter, a center, and warning settings.")
+			.examples("set world border of {_instance} to new world border with diameter 500")
+			.parser(new Parser<>() {
+				@Nullable
+				public WorldBorder parse(@NotNull String s, @NotNull ParseContext context) {
+					if (s.equalsIgnoreCase("default world border")) return WorldBorder.DEFAULT_BORDER;
+					return null;
+				}
+
+				@Override
+				public boolean canParse(@NotNull ParseContext context) {
+					return true;
+				}
+
+				@Override
+				public @NotNull String toString(@NotNull WorldBorder o, int flags) {
+					return toVariableNameString(o);
+				}
+
+				@Override
+				public @NotNull String toVariableNameString(@NotNull WorldBorder o) {
+					return "world border with diameter " + Classes.toString(o.diameter()) + " centered at " +
+						Classes.toString(o.centerX()) + ", " + Classes.toString(o.centerZ()) + " with warning distance " +
+						o.warningDistance() + " and warning time " + o.warningTime();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public @NotNull Fields serialize(@NotNull WorldBorder o) {
+					Fields fields = new Fields();
+					fields.putPrimitive("diameter", o.diameter());
+					fields.putPrimitive("center-x", o.centerX());
+					fields.putPrimitive("center-z", o.centerZ());
+					fields.putPrimitive("warning-distance", o.warningDistance());
+					fields.putPrimitive("warning-time", o.warningTime());
+					fields.putPrimitive("teleport-boundary", o.dimensionTeleportBoundary());
+					return fields;
+				}
+
+				@Override
+				public void deserialize(@NotNull WorldBorder o, @NotNull Fields f) {
+					assert false;
+				}
+
+				@Override
+				protected @NotNull WorldBorder deserialize(@NotNull Fields f) throws StreamCorruptedException {
+					double diameter = f.getPrimitive("diameter", double.class);
+					double centerX = f.getPrimitive("center-x", double.class);
+					double centerZ = f.getPrimitive("center-z", double.class);
+					if (!(diameter >= 0) || Double.isNaN(centerX) || Double.isNaN(centerZ))
+						throw new StreamCorruptedException("A world border needs a diameter of at least 0 and a center that is a number");
+					return new WorldBorder(diameter, centerX, centerZ,
+						f.getPrimitive("warning-distance", int.class),
+						f.getPrimitive("warning-time", int.class),
+						f.getPrimitive("teleport-boundary", int.class));
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return false;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			}));
 		Classes.registerClass(new EnumClassInfo<>(Sound.Source.class, "soundcategory")
 			.user("sound ?categor(y|ies)")
 			.name("Sound Category")

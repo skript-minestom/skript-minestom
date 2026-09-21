@@ -11,12 +11,14 @@ import ch.njol.skript.util.AABB;
 import ch.njol.util.Kleenean;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.Chunk;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.WorldBorder;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Is Within")
 @Description("""
-	Whether a point is within something else. The "something" can be a block, an entity, a chunk, a world, or a cuboid formed by two other points.
+	Whether a point is within something else. The "something" can be a chunk, a world border, the world border of an instance, or a cuboid formed by two other points.
 	Note that using the <a href='#CondCompare'>is between</a> condition will refer to a straight line between points, while this condition will refer to the cuboid between points.""")
 @Examples("""
 	if player's position is within {_loc1} and {_loc2}:
@@ -30,8 +32,8 @@ public class CondIsWithin extends Condition {
 		Skript.registerCondition(CondIsWithin.class,
 			"%points% (is|are) within %point% and %point%",
 			"%points% (isn't|is not|aren't|are not) within %point% and %point%",
-			"%points% (is|are) (within|in[side [of]]) %chunks%",
-			"%points% (isn't|is not|aren't|are not) (within|in[side [of]]) %chunks%"
+			"%points% (is|are) (within|in[side [of]]) %chunks/worldborders/instances%",
+			"%points% (isn't|is not|aren't|are not) (within|in[side [of]]) %chunks/worldborders/instances%"
 		);
 	}
 
@@ -77,6 +79,10 @@ public class CondIsWithin extends Condition {
 						return entityBox.(point.toVector());
 					} else */if (object instanceof Chunk chunk) {
 						return point.sameChunk(chunk.toPosition());
+					} else if (object instanceof WorldBorder border) {
+						return border.inBounds(point);
+					} else if (object instanceof Instance instance) {
+						return instance.getWorldBorder().inBounds(point);
 					}
 					return false;
 				}, false, area.getAnd()),
