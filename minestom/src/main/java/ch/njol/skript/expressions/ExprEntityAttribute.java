@@ -22,22 +22,22 @@ import java.util.stream.Stream;
 
 @Name("Entity Attribute")
 @Description("""
-	The numerical value of an entity's particular attribute.
+	The numerical value of an entity's particular attribute(s).
 	Note that the movement speed attribute cannot be reliably used for players. For that purpose, use the speed expression instead.
 	Resetting an entity's attribute is only available in Minecraft 1.11 and above.""")
 @Example("""
 	on join:
-		set player's scale attribute to 0.5""")
+		set player's scale attribute to 0.5
+		set player's (max health and scale) attributes to 10""")
 @Since("2.5, 2.6.1 (final attribute value)")
 public class ExprEntityAttribute extends PropertyExpression<LivingEntity, Number> {
 
 	static {
 		Skript.registerExpression(ExprEntityAttribute.class, Number.class, ExpressionType.COMBINED,
-			"[the] %attributetype% [(1:(total|final|modified))] attribute [value] of %livingentities%",
-			"%livingentities%'[s] %attributetype% [(1:(total|final|modified))] attribute [value]");
+			"[the] %attributetypes% [(1:(total|final|modified))] attribute[s] [value[s]] of %livingentities%",
+			"%livingentities%'[s] %attributetypes% [(1:(total|final|modified))] attribute[s] [value[s]]");
 	}
 
-	@Nullable
 	private Expression<Attribute> attributes;
 	private boolean withModifiers;
 
@@ -53,12 +53,10 @@ public class ExprEntityAttribute extends PropertyExpression<LivingEntity, Number
 	@Override
 	@SuppressWarnings("null")
 	protected Number[] get(Event event, LivingEntity[] entities) {
-		if (attributes == null) return new Number[0];
-		Attribute attribute = attributes.getSingle(event);
-		if (attribute == null) return new Number[0];
+		Attribute[] attributes = this.attributes.getArray(event);
 		return Stream.of(entities)
-			.map(ent -> ent.getAttribute(attribute))
-			.map(att -> withModifiers ? att.getValue() : att.getBaseValue())
+			.flatMap(entity -> Stream.of(attributes).map(entity::getAttribute))
+			.map(instance -> withModifiers ? instance.getValue() : instance.getBaseValue())
 			.toArray(Number[]::new);
 	}
 
@@ -73,32 +71,38 @@ public class ExprEntityAttribute extends PropertyExpression<LivingEntity, Number
 	@Override
 	@SuppressWarnings("null")
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
-		if (attributes == null) return;
-		Attribute attribute = attributes.getSingle(event);
-		if (attribute == null) return;
+		Attribute[] attributes = this.attributes.getArray(event);
 		double deltaValue = delta == null ? 0 : ((Number) delta[0]).doubleValue();
 		for (LivingEntity entity : getExpr().getArray(event)) {
-			AttributeInstance instance = entity.getAttribute(attribute);
-			switch (mode) {
-				case ADD:
-					instance.setBaseValue(instance.getBaseValue() + deltaValue);
-					break;
-				case SET:
-					instance.setBaseValue(deltaValue);
-					break;
-				case DELETE:
-					instance.setBaseValue(0);
-					break;
-				case RESET:
-					instance.setBaseValue(attribute.defaultValue());
-					break;
-				case REMOVE:
-					instance.setBaseValue(instance.getBaseValue() - deltaValue);
-					break;
-				case REMOVE_ALL:
-					assert false;
+			for (Attribute attribute : attributes) {
+				AttributeInstance instance = entity.getAttribute(attribute);
+				switch (mode) {
+					case ADD:
+						instance.setBaseValue(instance.getBaseValue() + deltaValue);
+						break;
+					case SET:
+						instance.setBaseValue(deltaValue);
+						break;
+					case DELETE:
+						instance.setBaseValue(0);
+						break;
+					case RESET:
+						// the attribute's own default is generic (e.g. 0.7 movement speed), so prefer the entity type's default
+						instance.setBaseValue(entity.getEntityType().defaultAttributes().getOrDefault(attribute, attribute.defaultValue()));
+						break;
+					case REMOVE:
+						instance.setBaseValue(instance.getBaseValue() - deltaValue);
+						break;
+					case REMOVE_ALL:
+						assert false;
+				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isSingle() {
+		return super.isSingle() && attributes.isSingle();
 	}
 
 	@Override
@@ -109,7 +113,7 @@ public class ExprEntityAttribute extends PropertyExpression<LivingEntity, Number
 	@Override
 	@SuppressWarnings("null")
 	public String toString(@Nullable Event event, boolean debug) {
-		return getExpr().toString(event, debug) + "'s " + (attributes == null ? "" : attributes.toString(event, debug)) + "attribute";
+		return getExpr().toString(event, debug) + "'s " + attributes.toString(event, debug) + (withModifiers ? " final" : "") + " attribute";
 	}
 
 }

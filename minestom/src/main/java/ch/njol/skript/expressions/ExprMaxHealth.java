@@ -42,7 +42,7 @@ public class ExprMaxHealth extends SimplePropertyExpression<LivingEntity, Number
 		for (LivingEntity entity : entities) {
 			AttributeInstance maxHealth = entity.getAttribute(Attribute.MAX_HEALTH);
 			if (mode == Changer.ChangeMode.RESET) {
-				maxHealth.setBaseValue(Attribute.MAX_HEALTH.defaultValue());
+				maxHealth.setBaseValue(entity.getEntityType().defaultAttributes().getOrDefault(Attribute.MAX_HEALTH, Attribute.MAX_HEALTH.defaultValue()));
 				continue;
 			}
 			if (health == null) return;
