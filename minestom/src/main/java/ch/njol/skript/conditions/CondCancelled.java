@@ -11,6 +11,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import net.minestom.server.event.trait.CancellableEvent;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -38,9 +39,9 @@ public class CondCancelled extends Condition {
 
 	@Override
 	public boolean check(Event e) {
-		net.minestom.server.event.Event trueEvent = ((EventWrapper<?>) e).getEvent();
-		if (!(trueEvent instanceof CancellableEvent cancellable)) return false;
-		return cancellable.isCancelled() ^ isNegated();
+		if (e instanceof Cancellable cancellable) return cancellable.isCancelled() ^ isNegated();
+		if (e instanceof EventWrapper<?> wrapper && wrapper.getEvent() instanceof CancellableEvent cancellable) return cancellable.isCancelled() ^ isNegated();
+		return false;
 	}
 
 	@Override
