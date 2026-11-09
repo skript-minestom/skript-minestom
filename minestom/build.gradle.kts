@@ -21,11 +21,11 @@ repositories {
 }
 
 dependencies {
-	api("net.minestom:minestom-sm:2026.08.30-26.2")
+	api("net.minestom:minestom-sm:2026.11.08-26.2")
 	api("net.kyori:adventure-text-minimessage:5.2.0")
 	implementation("dev.hollowcube:polar:1.16.0")
 	implementation("it.unimi.dsi:fastutil:8.5.18") // fix polar error
-	api("com.conceptmc:luckperms-minestom:5.5-SNAPSHOT")
+	api("dev.lu15:luckperms-minestom:2026.11.08-26.2") // hosted on hapily.me releases
 	implementation("com.h2database:h2:2.2.224") // fix luckperms cause it's lowkey being stupid
 	api("ga.windpvp:spark-minestom:1.10.165-3")
 	implementation("org.spongepowered:configurate-hocon:3.7.2") // configuration using hocon
