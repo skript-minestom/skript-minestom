@@ -56,8 +56,8 @@ public class EffCancelEvent extends Effect {
 
 	@Override
 	public void execute(final Event e) {
-		net.minestom.server.event.Event trueEvent = ((EventWrapper<?>) e).getEvent();
-		if (trueEvent instanceof CancellableEvent cancellable) cancellable.setCancelled(cancel);
+		if (e instanceof Cancellable cancellable) cancellable.setCancelled(cancel);
+		else if (e instanceof EventWrapper<?> wrapper && wrapper.getEvent() instanceof CancellableEvent cancellable) cancellable.setCancelled(cancel);
 	}
 
 	@Override
