@@ -23,7 +23,7 @@ repositories {
 dependencies {
 	api("net.minestom:minestom-sm:2026.11.08-26.2")
 	api("net.kyori:adventure-text-minimessage:5.2.0")
-	implementation("dev.hollowcube:polar:1.16.0")
+	implementation("dev.hollowcube:polar:1.16.1")
 	implementation("it.unimi.dsi:fastutil:8.5.18") // fix polar error
 	api("dev.lu15:luckperms-minestom:2026.11.08-26.2") // hosted on hapily.me releases
 	implementation("com.h2database:h2:2.2.224") // fix luckperms cause it's lowkey being stupid
