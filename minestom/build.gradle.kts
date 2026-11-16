@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-	api("net.minestom:minestom-sm:2026.11.08-26.2")
+	api("net.minestom:minestom-sm:2026.11.16-26.3")
 	api("net.kyori:adventure-text-minimessage:5.2.0")
 	implementation("dev.hollowcube:polar:1.16.1")
 	implementation("it.unimi.dsi:fastutil:8.5.18") // fix polar error

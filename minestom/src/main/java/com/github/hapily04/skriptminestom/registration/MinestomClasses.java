@@ -13,6 +13,7 @@ import ch.njol.skript.util.dialog.DialogWrapper;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.yggdrasil.Fields;
+import com.github.hapily04.skriptminestom.util.EntityAnimation;
 import com.github.hapily04.skriptminestom.util.NBTUtils;
 import com.github.hapily04.skriptminestom.util.NumberUtils;
 import net.kyori.adventure.bossbar.BossBar;
@@ -61,7 +62,6 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemAnimation;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.network.player.ClientSettings;
 import net.minestom.server.particle.Particle;
@@ -1825,7 +1825,7 @@ public class MinestomClasses {
 			.user("bed ?rules?")
 			.name("Bed Rule")
 			.description("The bed rule environment attribute.")
-			.examples("set {_rule} to new bed rule with sleep rule monsters and with spawn rule spawn")
+			.examples("set {_rule} to new bed rule with sleep rule when dark and with spawn rule always")
 			.parser(new Parser<>() {
 				@Override
 				public boolean canParse(@NotNull ParseContext context) {
@@ -1840,7 +1840,7 @@ public class MinestomClasses {
 				@Override
 				public @NotNull String toVariableNameString(@NotNull BedRule o) {
 					return "bed rule can sleep: " + Classes.toString(o.canSleep()) + " can set spawn: " +
-						Classes.toString(o.canSetSpawn()) + " explodes: " + o.explodes() + " error message: " + Classes.toString(o.errorMessage());
+						Classes.toString(o.canSetSpawn()) + " destroy on use: " + o.destroyOnUse() + " destroy on leave: " + o.destroyOnLeave() + " error message: " + Classes.toString(o.errorMessage());
 				}
 			})
 			.serializer(new Serializer<>() {
@@ -1849,7 +1849,8 @@ public class MinestomClasses {
 					Fields fields = new Fields();
 					fields.putObject("sleep", o.canSleep());
 					fields.putObject("spawn", o.canSetSpawn());
-					fields.putPrimitive("explodes", o.explodes());
+					fields.putPrimitive("destroy-on-use", o.destroyOnUse());
+					fields.putPrimitive("destroy-on-leave", o.destroyOnLeave());
 					fields.putObject("error-message", o.errorMessage());
 					return fields;
 				}
@@ -1863,11 +1864,12 @@ public class MinestomClasses {
 				protected @NotNull BedRule deserialize(@NotNull Fields f) throws StreamCorruptedException {
 					BedRule.Rule sleep = f.getObject("sleep", BedRule.Rule.class);
 					BedRule.Rule spawn = f.getObject("spawn", BedRule.Rule.class);
-					boolean explodes = f.getPrimitive("explodes", boolean.class);
+					boolean destroyOnUse = f.getPrimitive("destroy-on-use", boolean.class);
+					boolean destroyOnLeave = f.getPrimitive("destroy-on-leave", boolean.class);
 					Component errorMessage = f.getObject("error-message", Component.class);
 					assert sleep != null;
 					assert spawn != null;
-					return new BedRule(sleep, spawn, explodes, errorMessage);
+					return new BedRule(sleep, spawn, destroyOnUse, destroyOnLeave, errorMessage);
 				}
 
 				@Override
@@ -1884,7 +1886,7 @@ public class MinestomClasses {
 			.user("bed ?rule ?rules?")
 			.name("Bed Rule Rule")
 			.description("A sleep or spawn rule used when creating a bed rule.")
-			.examples("set {_rule} to new bed rule with sleep rule monsters and with spawn rule spawn")
+			.examples("set {_rule} to new bed rule with sleep rule when dark and with spawn rule always")
 			.defaultExpression(new EventValueExpression<>(BedRule.Rule.class)));
 		Classes.registerClass(new ClassInfo<>(WorldBorder.class, "worldborder")
 			.user("world ?borders?")
@@ -2216,12 +2218,12 @@ public class MinestomClasses {
 			.description("The text alignment of a text display (center, left, or right)")
 			.examples("set text alignment of {_entity} to center")
 			.defaultExpression(new EventValueExpression<>(TextDisplayMeta.Alignment.class)));
-		Classes.registerClass(new EnumClassInfo<>(EntityAnimationPacket.Animation.class, "animation")
+		Classes.registerClass(new EnumClassInfo<>(EntityAnimation.class, "animation")
 			.user("animations?")
 			.name("Entity Animation")
 			.description("An animation that an entity can play (main hand swing, leave bed, etc.)")
 			.examples("play swing main arm animation on player")
-			.defaultExpression(new EventValueExpression<>(EntityAnimationPacket.Animation.class)));
+			.defaultExpression(new EventValueExpression<>(EntityAnimation.class)));
 		Classes.registerClass(new EnumClassInfo<>(NBTUtils.TagType.class, "tagtype")
 			.user("tag ?types?")
 			.name("NBT Tag Type")

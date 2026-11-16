@@ -8,11 +8,10 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import com.github.hapily04.skriptminestom.util.EntityAnimation;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.packet.server.ServerPacket;
-import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
-import net.minestom.server.network.packet.server.play.HitAnimationPacket;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -25,7 +24,7 @@ public class EffPlayAnimation extends Effect {
 		Skript.registerEffect(EffPlayAnimation.class, "play %animations% animation[s] on %entities% [(to|for) %-players%]");
 	}
 
-	private Expression<EntityAnimationPacket.Animation> animations;
+	private Expression<EntityAnimation> animations;
 	private Expression<Entity> entities;
 	@Nullable
 	private Expression<Player> players;
@@ -33,7 +32,7 @@ public class EffPlayAnimation extends Effect {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-		animations = (Expression<EntityAnimationPacket.Animation>) expressions[0];
+		animations = (Expression<EntityAnimation>) expressions[0];
 		entities = (Expression<Entity>) expressions[1];
 		players = (Expression<Player>) expressions[2];
 		return true;
@@ -43,14 +42,12 @@ public class EffPlayAnimation extends Effect {
 	protected void execute(Event event) {
 		Entity[] entities = this.entities.getArray(event);
 		Player[] players = this.players == null ? null : this.players.getArray(event);
-		for (EntityAnimationPacket.Animation animation : animations.getArray(event)) {
+		for (EntityAnimation animation : animations.getArray(event)) {
 			for (Entity entity : entities) {
-				int entityId = entity.getEntityId();
-				ServerPacket packet;
-				if (animation == EntityAnimationPacket.Animation.TAKE_DAMAGE) packet = new HitAnimationPacket(entityId, 0);
-				else packet = new EntityAnimationPacket(entityId, animation);
-				if (players == null) entity.getInstance().sendGroupedPacket(packet);
-				else {
+				ServerPacket packet = animation.createPacket(entity);
+				if (players == null) {
+					if (entity.getInstance() != null) entity.getInstance().sendGroupedPacket(packet);
+				} else {
 					for (Player player : players) {
 						player.sendPacket(packet);
 					}
